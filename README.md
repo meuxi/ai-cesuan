@@ -12,7 +12,7 @@
 - [x] **周公解梦** - 解析梦境含义，探索潜意识
 - [x] **起名取名** - 根据生辰八字和五行推荐吉祥名字
 - [x] **梅花易数** - 传统易学占卜方法
-- [x] **姻缘占卜** - 分析感情运势和姻缘走向 [@alongLFB](https://github.com/alongLFB)
+- [x] **姻缘占卜** - 分析感情运势和姻缘走向 [@alongLFB](https://sou.meuxi.com)
 
 **特色功能**：
 - 🌊 流式输出 - AI 占卜结果以打字机效果实时呈现
@@ -30,7 +30,7 @@
 
 1. 点击下方按钮开始部署：
 
-   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdreamhunter2333%2Fchatgpt-tarot-divination&env=api_key,api_base&project-name=ai-divination&repository-name=ai-divination&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fdivination.app.awsl.uk)
+   [![Deploy with Vercel](https://vercel.com/button)]([https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdreamhunter2333%2Fchatgpt-tarot-divination&env=api_key,api_base&project-name=ai-divination&repository-name=ai-divination&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fdivination.app.awsl.uk](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkelvien1118%2Fai-cesuan&env=api_key,api_base&project-name=ai-cesuan&repository-name=ai-cesuan&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fcesuan.meuxi.com%2F))
 
 2. 在部署时配置环境变量：
    - `api_key`：必填，你的 OpenAI API Key
