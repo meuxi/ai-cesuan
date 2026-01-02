@@ -61,7 +61,7 @@ export default function FatePage() {
           </div>
           <div className="text-center text-sm">
             <a
-              href="https://github.com/alongLFB/alonglfb.github.io/blob/master/images/wechatpay.png"
+              href="https://sou.meuxi.com/static/donate/index.html"
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
