@@ -124,7 +124,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                                     </Button>
 
                                     <Button variant="ghost" size="icon" asChild>
-                                        <a href="https://github.com/kelvien1118/ai-cesuan" target="_blank" rel="noopener noreferrer">
+                                        <a href="https://github.com/meuxi/ai-cesuan" target="_blank" rel="noopener noreferrer">
                                             <Github className="h-5 w-5" />
                                         </a>
                                     </Button>
