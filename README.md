@@ -30,7 +30,7 @@
 
 1. 点击下方按钮开始部署：
 
-   [![Deploy with Vercel](https://vercel.com/button)]([https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdreamhunter2333%2Fchatgpt-tarot-divination&env=api_key,api_base&project-name=ai-divination&repository-name=ai-divination&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fdivination.app.awsl.uk](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkelvien1118%2Fai-cesuan&env=api_key,api_base&project-name=ai-cesuan&repository-name=ai-cesuan&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fcesuan.meuxi.com%2F))
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkelvien1118%2Fai-cesuan&env=api_key,api_base&project-name=ai-cesuan&repository-name=ai-cesuan&demo-title=AI%20Divination&demo-description=AI%20Divination&demo-url=https%3A%2F%2Fcesuan.meuxi.com%2F)
 
 2. 在部署时配置环境变量：
    - `api_key`：必填，你的 OpenAI API Key
