@@ -174,6 +174,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
                         <footer className="mt-8 py-6 text-center text-sm text-muted-foreground border-t border-border/40">
                             <p>© {new Date().getFullYear()} AI Tarot Divination. Keep an open mind.</p>
                         </footer>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+  本网站内容仅供娱乐参考，不构成任何决策建议
                     </div>
 
                     {/* Right Ad Column */}
