@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Toaster } from '@/components/ui/sonner'
 import { useGlobalState } from '@/store'
 import MarketPage from '@/pages/Market'
@@ -103,6 +104,7 @@ function App() {
           </Alert>
         ) : null}
       </MainLayout>
+      <SpeedInsights />
       <Toaster />
     </>
   )
