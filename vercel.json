@@ -1,14 +1,8 @@
 {
-    "builds": [
-        {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build"
-        },
-        {
-            "src": "main.py",
-            "use": "@vercel/python"
-        }
-    ],
+    "buildCommand": "pip install -r requirements.txt && cd frontend && pnpm install && pnpm build",
+    "outputDirectory": "dist",
+    "installCommand": "pip install -r requirements.txt",
+    "framework": null,
     "routes": [
         {
             "src": "/api/(.*)",
@@ -23,12 +17,23 @@
             "dest": "main.py"
         },
         {
-            "src": "/(.*)\\.(.*)",
-            "dest": "/frontend/$1.$2"
+            "src": "/static/(.*)",
+            "dest": "/dist/static/$1"
+        },
+        {
+            "src": "/assets/(.*)",
+            "dest": "/dist/assets/$1"
+        },
+        {
+            "src": "/favicon.ico",
+            "dest": "/dist/favicon.ico"
         },
         {
             "src": "/(.*)",
-            "dest": "frontend/"
+            "dest": "/dist/$1"
         }
-    ]
+    ],
+    "env": {
+        "PYTHON_VERSION": "3.11"
+    }
 }
