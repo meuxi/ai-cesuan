@@ -99,6 +99,7 @@ export default function PlumFlowerPage() {
         result={result}
         loading={resultLoading}
         streaming={streaming}
+        title={CONFIG.title}
       />
     </DivinationCardHeader>
   )

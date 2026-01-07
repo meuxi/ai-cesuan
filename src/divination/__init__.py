@@ -6,6 +6,7 @@ from . import dream
 from . import new_name
 from . import plum_flower
 from . import fate
+from . import xiaoliu
 from .base import DivinationFactory
 
 import logging

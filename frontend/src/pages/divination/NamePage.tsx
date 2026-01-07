@@ -76,6 +76,7 @@ export default function NamePage() {
         result={result}
         loading={resultLoading}
         streaming={streaming}
+        title={CONFIG.title}
       />
     </DivinationCardHeader>
   )

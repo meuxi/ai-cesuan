@@ -80,6 +80,7 @@ export default function TarotPage() {
         result={result}
         loading={resultLoading}
         streaming={streaming}
+        title={CONFIG.title}
       />
     </DivinationCardHeader>
   )

@@ -108,6 +108,7 @@ export default function FatePage() {
         result={result}
         loading={resultLoading}
         streaming={streaming}
+        title={CONFIG.title}
       />
     </DivinationCardHeader>
   )

@@ -171,3 +171,10 @@ cython_debug/
 worker/
 src-tauri/bin/
 src-tauri/Cargo.lock
+
+# Test files
+test_*.py
+test_*.bat
+
+# Frontend build output (only keep root dist for backend)
+frontend/dist/

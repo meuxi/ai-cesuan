@@ -78,6 +78,7 @@ export default function DreamPage() {
         result={result}
         loading={resultLoading}
         streaming={streaming}
+        title={CONFIG.title}
       />
     </DivinationCardHeader>
   )

@@ -22,6 +22,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^12.23.26",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.460.0",
     "lunar-javascript": "^1.7.6",
     "markdown-it": "^14.1.0",

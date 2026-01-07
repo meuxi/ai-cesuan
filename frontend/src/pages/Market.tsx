@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DIVINATION_OPTIONS } from '@/config/constants'
 import { Sparkles, Info } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import DivinationSkeleton from '@/components/DivinationSkeleton'
 
 const container = {
   hidden: { opacity: 0 },
@@ -21,6 +23,17 @@ const item = {
 
 export default function MarketPage() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // 模拟加载延迟
+    const timer = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) {
+    return <DivinationSkeleton />
+  }
 
   return (
     <motion.div
@@ -40,21 +53,22 @@ export default function MarketPage() {
               whileTap={{ scale: 0.95 }}
             >
               <Card
-                className="group relative cursor-pointer border-primary/20 bg-card/40 backdrop-blur-sm overflow-hidden transition-colors hover:border-primary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)]"
+                className="group relative cursor-pointer border-primary/20 bg-card/60 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)] hover:-translate-y-1 ink-texture"
                 onClick={() => navigate(`/divination/${option.key}`)}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-16 translate-x-16 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-700" />
 
                 <CardHeader className="p-4 md:p-6 relative z-10">
                   <div className="flex items-center gap-3 md:gap-4 mb-2">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                    <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <CardTitle className="text-lg md:text-xl font-serif tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:from-primary group-hover:to-secondary transition-all">
+                    <CardTitle className="text-lg md:text-xl font-serif tracking-wider text-gradient-ink group-hover:text-gradient-cinnabar transition-all">
                       {option.label}
                     </CardTitle>
                   </div>
-                  <CardDescription className="text-sm md:text-base line-clamp-2">
+                  <CardDescription className="text-sm md:text-base line-clamp-2 leading-relaxed">
                     {option.description}
                   </CardDescription>
                 </CardHeader>
@@ -76,19 +90,20 @@ export default function MarketPage() {
           whileTap={{ scale: 0.95 }}
         >
           <Card
-            className="group relative cursor-pointer border-secondary/20 bg-card/40 backdrop-blur-sm overflow-hidden transition-colors hover:border-secondary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--secondary)/0.3)]"
+            className="group relative cursor-pointer border-secondary/20 bg-card/60 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-secondary/50 hover:shadow-[0_0_30px_-5px_hsl(var(--secondary)/0.3)] hover:-translate-y-1 ink-texture"
             onClick={() => navigate('/about')}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -translate-y-16 translate-x-16 group-hover:translate-x-8 group-hover:-translate-y-8 transition-transform duration-700" />
 
             <CardHeader className="p-4 md:p-6 relative z-10">
               <div className="flex items-center gap-3 md:gap-4 mb-2">
-                <div className="p-3 rounded-xl bg-secondary/10 text-secondary-foreground group-hover:bg-secondary group-hover:text-secondary-foreground transition-all duration-300">
+                <div className="p-3 rounded-xl bg-secondary/10 text-secondary-foreground group-hover:bg-secondary group-hover:text-secondary-foreground transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
                   <Info className="h-6 w-6" />
                 </div>
-                <CardTitle className="text-lg md:text-xl font-serif tracking-wide">关于占卜</CardTitle>
+                <CardTitle className="text-lg md:text-xl font-serif tracking-wider">关于占卜</CardTitle>
               </div>
-              <CardDescription className="text-sm md:text-base">
+              <CardDescription className="text-sm md:text-base leading-relaxed">
                 了解各种占卜方式的起源与含义
               </CardDescription>
             </CardHeader>

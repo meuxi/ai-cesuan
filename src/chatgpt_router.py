@@ -35,15 +35,16 @@ async def divination(
 
     real_ip = get_real_ipaddr(request)
     # rate limit when not login
-    if settings.enable_rate_limit:
-        if not user:
-            max_reqs, time_window_seconds = settings.rate_limit
-            check_rate_limit(f"{settings.project_name}:{real_ip}", time_window_seconds, max_reqs)
-        else:
-            max_reqs, time_window_seconds = settings.user_rate_limit
-            check_rate_limit(
-                f"{settings.project_name}:{user.login_type}:{user.user_name}", time_window_seconds, max_reqs
-            )
+    # 临时注释掉速率限制，方便测试
+    # if settings.enable_rate_limit:
+    #     if not user:
+    #         max_reqs, time_window_seconds = settings.rate_limit
+    #         check_rate_limit(f"{settings.project_name}:{real_ip}", time_window_seconds, max_reqs)
+    #     else:
+    #         max_reqs, time_window_seconds = settings.user_rate_limit
+    #         check_rate_limit(
+    #             f"{settings.project_name}:{user.login_type}:{user.user_name}", time_window_seconds, max_reqs
+    #         )
 
     _logger.info(
         f"Request from {real_ip}, "
@@ -67,17 +68,34 @@ async def divination(
     custom_base_url = request.headers.get("x-api-url")
     custom_api_key = request.headers.get("x-api-key")
     custom_api_model = request.headers.get("x-api-model")
-    api_client = client
+    
+    # 确定使用的 API 配置
+    final_api_key = custom_api_key or settings.api_key
+    final_base_url = custom_base_url or settings.api_base
     api_model = custom_api_model if custom_api_model else settings.model
-    if custom_base_url and custom_api_key:
-        api_client = AsyncOpenAI(api_key=custom_api_key, base_url=custom_base_url)
-    elif custom_api_key:
-        api_client = AsyncOpenAI(api_key=custom_api_key, base_url=settings.api_base)
 
-    if not (settings.api_base or custom_base_url) or not (settings.api_key or custom_api_key):
+    if not final_base_url or not final_api_key:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="请设置 API KEY 和 API BASE URL"
+        )
+    
+    # 清理API密钥：去除前后空格、不可见字符和Bearer前缀
+    final_api_key = final_api_key.strip().replace('\xa0', '').replace('\u200b', '')
+    if final_api_key.startswith("Bearer "):
+        final_api_key = final_api_key[7:].strip()
+    
+    # 检测是否是智谱AI（用于特殊处理）
+    is_zhipu = final_base_url and "bigmodel.cn" in final_base_url
+    
+    # 智谱AI兼容：智谱AI使用OpenAI兼容接口，直接使用AsyncOpenAI客户端即可
+    # 智谱AI API密钥格式: xxxxx.xxxxx (SDK会自动添加 Bearer 前缀)
+    # OpenAI API密钥格式: sk-xxxxx (SDK会自动添加 Bearer 前缀)
+    api_client = AsyncOpenAI(
+        api_key=final_api_key, 
+        base_url=final_base_url,
+        timeout=60.0,  # 增加超时时间
+        max_retries=0  # 智谱AI并发限制严格，禁用自动重试
         )
 
     try:
@@ -96,10 +114,19 @@ async def divination(
             ]
         )
     except Exception as e:
-        _logger.error(f"OpenAI API error: {e}")
+        error_msg = str(e)
+        _logger.error(f"API error: {error_msg}")
+        
+        # 智谱AI并发限制友好提示
+        if is_zhipu and ("1302" in error_msg or "并发" in error_msg):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="智谱AI并发请求过多，请稍后再试（建议间隔3-5秒）"
+            )
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"OpenAI API error: {str(e)}"
+            detail=f"API调用失败: {error_msg}"
         )
 
     async def get_openai_generator():

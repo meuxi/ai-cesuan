@@ -6,6 +6,7 @@ import {
   User,
   Moon,
   Flower2,
+  Hexagon,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -24,6 +25,13 @@ export const DIVINATION_OPTIONS: DivinationOption[] = [
     title: '塔罗牌占卜',
     description: '通过塔罗牌探索内心, 洞察未来可能性',
     icon: Sparkles,
+  },
+  {
+    key: 'xiaoliu',
+    label: '小六壬',
+    title: '小六壬',
+    description: '以简约之形，探天地之理',
+    icon: Hexagon,
   },
   {
     key: 'fate',
@@ -64,7 +72,7 @@ export const DIVINATION_OPTIONS: DivinationOption[] = [
     key: 'plum_flower',
     label: '梅花易数',
     title: '梅花易数',
-    description: '古老的占卜术, 预测吉凶祸福',
+    description: '古老的占卜术, 洞察能量变化',
     icon: Flower2,
   },
 ] as const
@@ -75,6 +83,20 @@ export function getDivinationOption(key: string): DivinationOption | undefined {
 }
 
 export const ABOUT = `# 关于 & 名词解释
+
+## 小六壬
+
+小六壬是中国传统的占卜方法之一，起源于三国时期，是一种简便快捷的预测术。它通过月、日、时三个数字的推算，得出六神（大安、留连、速喜、赤口、小吉、空亡）的落宫位置，从而判断事情的吉凶。
+
+小六壬的六神含义：
+- 大安：大吉大利，百事顺遂，代表平安、顺利、吉祥
+- 留连：凶多吉少，办事迟缓，代表纠缠、拖延、阻碍
+- 速喜：大吉之兆，百事顺遂，代表迅速、喜庆、成功
+- 赤口：大凶之兆，百事不利，代表口舌、是非、争斗
+- 小吉：吉祥之兆，小利可得，代表小吉、顺利、进展
+- 空亡：凶兆，百事无成，代表空虚、无望、失败
+
+小六壬的推算方法简单易学，只需要知道月、日、时三个数字，按照"月上起日，日上起时"的口诀进行推算即可。它在民间广为流传，被认为是一种快速了解事情吉凶的有效方法。
 
 ## 姓名五格
 

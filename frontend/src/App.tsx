@@ -14,9 +14,12 @@ import NamePage from '@/pages/divination/NamePage'
 import DreamPage from '@/pages/divination/DreamPage'
 import PlumFlowerPage from '@/pages/divination/PlumFlowerPage'
 import FatePage from '@/pages/divination/FatePage'
+import XiaoLiuRenPage from '@/pages/divination/XiaoLiuRenPage'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Sparkles } from 'lucide-react'
 import MainLayout from '@/layouts/MainLayout'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import OfflineIndicator from '@/components/OfflineIndicator'
 
 const API_BASE = import.meta.env.VITE_API_BASE || ''
 
@@ -65,7 +68,9 @@ function App() {
   }, [])
 
   return (
-    <>
+    <ErrorBoundary>
+      <OfflineIndicator />
+      
       {loading && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="text-center space-y-4">
@@ -86,6 +91,7 @@ function App() {
             <Route path="/" element={<MarketPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/divination/tarot" element={<TarotPage />} />
+            <Route path="/divination/xiaoliu" element={<XiaoLiuRenPage />} />
             <Route path="/divination/birthday" element={<BirthdayPage />} />
             <Route path="/divination/new_name" element={<NewNamePage />} />
             <Route path="/divination/name" element={<NamePage />} />
@@ -104,7 +110,7 @@ function App() {
         ) : null}
       </MainLayout>
       <Toaster />
-    </>
+    </ErrorBoundary>
   )
 }
 

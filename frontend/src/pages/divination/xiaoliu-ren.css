@@ -1,0 +1,240 @@
+.xiaoliu-card {
+  --card-w: 180px;
+  --card-h: 200px;
+  width: var(--card-w);
+  height: var(--card-h);
+  font-family: "Noto Serif SC", serif;
+  overflow: visible;
+  position: relative;
+  border-radius: 10px;
+  /* subtle elevated surface for a more premium feel */
+  box-shadow: 0 8px 20px rgba(18, 24, 36, 0.06), 0 2px 4px rgba(18,24,36,0.04);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+/* 传统美学风格 - 斜角朱砂红印章标签 */
+.xiaoliu-card {
+  overflow: hidden;
+}
+
+/* 标签容器 - 参考源码 .time-tags-container */
+.xiaoliu-badge-container {
+  position: absolute;
+  top: 39px;
+  right: -34px;
+  transform-origin: right top;
+  transform: rotate(45deg);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.xiaoliu-badge {
+  font-weight: 700;
+  color: #fff;
+  
+  /* 朱砂红纯色 */
+  background-color: #e53935;
+  
+  /* 尺寸和间距 - 参考源码 */
+  padding: 5px 49px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+  
+  /* 简洁线条，圆角适中 */
+  border-radius: 4px;
+  
+  /* 适当阴影增强层次感 */
+  box-shadow: 
+    0 2px 4px rgba(229, 57, 53, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  
+  /* 细边框增加精致感 */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  
+  /* 字体优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.08em;
+  
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* 小标签模式 - 当只有1-2个字时使用 */
+.xiaoliu-badge.small {
+  padding: 4px 38px;
+  font-size: 11px;
+}
+
+/* 响应式调整 - 移动端 */
+@media (max-width: 640px) {
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+  
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 10px;
+  }
+  
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 9px;
+  }
+}
+
+/* 暗色模式适配 */
+.dark .xiaoliu-badge {
+  background-color: #ef5350;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 2px 4px rgba(239, 83, 80, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.xiaoliu-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.xiaoliu-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  padding-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.xiaoliu-top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.xiaoliu-godname {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  text-shadow: none;
+  position: relative;
+}
+.xiaoliu-godname.final {
+  color: #2196F3;
+  text-shadow: 0 1px 2px rgba(33,150,243,0.3);
+}
+.xiaoliu-dot {
+  color: #2196F3;
+  position: absolute;
+  right: -12px;
+  top: -4px;
+  font-size: 0.6rem;
+}
+
+.xiaoliu-liuqin {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+.xiaoliu-liuqin.final {
+  background-color: rgba(59,130,246,0.1);
+  color: #1d4ed8;
+  border: 1px solid rgba(59,130,246,0.3);
+}
+
+.xiaoliu-mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin: 2px 0;
+}
+.xiaoliu-tianGan {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #4a5568;
+  letter-spacing: 1px;
+}
+.xiaoliu-branch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -2px;
+}
+.branchName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #4a6fa5;
+  background-color: rgba(74, 111, 165, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+.branchElement {
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
+.xiaoliu-fiveSix {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.xiaoliu-fiveStar {
+  font-size: 1rem;
+  color: #8e44ad;
+  font-style: italic;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: rgba(142, 68, 173, 0.05);
+}
+.xiaoliu-sixGodBeast {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  min-width: 60px;
+  text-align: center;
+}
+.element-color {
+  color: var(--el-color);
+}
+.el-default {
+  background: linear-gradient(90deg, rgba(153,153,153,1), rgba(187,187,187,1));
+}
+.el-mu { background: linear-gradient(90deg, rgba(76,175,80,1), rgba(76,175,80,0.87)); }
+.el-huo { background: linear-gradient(90deg, rgba(244,67,54,1), rgba(244,67,54,0.87)); }
+.el-tu { background: linear-gradient(90deg, rgba(255,193,7,1), rgba(255,193,7,0.87)); }
+.el-jin { background: linear-gradient(90deg, rgba(158,158,158,1), rgba(158,158,158,0.87)); }
+.el-shui { background: linear-gradient(90deg, rgba(33,150,243,1), rgba(33,150,243,0.87)); }
+
+.el-color-mu { color: #4CAF50; }
+.el-color-huo { color: #F44336; }
+.el-color-tu { color: #FFC107; }
+.el-color-jin { color: #9E9E9E; }
+.el-color-shui { color: #2196F3; }
+

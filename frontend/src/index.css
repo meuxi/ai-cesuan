@@ -1,70 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 220 40% 98%;
-    /* Light Blueish White */
-    --foreground: 222.2 84% 4.9%;
+    /* 东方美学 - 明亮主题（水墨白） */
+    --background: 40 20% 97%;
+    /* 宣纸白 */
+    --foreground: 20 10% 15%;
+    /* 墨色 */
 
-    /* Mystic Blue Primary (Vibrant Blue) */
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    /* 朱砂红作为主色 */
+    --primary: 0 65% 55%;
+    /* 朱砂红 */
+    --primary-foreground: 40 20% 97%;
 
-    /* Ethereal Cyan/Gold Secondary */
-    --secondary: 190 90% 50%;
-    /* Cyan/Teal accent */
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* 青金石蓝作为辅色 */
+    --secondary: 210 50% 45%;
+    /* 青金石蓝 */
+    --secondary-foreground: 40 20% 97%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --card: 40 30% 99%;
+    /* 微黄宣纸 */
+    --card-foreground: 20 10% 15%;
+    --popover: 40 30% 99%;
+    --popover-foreground: 20 10% 15%;
 
-    --muted: 220 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 20 10% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 85% 60%;
+    /* 金箔色 */
+    --accent-foreground: 20 10% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 40 20% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 1rem;
+    --border: 20 15% 85%;
+    --input: 20 15% 85%;
+    --ring: 0 65% 55%;
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Deep Cosmic Blue Background */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* 东方美学 - 暗黑主题（夜空墨） */
+    --background: 240 15% 8%;
+    /* 深夜墨色 */
+    --foreground: 40 20% 92%;
+    /* 月光白 */
 
-    --card: 222.2 84% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --card: 240 15% 12%;
+    /* 深墨卡片 */
+    --card-foreground: 40 20% 92%;
+    --popover: 240 15% 10%;
+    --popover-foreground: 40 20% 92%;
 
-    /* Glowing Blue Primary */
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* 赤金色作为主色 */
+    --primary: 35 80% 55%;
+    /* 赤金 */
+    --primary-foreground: 240 15% 8%;
 
-    /* Cyan Secondary */
-    --secondary: 190 80% 60%;
-    --secondary-foreground: 210 40% 98%;
+    /* 青瓷色作为辅色 */
+    --secondary: 180 25% 50%;
+    /* 青瓷绿 */
+    --secondary-foreground: 40 20% 92%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 240 15% 18%;
+    --muted-foreground: 40 10% 60%;
+    --accent: 0 70% 55%;
+    /* 朱砂红强调 */
+    --accent-foreground: 40 20% 92%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 40 20% 92%;
+    --border: 240 15% 20%;
+    --input: 240 15% 20%;
+    --ring: 35 80% 55%;
   }
 }
 
@@ -75,8 +88,12 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Noto Serif SC', 'ZCOOL XiaoWei', serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsl(var(--secondary) / 0.03) 0%, transparent 50%);
+    background-attachment: fixed;
   }
 
   h1,
@@ -85,8 +102,8 @@
   h4,
   h5,
   h6 {
-    @apply font-sans;
-    /* Revert to sans-serif if Cinzel is not desired */
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', cursive;
+    letter-spacing: 0.05em;
   }
 }
 
@@ -101,19 +118,33 @@
     animation-name: fadeIn;
   }
 
-  /* Glassmorphism utility */
+  /* 东方美学玻璃态 */
   .glass {
-    @apply backdrop-blur-md bg-opacity-30 border border-white/10 shadow-lg;
+    @apply backdrop-blur-md bg-opacity-30 border shadow-lg;
+    border-color: hsl(var(--border) / 0.3);
+    background: linear-gradient(135deg, 
+      hsl(var(--card) / 0.6) 0%, 
+      hsl(var(--card) / 0.4) 100%);
   }
 
-  /* Text gradient utility */
+  /* 水墨渐变文字 */
+  .text-gradient-ink {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60;
+  }
+
+  /* 金色渐变文字 */
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600;
   }
 
-  .text-gradient-mystic {
-    /* Blue to Cyan Gradient */
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400;
+  /* 朱砂渐变文字 */
+  .text-gradient-cinnabar {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-red-600 via-orange-500 to-red-600;
+  }
+
+  /* 青瓷渐变文字 */
+  .text-gradient-celadon {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-600 via-cyan-500 to-teal-600;
   }
 
   .scrollbar-hide {
@@ -123,6 +154,21 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* 水墨纹理效果 */
+  .ink-texture {
+    position: relative;
+  }
+
+  .ink-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 30% 40%, hsl(var(--foreground) / 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, hsl(var(--foreground) / 0.03) 0%, transparent 50%);
+    pointer-events: none;
   }
 }
 
@@ -147,3 +193,691 @@
     opacity: 1;
   }
 }
+
+/* 导出图片优化样式 */
+.export-optimized {
+  background: #ffffff !important;
+  color: #2b2520 !important;
+}
+
+.export-optimized .prose {
+  color: #2b2520 !important;
+}
+
+.export-optimized .prose h1,
+.export-optimized .prose h2,
+.export-optimized .prose h3,
+.export-optimized .prose h4,
+.export-optimized .prose h5,
+.export-optimized .prose h6 {
+  color: #1a1a1a !important;
+}
+
+.export-optimized .prose p {
+  color: #2b2520 !important;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1rem !important;
+}
+
+.export-optimized .prose ul,
+.export-optimized .prose ol {
+  color: #2b2520 !important;
+}
+
+.export-optimized .prose li {
+  color: #2b2520 !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+}
+
+.export-optimized .prose strong {
+  color: #1a1a1a !important;
+}
+
+.export-optimized .prose a {
+  color: #d94a4a !important;
+  text-decoration: underline !important;
+}
+
+/* 针对小六壬排盘的特殊优化 */
+.export-optimized .six-palaces-grid {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.export-optimized .palace-item {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #2b2520 !important;
+}
+
+.export-optimized .palace-title {
+  color: #1a1a1a !important;
+}
+
+.export-optimized .palace-content {
+  color: #2b2520 !important;
+}
+
+/* ------------------ 小六壬参考样式（从备份 styles.css 迁移关键样式） ------------------ */
+/* 用于精确还原六宫格、斜向时间标签、宫格内部排版与颜色 */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 0;
+  width: 100%;
+  max-width: 550px;
+  margin: 20px auto;
+  justify-items: center;
+  border: 3px solid hsl(var(--border) / 1);
+  border-radius: 16px;
+  background-color: hsl(var(--card) / 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.grid-cell {
+  width: 180px;
+  height: 200px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid hsl(var(--border) / 1);
+  border-radius: 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  background-color: hsl(var(--card) / 1);
+  font-family: 'Noto Serif SC', serif;
+  box-shadow: none;
+  overflow: visible; /* allow rotated tag to extend outside corner (match reference) */
+}
+
+.grid-cell.final-result {
+  background-color: #fff8e1;
+  border: 2px solid #ffc107;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+  transform: scale(1.02);
+}
+
+.grid-cell.day-result {
+  background-color: hsl(var(--card) / 1);
+  border: 1px solid hsl(var(--border) / 1);
+  box-shadow: none;
+  transform: none;
+}
+
+.cell-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  z-index: 1;
+  position: relative;
+}
+
+.cell-top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.god-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease;
+  font-family: 'Noto Serif SC', serif;
+  visibility: visible;
+  opacity: 1;
+  z-index: 10;
+}
+
+.god-name.self-position {
+  color: #2196F3;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(33, 150, 243, 0.3);
+  position: relative;
+}
+.god-name.self-position::after {
+  content: '●';
+  color: #2196F3;
+  position: absolute;
+  right: -12px;
+  top: -4px;
+  font-size: 0.6rem;
+}
+
+.liuqin {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  white-space: nowrap;
+  display: inline-block;
+}
+.liuqin.self-liuqin {
+  color: #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+  border-color: rgba(33, 150, 243, 0.3);
+  font-weight: bold;
+}
+
+.five-star {
+  font-size: 1rem;
+  color: #8e44ad;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: rgba(142, 68, 173, 0.05);
+  display: inline-block;
+  font-style: italic;
+  text-align: left;
+}
+
+.six-god {
+  font-size: 1rem;
+  color: #e74c3c;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: rgba(231, 76, 60, 0.2);
+  display: inline-block;
+  text-align: center;
+  position: relative;
+  z-index: 120;
+  margin-left: 12px;
+  visibility: visible !important;
+  opacity: 1 !important;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+  min-width: 70px;
+  border: 1px solid #e74c3c;
+}
+
+.element-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  transition: all 0.3s ease;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 红色斜向标签：保留参考站点定位与视觉样式，但使用裁剪容器实现不会遮挡内容 */
+.time-tags-container {
+  /* 固定贴靠单格右上内角：容器大小 100x100，裁剪超出部分 */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  z-index: 50;
+  pointer-events: none; /* 不阻挡宫格点击 */
+}
+.time-tag {
+  /* 放在容器内侧并旋转45deg；调整 right/top 保证在右上角内斜伸 */
+  position: absolute;
+  right: -20px;
+  top: 20px;
+  transform: rotate(45deg);
+  transform-origin: right top;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+  font-weight: 700;
+  background-color: #f44336;
+  color: #fff;
+  border: 1px solid #d32f2f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  white-space: nowrap;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* 强制覆盖：参考站点 time-tags 原始样式（保证像素一致） */
+.time-tags-container.force-reference {
+  /* Container positioned in cell corner; rotation applied only to inner tag */
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  transform-origin: right top !important;
+  transform: none !important; /* ensure single rotation on inner element only */
+  z-index: 1200 !important;
+  pointer-events: none !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+}
+.time-tag.force-reference {
+  /* Smaller padding so the rotated tag stays within the cell while keeping reference look */
+  padding: 6px 28px !important;
+  font-size: 0.9rem !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+  background-color: #f44336 !important;
+  color: #ffffff !important;
+  border: 1px solid #d32f2f !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18) !important;
+  white-space: nowrap !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+
+/* Portal tag style (body-level) */
+.portal-time-tag {
+  padding: 6px 28px;
+  background: #f44336;
+  color: #fff;
+  border: 1px solid #d32f2f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  transform-origin: right top;
+  font-size: 14px;
+}
+/* Vertical variant: narrow tall rectangle for right-top placement */
+.portal-time-tag.vertical {
+  width: 36px;
+  height: 72px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 13px;
+}
+
+/* 深色模式下的标签优雅适配 */
+.dark .time-tag {
+  background-color: #e53935;
+  color: #ffffff;
+  border-color: #c62828;
+  box-shadow: 0 1px 2px rgba(255,255,255,0.1);
+}
+
+/* 响应式：移动端将斜向标签改为右上角紧凑标签（来自参考） */
+@media (max-width: 768px) {
+  .time-tags-container {
+    top: 4px;
+    right: 4px;
+    transform: none;
+  }
+  .time-tag {
+    font-size: 0.9rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+  .grid-cell {
+    width: 140px;
+    height: 160px;
+  }
+}
+/* ------------------ 结束迁移片段 ------------------ */
+
+/* 参考站的详细信息弹窗样式（info-dialog） */
+.info-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 降低遮罩强度并移除模糊，保持对话框清晰可读 */
+  background: rgba(0, 0, 0, 0.36);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 1;
+  visibility: visible;
+  backdrop-filter: none;
+}
+.info-dialog .dialog-content {
+  /* 使用接近纯白的实底，确保与背景有足够对比 */
+  background: rgba(255,255,255,0.98);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 820px;
+  width: 92%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: #111827; /* 更深的文字颜色 */
+  font-size: 15px;
+  line-height: 1.6;
+}
+.info-dialog .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid hsl(var(--border) / 1);
+  color: var(--card-foreground);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.info-dialog .content-wrapper {
+  display: flex;
+  gap: 24px;
+}
+.info-dialog .basic-info {
+  flex: 1;
+  background: transparent;
+  padding: 8px;
+}
+.info-dialog .validation-section {
+  flex: 1;
+  background: transparent;
+  padding: 8px;
+}
+.info-dialog .basic-info p,
+.info-dialog .validation-section p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+}
+.info-dialog .basic-info p:last-child,
+.info-dialog .validation-section p:last-child {
+  border-bottom: none;
+}
+.info-dialog .basic-info strong {
+  color: var(--secondary);
+  font-weight: 700;
+}
+.info-dialog .value {
+  font-weight: 700;
+  color: var(--card-foreground);
+}
+
+/* ------------------ 参考站弹窗完整样式（逐节点对齐） ------------------ */
+
+/* 详细信息对话框样式 - 北京验收白色弹窗 */
+.info-dialog-reference {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 对话框整体样式 */
+.info-dialog-reference .dialog-content {
+  background-color: white;
+  border: 3px solid #d4d4d8;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 对话框头部 - 只包含关闭按钮 */
+.info-dialog-reference .dialog-header {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 10px 20px;
+  margin: 0;
+  text-align: right;
+  position: relative;
+  border-radius: 13px 13px 0 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+/* 基础信息区域的标题样式 */
+.info-dialog-reference .section-title {
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Noto Serif SC', serif;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  text-align: left;
+}
+
+/* 关闭按钮 - 右上角 */
+.info-dialog-reference .close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.info-dialog-reference .close-btn:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  transform: scale(1.1);
+}
+
+/* 对话框内容区域 - 左右布局，确保在圆角方框内部 */
+.info-dialog-reference .dialog-content > div.content-wrapper {
+  padding: 24px;
+  background-color: white;
+}
+
+/* 内容容器 - 左右两列布局 */
+.info-dialog-reference .content-wrapper {
+  display: flex;
+  gap: 24px;
+}
+
+/* 左侧基础信息区域 */
+.info-dialog-reference .basic-info {
+  flex: 1;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* 右侧校准验证信息区域 */
+.info-dialog-reference .validation-section {
+  flex: 1;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* 验证区域标题 */
+.info-dialog-reference .validation-section h4 {
+  margin-bottom: 16px;
+  color: #3b82f6;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+/* 基础信息文本样式 */
+.info-dialog-reference .basic-info p {
+  margin: 12px 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.info-dialog-reference .basic-info p:last-child {
+  border-bottom: none;
+}
+
+/* 验证信息文本样式 */
+.info-dialog-reference .validation-section p {
+  margin: 12px 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.info-dialog-reference .validation-section p:last-child {
+  border-bottom: none;
+}
+
+/* 标签样式 */
+.info-dialog-reference strong {
+  color: #475569;
+  font-weight: 600;
+  flex: 1;
+  font-size: 15px;
+}
+
+/* 数值样式 */
+.info-dialog-reference .value {
+  font-weight: 700;
+  color: #1e293b;
+  text-align: right;
+  min-width: 120px;
+  font-size: 15px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* 暗色主题适配 */
+.dark-theme .info-dialog-reference .dialog-content {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .info-dialog-reference .dialog-header {
+  background-color: #0f172a;
+  border-bottom-color: #334155;
+  border-radius: 13px 13px 0 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.dark-theme .info-dialog-reference .section-title {
+  color: #f8fafc;
+  border-bottom-color: #334155;
+}
+
+.dark-theme .info-dialog-reference .dialog-header h3 {
+  color: #f8fafc;
+}
+
+.dark-theme .info-dialog-reference .dialog-content > div {
+  background-color: #1e293b;
+}
+
+.dark-theme .info-dialog-reference .basic-info,
+.dark-theme .info-dialog-reference .validation-section {
+  background-color: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .info-dialog-reference strong {
+  color: #cbd5e1;
+}
+
+.dark-theme .info-dialog-reference .value {
+  color: #f8fafc;
+}
+
+.dark-theme .info-dialog-reference .validation-section h4 {
+  color: #60a5fa;
+  border-bottom-color: #334155;
+}
+
+.dark-theme .info-dialog-reference .close-btn {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .info-dialog-reference .close-btn:hover {
+  background-color: #1e293b;
+  color: #f8fafc;
+  transform: scale(1.1);
+}
+
+.dark-theme .info-dialog-reference .basic-info p,
+.dark-theme .info-dialog-reference .validation-section p {
+  border-bottom-color: #334155;
+}
+
+/* ------------------ 结束参考站弹窗样式 ------------------ */
