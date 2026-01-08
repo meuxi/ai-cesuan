@@ -4,7 +4,7 @@
   width: var(--card-w);
   height: var(--card-h);
   font-family: "Noto Serif SC", serif;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   border-radius: 10px;
   /* subtle elevated surface for a more premium feel */
@@ -69,19 +69,250 @@
 
 /* 响应式调整 - 移动端 */
 @media (max-width: 640px) {
-  .xiaoliu-badge-container {
-    top: 34px;
-    right: -27px;
+  /* 卡片尺寸调整 - 适应小屏幕 */
+  .xiaoliu-card {
+    --card-w: 100px !important;
+    --card-h: 120px !important;
+    width: var(--card-w);
+    height: var(--card-h);
+    border-radius: 6px;
   }
-  
+
+  /* 标签容器调整 */
+  .xiaoliu-badge-container {
+    top: 24px;
+    right: -20px;
+  }
+
   .xiaoliu-badge {
-    padding: 4px 38px;
+    padding: 4px 30px;
     font-size: 10px;
   }
-  
+
   .xiaoliu-badge.small {
-    padding: 3px 28px;
+    padding: 3px 22px;
     font-size: 9px;
+  }
+
+  /* 内部内容调整 */
+  .xiaoliu-inner {
+    padding: 8px 6px;
+    padding-bottom: 10px;
+  }
+
+  .xiaoliu-top {
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 0.9rem;
+    padding: 2px 4px;
+  }
+
+  .xiaoliu-dot {
+    right: -8px;
+    top: -2px;
+    font-size: 0.5rem;
+  }
+
+  .xiaoliu-liuqin {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .xiaoliu-mid {
+    gap: 1px;
+    margin: 1px 0;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 1rem;
+  }
+
+  .branchName {
+    font-size: 0.85rem;
+    padding: 2px 6px;
+  }
+
+  .branchElement {
+    font-size: 0.65rem;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    min-width: 40px;
+  }
+
+  .xiaoliu-fiveSix {
+    margin-top: 2px;
+    gap: 4px;
+  }
+}
+
+/* 弹窗样式 - 使用绝对定位和层级确保在最上层 */
+.info-dialog-reference {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.info-dialog-reference .dialog-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.info-dialog-reference .dialog-header {
+  padding: 1rem 1rem 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.info-dialog-reference .close-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.info-dialog-reference .close-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.info-dialog-reference .content-wrapper {
+  padding: 1rem;
+}
+
+.info-dialog-reference .basic-info {
+  margin-bottom: 1rem;
+}
+
+.info-dialog-reference .basic-info p {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.info-dialog-reference .basic-info strong {
+  min-width: 80px;
+  color: #374151;
+}
+
+.info-dialog-reference .basic-info .value {
+  color: #111827;
+  font-weight: 500;
+}
+
+.info-dialog-reference .validation-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.info-dialog-reference .validation-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.info-dialog-reference .validation-section p {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.info-dialog-reference .validation-section strong {
+  min-width: 80px;
+  color: #374151;
+}
+
+.info-dialog-reference .validation-section .value {
+  color: #111827;
+  font-weight: 500;
+}
+
+/* 暗色模式适配 */
+.dark .info-dialog-reference .dialog-content {
+  background: #1f2937;
+}
+
+.dark .info-dialog-reference .close-btn {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.dark .info-dialog-reference .close-btn:hover {
+  background-color: #4b5563;
+}
+
+.dark .info-dialog-reference .basic-info strong,
+.dark .info-dialog-reference .validation-section strong,
+.dark .info-dialog-reference .validation-section h4 {
+  color: #f9fafb;
+}
+
+.dark .info-dialog-reference .basic-info .value,
+.dark .info-dialog-reference .validation-section .value {
+  color: #f3f4f6;
+}
+
+.dark .info-dialog-reference .validation-section {
+  border-top-color: #374151;
+}
+
+/* 移动端弹窗适配 */
+@media (max-width: 640px) {
+  .info-dialog-reference {
+    padding: 0.5rem;
+  }
+
+  .info-dialog-reference .dialog-content {
+    max-width: 100%;
+    margin: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .info-dialog-reference .content-wrapper {
+    padding: 0.75rem;
+  }
+
+  .info-dialog-reference .basic-info p,
+  .info-dialog-reference .validation-section p {
+    font-size: 0.875rem;
+  }
+
+  .info-dialog-reference .basic-info strong,
+  .info-dialog-reference .validation-section strong {
+    min-width: 70px;
   }
 }
 

@@ -409,13 +409,13 @@ export default function XiaoLiuRenPage() {
         </div>
 
         {/* 起卦方式切换 */}
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-3 sm:gap-4">
           <Button
             onClick={() => setMethod('date')}
             variant={method === 'date' ? 'default' : 'outline'}
-            className={`px-8 py-6 text-base font-medium transition-all ${
-              method === 'date' 
-                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg' 
+            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${
+              method === 'date'
+                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
                 : ''
             }`}
           >
@@ -424,9 +424,9 @@ export default function XiaoLiuRenPage() {
           <Button
             onClick={() => setMethod('number')}
             variant={method === 'number' ? 'default' : 'outline'}
-            className={`px-8 py-6 text-base font-medium transition-all ${
-              method === 'number' 
-                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg' 
+            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${
+              method === 'number'
+                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
                 : ''
             }`}
           >
@@ -435,12 +435,12 @@ export default function XiaoLiuRenPage() {
         </div>
 
         {/* 输入区域 */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-blue-500" />
-          
+
           {method === 'date' ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-3 gap-6">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     农历月份
@@ -492,8 +492,8 @@ export default function XiaoLiuRenPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-3 gap-6">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                     月数 (1-12)
@@ -538,11 +538,11 @@ export default function XiaoLiuRenPage() {
           )}
 
           {/* 按钮组 */}
-          <div className="flex gap-4 mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8">
             <Button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 py-6 text-lg font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all"
+              className="flex-1 py-4 sm:py-6 text-base sm:text-lg font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all"
             >
               {loading ? (
                 <>
@@ -559,7 +559,7 @@ export default function XiaoLiuRenPage() {
             {method === 'date' && (
               <Button
                 onClick={useCurrentTime}
-                className="px-6 py-6 font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all"
+                className="px-4 sm:px-6 py-4 sm:py-6 font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all"
                 title="使用当前时间"
               >
                 <Calendar className="h-5 w-5 mr-2" />
@@ -571,16 +571,16 @@ export default function XiaoLiuRenPage() {
 
         {/* 排盘结果 - 完整照抄目标网站 */}
         {calculatedResult && (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
-              <h3 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-gray-900 dark:text-gray-100">
                 排盘结果
               </h3>
               
               {/* 六宫格 - 完全按照目标网站结构 */}
-              <div className="flex justify-center overflow-visible p-5">
-                <div 
-                  className="grid grid-cols-3 border-[3px] border-gray-300 dark:border-gray-600 rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible"
+              <div className="flex justify-center overflow-visible p-3 sm:p-5">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 border-[2px] sm:border-[3px] border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible"
                 >
                   {correctLayoutOrder.map((index) => {
                     // Prefer authoritative gridData from calculation; fall back to building on the fly
@@ -672,24 +672,24 @@ export default function XiaoLiuRenPage() {
               </div>
 
               {/* 计算过程 */}
-              <div className="mt-8 p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-4 text-lg">起课步骤</h4>
-                <div className="space-y-3 text-sm">
-                  <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
+              <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 text-base sm:text-lg">起课步骤</h4>
+                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
                     <span className="font-bold text-blue-600 dark:text-blue-400">① 月上起日：</span>
                     <span className="text-gray-700 dark:text-gray-300 ml-2">
                       从大安起，数到{lunarMonths[calculatedResult.month - 1]}，再数到{lunarDays[calculatedResult.day - 1]}，
                       落在 <span className="font-bold text-gray-900 dark:text-gray-100">{sixGodNames[sixGods[calculatedResult.dayResult]]}</span>
                     </span>
                   </div>
-                  <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-green-500">
+                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-green-500">
                     <span className="font-bold text-green-600 dark:text-green-400">② 日上起时：</span>
                     <span className="text-gray-700 dark:text-gray-300 ml-2">
                       从 {sixGodNames[sixGods[calculatedResult.dayResult]]} 起，数到{hourNames[calculatedResult.hour - 1]}时，
                       最终落在 <span className="font-bold text-gray-900 dark:text-gray-100">{calculatedResult.godName}</span>
                     </span>
                   </div>
-                  <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500">
+                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500">
                     <span className="font-bold text-purple-600 dark:text-purple-400">③ 五行属性：</span>
                     <span className="text-gray-700 dark:text-gray-300 ml-2">
                       {calculatedResult.godName} 对应五行为 
@@ -745,20 +745,20 @@ export default function XiaoLiuRenPage() {
         )}
 
         {/* 时辰对照表 */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
-          <h3 className="text-xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-center text-gray-900 dark:text-gray-100">
             时辰对照表
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
             {hourTable.map(h => (
-              <div 
-                key={h.index} 
-                className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              <div
+                key={h.index}
+                className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <span className="font-medium text-primary">
+                <span className="font-medium text-primary text-sm sm:text-base">
                   {h.chinese}时
                 </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   {h.range}
                 </span>
               </div>
