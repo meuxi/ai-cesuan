@@ -577,10 +577,10 @@ export default function XiaoLiuRenPage() {
                 排盘结果
               </h3>
               
-              {/* 六宫格 - 完全按照目标网站结构 */}
+              {/* 六宫格 - 完全按照目标网站结构，保持3列布局 */}
               <div className="flex justify-center overflow-visible p-3 sm:p-5">
                 <div
-                  className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 border-[2px] sm:border-[3px] border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible"
+                  className="grid grid-cols-3 gap-2 sm:gap-3 border-[2px] sm:border-[3px] border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible"
                 >
                   {correctLayoutOrder.map((index) => {
                     // Prefer authoritative gridData from calculation; fall back to building on the fly

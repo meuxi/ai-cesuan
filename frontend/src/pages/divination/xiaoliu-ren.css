@@ -12,6 +12,63 @@
   transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
+/* 响应式 - 平板设备（768px以下） */
+@media (max-width: 768px) {
+  .xiaoliu-card {
+    --card-w: 140px !important;
+    --card-h: 160px !important;
+  }
+
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 11px;
+  }
+
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 10px;
+  }
+
+  .xiaoliu-inner {
+    padding: 10px 8px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 1rem;
+  }
+
+  .xiaoliu-liuqin {
+    font-size: 0.9rem;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 1.1rem;
+  }
+
+  .branchName {
+    font-size: 1rem;
+  }
+
+  .branchElement {
+    font-size: 0.75rem;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.9rem;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.85rem;
+  }
+}
+
+
+
 /* 传统美学风格 - 斜角朱砂红印章标签 */
 .xiaoliu-card {
   overflow: hidden;
@@ -67,47 +124,46 @@
   font-size: 11px;
 }
 
-/* 响应式调整 - 移动端 */
-@media (max-width: 640px) {
-  /* 卡片尺寸调整 - 适应小屏幕 */
+/* 响应式调整 - 移动设备（480px以下） */
+@media (max-width: 480px) {
   .xiaoliu-card {
     --card-w: 100px !important;
-    --card-h: 120px !important;
+    --card-h: 160px !important;
     width: var(--card-w);
     height: var(--card-h);
-    border-radius: 6px;
   }
 
-  /* 标签容器调整 */
   .xiaoliu-badge-container {
-    top: 24px;
-    right: -20px;
+    top: 34px;
+    right: -27px;
   }
 
   .xiaoliu-badge {
-    padding: 4px 30px;
+    padding: 4px 38px;
     font-size: 10px;
   }
 
   .xiaoliu-badge.small {
-    padding: 3px 22px;
+    padding: 3px 28px;
     font-size: 9px;
   }
 
-  /* 内部内容调整 */
   .xiaoliu-inner {
-    padding: 8px 6px;
+    padding: 14px 12px;
     padding-bottom: 10px;
   }
 
   .xiaoliu-top {
-    margin-bottom: 6px;
-    gap: 6px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .xiaoliu-godname {
-    font-size: 0.9rem;
-    padding: 2px 4px;
+    font-size: 0.7rem;
+    padding: 1px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .xiaoliu-dot {
@@ -117,43 +173,142 @@
   }
 
   .xiaoliu-liuqin {
-    font-size: 0.7rem;
-    padding: 1px 4px;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    padding: 2px 6px;
   }
 
   .xiaoliu-mid {
     gap: 1px;
-    margin: 1px 0;
+    margin: 2px 0;
   }
 
   .xiaoliu-tianGan {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
   }
 
   .branchName {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     padding: 2px 6px;
   }
 
   .branchElement {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    padding: 1px 4px;
   }
 
   .xiaoliu-fiveStar {
-    font-size: 0.75rem;
-    padding: 2px 6px;
+    font-size: 0.65rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .xiaoliu-sixGodBeast {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .xiaoliu-fiveSix {
+    margin-top: 4px;
+    gap: 1px;
+  }
+}
+
+/* 响应式调整 - 小屏移动设备（360px以下） */
+@media (max-width: 360px) {
+  .xiaoliu-card {
+    --card-w: auto !important;
+    --card-h: 145px !important;
+    width: 100%;
+    height: var(--card-h);
+  }
+
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 9px;
+  }
+
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 8px;
+  }
+
+  .xiaoliu-inner {
+    padding: 12px 10px;
+    padding-bottom: 8px;
+  }
+
+  .xiaoliu-top {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .xiaoliu-dot {
+    right: -6px;
+    top: -2px;
+    font-size: 0.4rem;
+  }
+
+  .xiaoliu-liuqin {
     font-size: 0.7rem;
-    padding: 2px 4px;
-    min-width: 40px;
+    padding: 1px 5px;
+  }
+
+  .xiaoliu-mid {
+    gap: 0;
+    margin: 0;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 0.8rem;
+    margin-bottom: 1px;
+    letter-spacing: 0;
+  }
+
+  .branchName {
+    font-size: 0.7rem;
+    padding: 1px 5px;
+  }
+
+  .branchElement {
+    font-size: 0.6rem;
+    padding: 1px 3px;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.6rem;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.6rem;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1.1;
   }
 
   .xiaoliu-fiveSix {
     margin-top: 2px;
-    gap: 4px;
+    gap: 1px;
   }
 }
 
@@ -164,129 +319,206 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  padding: 1rem;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
 }
 
 .info-dialog-reference .dialog-content {
   background: white;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 100%;
-  max-height: 90vh;
+  border: 3px solid #d4d4d8;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .info-dialog-reference .dialog-header {
-  padding: 1rem 1rem 0.5rem;
-  display: flex;
-  justify-content: flex-end;
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 10px 20px;
+  margin: 0;
+  text-align: right;
+  position: relative;
+  border-radius: 13px 13px 0 0;
 }
 
 .info-dialog-reference .close-btn {
-  background: #f3f4f6;
-  border: none;
-  border-radius: 50%;
   width: 32px;
   height: 32px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 18px;
   cursor: pointer;
-  font-size: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .info-dialog-reference .close-btn:hover {
-  background-color: #e5e7eb;
+  background-color: #e2e8f0;
+  color: #1e293b;
+  transform: scale(1.1);
 }
 
 .info-dialog-reference .content-wrapper {
-  padding: 1rem;
+  padding: 24px;
+  background-color: white;
+}
+
+.info-dialog-reference .content-wrapper {
+  display: flex;
+  gap: 24px;
 }
 
 .info-dialog-reference .basic-info {
-  margin-bottom: 1rem;
-}
-
-.info-dialog-reference .basic-info p {
-  margin: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.info-dialog-reference .basic-info strong {
-  min-width: 80px;
-  color: #374151;
-}
-
-.info-dialog-reference .basic-info .value {
-  color: #111827;
-  font-weight: 500;
+  flex: 1;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .info-dialog-reference .validation-section {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1rem;
+  flex: 1;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .info-dialog-reference .validation-section h4 {
-  margin: 0 0 0.75rem 0;
-  font-size: 1rem;
+  margin-bottom: 16px;
+  color: #3b82f6;
+  font-size: 18px;
   font-weight: 600;
-  color: #374151;
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.info-dialog-reference .basic-info p {
+  margin: 12px 0;
+  line-height: 1.6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.info-dialog-reference .basic-info p:last-child {
+  border-bottom: none;
 }
 
 .info-dialog-reference .validation-section p {
-  margin: 0.5rem 0;
+  margin: 12px 0;
+  line-height: 1.6;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
+.info-dialog-reference .validation-section p:last-child {
+  border-bottom: none;
+}
+
+.info-dialog-reference .basic-info strong,
 .info-dialog-reference .validation-section strong {
-  min-width: 80px;
-  color: #374151;
+  color: #475569;
+  font-weight: 600;
+  flex: 1;
+  font-size: 15px;
 }
 
+.info-dialog-reference .basic-info .value,
 .info-dialog-reference .validation-section .value {
-  color: #111827;
-  font-weight: 500;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: right;
+  min-width: 120px;
+  font-size: 15px;
 }
 
 /* 暗色模式适配 */
 .dark .info-dialog-reference .dialog-content {
-  background: #1f2937;
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.dark .info-dialog-reference .dialog-header {
+  background-color: #0f172a;
+  border-bottom-color: #334155;
+  border-radius: 13px 13px 0 0;
 }
 
 .dark .info-dialog-reference .close-btn {
-  background: #374151;
-  color: #f9fafb;
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .dark .info-dialog-reference .close-btn:hover {
-  background-color: #4b5563;
+  background-color: #1e293b;
+  color: #f8fafc;
+  transform: scale(1.1);
+}
+
+.dark .info-dialog-reference .basic-info,
+.dark .info-dialog-reference .validation-section {
+  background-color: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
 .dark .info-dialog-reference .basic-info strong,
-.dark .info-dialog-reference .validation-section strong,
-.dark .info-dialog-reference .validation-section h4 {
-  color: #f9fafb;
+.dark .info-dialog-reference .validation-section strong {
+  color: #cbd5e1;
 }
 
 .dark .info-dialog-reference .basic-info .value,
 .dark .info-dialog-reference .validation-section .value {
-  color: #f3f4f6;
+  color: #f8fafc;
 }
 
-.dark .info-dialog-reference .validation-section {
-  border-top-color: #374151;
+.dark .info-dialog-reference .validation-section h4 {
+  color: #60a5fa;
+  border-bottom-color: #334155;
+}
+
+.dark .info-dialog-reference .basic-info p,
+.dark .info-dialog-reference .validation-section p {
+  border-bottom-color: #334155;
 }
 
 /* 移动端弹窗适配 */
@@ -298,23 +530,38 @@
   .info-dialog-reference .dialog-content {
     max-width: 100%;
     margin: 0.5rem;
-    border-radius: 8px;
+    border-radius: 12px;
   }
 
   .info-dialog-reference .content-wrapper {
-    padding: 0.75rem;
+    padding: 16px 12px;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .info-dialog-reference .basic-info,
+  .info-dialog-reference .validation-section {
+    padding: 16px 12px;
   }
 
   .info-dialog-reference .basic-info p,
   .info-dialog-reference .validation-section p {
-    font-size: 0.875rem;
+    font-size: 14px;
   }
 
   .info-dialog-reference .basic-info strong,
   .info-dialog-reference .validation-section strong {
+    font-size: 14px;
     min-width: 70px;
   }
+
+  .info-dialog-reference .basic-info .value,
+  .info-dialog-reference .validation-section .value {
+    font-size: 14px;
+    min-width: 100px;
+  }
 }
+
 
 /* 暗色模式适配 */
 .dark .xiaoliu-badge {
