@@ -20,7 +20,8 @@ class Settings(BaseSettings):
     # github oauth login settings
     github_client_id: str = ""
     github_client_secret: str = Field(default="", exclude=True)
-    jwt_secret: str = Field(default="secret", exclude=True, alias="JWT_SECRET")
+    # 移除alias确保环境变量名与Vercel配置一致
+    jwt_secret: str = Field(default="secret", exclude=True)
 
     @field_validator('jwt_secret')
     @classmethod
@@ -72,4 +73,9 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-settings = Settings()
+# 添加配置加载异常捕获
+try:
+    settings = Settings()
+except Exception as e:
+    _logger.error(f"配置加载失败: {str(e)}", exc_info=True)
+    raise RuntimeError(f"配置加载失败: {str(e)}") from e
