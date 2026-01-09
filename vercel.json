@@ -1,8 +1,21 @@
 {
-    "buildCommand": "pip install -r requirements.txt && cd frontend && npm install && npm run build && cd .. && cp -r frontend/dist dist",
-    "outputDirectory": "dist",
-    "installCommand": "",
-    "framework": null,
+    "version": 2,
+    "builds": [
+        {
+            "src": "main.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "15mb"
+            }
+        },
+        {
+            "src": "frontend/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
     "routes": [
         {
             "src": "/api/(.*)",
@@ -17,24 +30,15 @@
             "dest": "main.py"
         },
         {
-            "src": "/static/(.*)",
-            "dest": "/dist/static/$1"
-        },
-        {
             "src": "/assets/(.*)",
-            "dest": "/dist/assets/$1"
-        },
-        {
-            "src": "/favicon.ico",
-            "dest": "/dist/favicon.ico"
+            "dest": "/frontend/$0"
         },
         {
             "src": "/(.*)",
-            "dest": "/dist/$1"
+            "dest": "/frontend/$1"
         }
     ],
     "env": {
-        "PYTHON_VERSION": "3.11",
         "VERCEL": "1"
     }
 }

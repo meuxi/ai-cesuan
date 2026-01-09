@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build --mode prod",
     "build:tauri": "tsc && vite build --mode tauri",
+    "vercel-build": "npm run build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
@@ -56,5 +57,7 @@
     "typescript": "^5.6.3",
     "vite": "^6.0.1"
   },
-  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
+  "engines": {
+    "node": ">=18"
+  }
 }
