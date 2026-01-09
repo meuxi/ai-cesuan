@@ -19,11 +19,6 @@ from src.divination import DivinationFactory
 client = AsyncOpenAI(api_key=settings.api_key, base_url=settings.api_base)
 router = APIRouter()
 _logger = logging.getLogger(__name__)
-STOP_WORDS = [
-    "忽略", "ignore", "指令", "命令", "command", "help", "帮助", "之前",
-    "幫助", "現在", "開始", "开始", "start", "restart", "重新开始", "重新開始",
-    "遵守", "遵循", "遵从", "遵從"
-]
 
 
 @router.post("/api/divination")
@@ -32,7 +27,28 @@ async def divination(
         divination_body: DivinationBody,
         user: Optional[User] = Depends(get_user)
 ):
-
+    """
+    AI占卜接口 - 流式返回占卜结果
+    
+    Args:
+        request: FastAPI请求对象，用于获取客户端IP和自定义API配置
+        divination_body: 占卜请求体，包含prompt和prompt_type
+        user: 可选的已登录用户信息
+    
+    Returns:
+        StreamingResponse: SSE流式响应，逐步返回AI生成的占卜结果
+    
+    Raises:
+        HTTPException 403: prompt包含停止词或缺少API配置
+        HTTPException 400: 不支持的占卜类型
+        HTTPException 429: 智谱AI并发限制
+        HTTPException 500: API调用失败
+    
+    支持的自定义Header:
+        x-api-key: 自定义API密钥
+        x-api-url: 自定义API基础URL
+        x-api-model: 自定义模型名称
+    """
     real_ip = get_real_ipaddr(request)
     # rate limit when not login
     if settings.enable_rate_limit:
@@ -50,7 +66,7 @@ async def divination(
         f"user={json.dumps(user.model_dump(), ensure_ascii=False) if user else None}, "
         f"body={json.dumps(divination_body.model_dump(), ensure_ascii=False)}"
     )
-    if any(w in divination_body.prompt.lower() for w in STOP_WORDS):
+    if any(w in divination_body.prompt.lower() for w in settings.stop_words):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Prompt contains stop words"
