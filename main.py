@@ -17,8 +17,13 @@ if os.getenv("VERCEL") == "1":
     _logger.info("Running on Vercel platform")
     try:
         # 确保Mangum已安装
+        import importlib.metadata  # 新增导入
         import mangum
-        _logger.info(f"Mangum version: {mangum.__version__}")
+        
+        # 使用正确的方式获取Mangum版本
+        mangum_version = importlib.metadata.version('mangum')
+        _logger.info(f"Mangum version: {mangum_version}")
+        
         handler = mangum.Mangum(app)
     except ImportError:
         _logger.error("Mangum package not found. Please install with: pip install mangum")
