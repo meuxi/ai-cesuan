@@ -3,6 +3,7 @@ import { Sparkles, X } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import ResultActions from '@/components/ResultActions'
+import DOMPurify from 'dompurify'
 
 interface ResultDrawerProps {
   show: boolean
@@ -95,15 +96,15 @@ export function ResultDrawer({ show, onClose, result, loading, streaming, title 
               <div id="divination-result" className={streaming ? 'streaming-content' : 'animate-in fade-in duration-300'}>
                 <div
                   className="prose prose-xs md:prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-ul:text-foreground/90 prose-ol:text-foreground/90"
-                  dangerouslySetInnerHTML={{ __html: result }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(result) }}
                 />
                 {streaming && (
                   <span className="inline-flex w-1.5 h-5 ml-1 bg-primary cursor-blink align-middle rounded-sm shadow-lg"></span>
                 )}
               </div>
               {!streaming && (
-                <ResultActions 
-                  result={result.replace(/<[^>]*>/g, '')} 
+                <ResultActions
+                  result={result.replace(/<[^>]*>/g, '')}
                   title={title}
                   elementId="divination-result"
                 />

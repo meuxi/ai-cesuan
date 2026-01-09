@@ -9,6 +9,7 @@ import { getDivinationOption } from '@/config/constants'
 import { Sparkles, Eye, Loader2, Calendar } from 'lucide-react'
 import * as LunarModule from 'lunar-javascript'
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './xiaoliu-ren.css'
 
 const CONFIG = getDivinationOption('xiaoliu')!
@@ -77,7 +78,81 @@ const hourTable = [
 // 五星顺序
 const fiveStars = ['木星', '火星', '土星', '金星', '水星', '天空']
 
-
+// 卦象解读库（从源项目集成）
+const interpretations: Record<string, { name: string; basic: string; combinations: Record<string, string> }> = {
+  'daan': {
+    name: '大安',
+    basic: '大吉大利，百事顺遂。代表平安、顺利、吉祥。谋事可成，婚姻美满，出行平安，疾病不药而愈。',
+    combinations: {
+      'daan': '双重吉利，万事如意',
+      'liulian': '先吉后阻，需耐心等待',
+      'suxi': '速战速决，马到成功',
+      'chikou': '吉中带凶，需谨慎行事',
+      'xiaoji': '吉祥如意，小利可得',
+      'kongwang': '吉处藏凶，事有阻碍'
+    }
+  },
+  'liulian': {
+    name: '留连',
+    basic: '凶多吉少，办事迟缓。代表纠缠、拖延、阻碍。谋事难成，婚姻有阻，出行不利，疾病缠绵。',
+    combinations: {
+      'daan': '先阻后吉，终有好结果',
+      'liulian': '双重阻碍，难以成功',
+      'suxi': '虽有阻碍，终会成功',
+      'chikou': '凶上加凶，灾祸临头',
+      'xiaoji': '困境中有机遇',
+      'kongwang': '完全受阻，宜守不宜进'
+    }
+  },
+  'suxi': {
+    name: '速喜',
+    basic: '大吉之兆，百事顺遂。代表迅速、喜庆、成功。谋事速成，婚姻喜庆，出行顺利，疾病速愈。',
+    combinations: {
+      'daan': '大吉大利，万事如意',
+      'liulian': '先吉后缓，不宜操之过急',
+      'suxi': '双喜临门，运势亨通',
+      'chikou': '先喜后忧，需防意外',
+      'xiaoji': '喜庆连连，小利不断',
+      'kongwang': '喜中有忧，事有变数'
+    }
+  },
+  'chikou': {
+    name: '赤口',
+    basic: '大凶之兆，百事不利。代表口舌、是非、争斗。谋事不成，婚姻不顺，出行有灾，疾病加重。',
+    combinations: {
+      'daan': '凶中带吉，化险为夷',
+      'liulian': '凶上加凶，大祸临头',
+      'suxi': '先凶后吉，转危为安',
+      'chikou': '双重凶险，灾难重重',
+      'xiaoji': '凶中有机，小吉可求',
+      'kongwang': '凶多吉少，宜守不宜进'
+    }
+  },
+  'xiaoji': {
+    name: '小吉',
+    basic: '吉祥之兆，小利可得。代表小吉、顺利、进展。谋事小成，婚姻顺利，出行平安，疾病好转。',
+    combinations: {
+      'daan': '大吉小吉，万事如意',
+      'liulian': '小有阻碍，终会成功',
+      'suxi': '喜上加喜，运势亨通',
+      'chikou': '小有不顺，需防口舌',
+      'xiaoji': '双重小吉，步步顺利',
+      'kongwang': '吉中带凶，事有变数'
+    }
+  },
+  'kongwang': {
+    name: '空亡',
+    basic: '凶兆，百事无成。代表空虚、无望、失败。谋事不成，婚姻难成，出行不利，疾病难愈。',
+    combinations: {
+      'daan': '凶中带吉，终有转机',
+      'liulian': '完全失败，不宜行动',
+      'suxi': '先凶后吉，峰回路转',
+      'chikou': '大凶之兆，灾祸临头',
+      'xiaoji': '小吉化解，转危为安',
+      'kongwang': '双重空亡，一事无成'
+    }
+  }
+}
 
 // 五行生克关系
 const elementRelationships: Record<string, Record<string, string>> = {
@@ -122,6 +197,9 @@ interface CellDetail {
 export default function XiaoLiuRenPage() {
   const [prompt, setPrompt] = useLocalStorage('xiaoliu-prompt', '')
   const [method, setMethod] = useState<'date' | 'number'>('date')
+  const [lastAIPrompt, setLastAIPrompt] = useState<string>('')
+  const [showAlert, setShowAlert] = useState(false)
+  const promptInputRef = useRef<HTMLTextAreaElement>(null)
 
   // 初始化时转换成农历月日 - 使用lunar-javascript库精确转换
   const solarToLunar = (solarDate: Date) => {
@@ -137,7 +215,7 @@ export default function XiaoLiuRenPage() {
     const year = solarDate.getFullYear()
     const month = (lunar as any).getMonth() // 农历月份 (1-12)
     const day = (lunar as any).getDay() // 农历日期 (1-30)
-    
+
     return { year, month, day }
   }
 
@@ -205,7 +283,7 @@ export default function XiaoLiuRenPage() {
     const myEarthlyBranch = hourInfo.earthlyBranch
     const myElement = hourInfo.element
 
-    const allEarthlyBranches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']
+    const allEarthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
     const hourBranchIndex = allEarthlyBranches.indexOf(myEarthlyBranch)
 
     const gridData: CellDetail[] = []
@@ -223,15 +301,15 @@ export default function XiaoLiuRenPage() {
       const cellEarthlyBranch = allEarthlyBranches[targetBranchIndex]
 
       // 天干选择（positionToGan）按阴阳选择
-      const gansForPosition = positionToGan[god] || ['甲','乙']
+      const gansForPosition = positionToGan[god] || ['甲', '乙']
       const isYangBranch = targetBranchIndex % 2 === 0
       const selectedGan = isYangBranch ? gansForPosition[0] : gansForPosition[1]
       const cellGanzhi = `${selectedGan}${cellEarthlyBranch}`
 
       // 六神兽计算
-      const sixGodOrder = ['青龙','朱雀','勾陈','白虎','玄武','螣蛇']
+      const sixGodOrder = ['青龙', '朱雀', '勾陈', '白虎', '玄武', '螣蛇']
       let dragonStartPosition = 0
-      switch(myEarthlyBranch) {
+      switch (myEarthlyBranch) {
         case '子':
         case '午':
           dragonStartPosition = 0
@@ -364,19 +442,29 @@ export default function XiaoLiuRenPage() {
     setMethod('date')
   }
 
-  // 开始占卜
+  // 开始占卜（仅显示排盘结果）
   const handleSubmit = () => {
+    if (!prompt || prompt.trim() === '') {
+      promptInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      promptInputRef.current?.focus()
+      setTimeout(() => setShowAlert(true), 300)
+      return
+    }
     const xiaoliuResult = calculateXiaoLiuRen()
     setCalculatedResult(xiaoliuResult)
-    
-    const fullPrompt = `${prompt || '运势'}
+  }
 
-起卦：月${month}日${day}时${hour}
-落宫：${xiaoliuResult.godName}
-五行：${xiaoliuResult.element}
-干支：${xiaoliuResult.ganzhi}`
-    
+  // AI解读（单独调用）
+  const handleAIInterpret = () => {
+    if (!calculatedResult) return
+    const fullPrompt = `${prompt || '运势'}\n\n起卦：月${calculatedResult.month}日${calculatedResult.day}时${calculatedResult.hour}\n落宫：${calculatedResult.godName}\n五行：${calculatedResult.element}\n干支：${calculatedResult.ganzhi}`
+    if (fullPrompt === lastAIPrompt && result) {
+      setShowDrawer(true)
+      return
+    }
+    setLastAIPrompt(fullPrompt)
     onSubmit({ prompt: fullPrompt })
+    setShowDrawer(true)
   }
 
   // 六宫格布局顺序：留连、速喜、赤口 / 大安、空亡、小吉
@@ -396,6 +484,7 @@ export default function XiaoLiuRenPage() {
             占卜问题
           </label>
           <Textarea
+            ref={promptInputRef}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="请输入您想要占卜的问题..."
@@ -413,22 +502,20 @@ export default function XiaoLiuRenPage() {
           <Button
             onClick={() => setMethod('date')}
             variant={method === 'date' ? 'default' : 'outline'}
-            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${
-              method === 'date'
-                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
-                : ''
-            }`}
+            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${method === 'date'
+              ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
+              : ''
+              }`}
           >
             时间起卦
           </Button>
           <Button
             onClick={() => setMethod('number')}
             variant={method === 'number' ? 'default' : 'outline'}
-            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${
-              method === 'number'
-                ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
-                : ''
-            }`}
+            className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base font-medium transition-all ${method === 'number'
+              ? 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white shadow-lg'
+              : ''
+              }`}
           >
             数字起卦
           </Button>
@@ -576,11 +663,11 @@ export default function XiaoLiuRenPage() {
               <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-gray-900 dark:text-gray-100">
                 排盘结果
               </h3>
-              
+
               {/* 六宫格 - 完全按照目标网站结构，保持3列布局 */}
-              <div className="flex justify-center overflow-visible p-3 sm:p-5">
+              <div className="flex justify-center overflow-visible p-2 sm:p-5 w-full">
                 <div
-                  className="grid grid-cols-3 gap-2 sm:gap-3 border-[2px] sm:border-[3px] border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible"
+                  className="grid grid-cols-3 gap-1 sm:gap-3 border-[2px] sm:border-[3px] border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-2xl shadow-2xl bg-white dark:bg-gray-800 overflow-visible w-full max-w-[560px]"
                 >
                   {correctLayoutOrder.map((index) => {
                     // Prefer authoritative gridData from calculation; fall back to building on the fly
@@ -621,20 +708,19 @@ export default function XiaoLiuRenPage() {
                             <div className={`xiaoliu-badge ${tagLabels.join('').length > 1 ? 'small' : ''}`}>{tagLabels.join('')}</div>
                           </div>
                         )}
-                        
+
                         {/* 点击显示详细信息：已绑定到宫格根节点（整个格子可点） */}
-                        
+
                         {/* 五行颜色条 - 底部 */}
                         <div
-                          className={`xiaoliu-bottom-bar ${
-                            branchElement === '木' ? 'el-mu' :
+                          className={`xiaoliu-bottom-bar ${branchElement === '木' ? 'el-mu' :
                             branchElement === '火' ? 'el-huo' :
-                            branchElement === '土' ? 'el-tu' :
-                            branchElement === '金' ? 'el-jin' :
-                            branchElement === '水' ? 'el-shui' : 'el-default'
-                          }`}
+                              branchElement === '土' ? 'el-tu' :
+                                branchElement === '金' ? 'el-jin' :
+                                  branchElement === '水' ? 'el-shui' : 'el-default'
+                            }`}
                         />
-                        
+
                         {/* 宫格内容 */}
                         <div className="xiaoliu-inner">
                           {/* 上部：六神名 + 六亲 */}
@@ -647,7 +733,7 @@ export default function XiaoLiuRenPage() {
                               {liuqin}
                             </div>
                           </div>
-                          
+
                           {/* 中部：天干、地支、五星、六神兽 */}
                           <div className="xiaoliu-mid">
                             <div className="xiaoliu-tianGan">
@@ -671,38 +757,96 @@ export default function XiaoLiuRenPage() {
                 </div>
               </div>
 
-              {/* 计算过程 */}
+              {/* 卦象解读 */}
+              <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-4 text-base sm:text-lg flex items-center gap-2">
+                  <span className="text-xl">📖</span> 卦象解读
+                </h4>
+                <div className="mb-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-2xl font-bold ${calculatedResult.god === 'daan' || calculatedResult.god === 'suxi' || calculatedResult.god === 'xiaoji' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {calculatedResult.godName}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${calculatedResult.god === 'daan' || calculatedResult.god === 'suxi' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : calculatedResult.god === 'xiaoji' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'}`}>
+                      {calculatedResult.god === 'daan' || calculatedResult.god === 'suxi' ? '大吉' : calculatedResult.god === 'xiaoji' ? '小吉' : '凶'}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    {interpretations[calculatedResult.god]?.basic}
+                  </p>
+                </div>
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-3 text-sm">六神组合参考</h5>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {Object.entries(interpretations[calculatedResult.god]?.combinations || {}).map(([key, value]) => (
+                      <div key={key} className={`p-2 rounded-lg text-xs ${key === calculatedResult.god ? 'bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{calculatedResult.godName}+{sixGodNames[key]}：</span>
+                        <span className="text-gray-600 dark:text-gray-400">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 起课步骤 - 完整8步 */}
               <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 text-base sm:text-lg">起课步骤</h4>
-                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
-                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">① 月上起日：</span>
-                    <span className="text-gray-700 dark:text-gray-300 ml-2">
-                      从大安起，数到{lunarMonths[calculatedResult.month - 1]}，再数到{lunarDays[calculatedResult.day - 1]}，
-                      落在 <span className="font-bold text-gray-900 dark:text-gray-100">{sixGodNames[sixGods[calculatedResult.dayResult]]}</span>
-                    </span>
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-4 text-base sm:text-lg">起课步骤</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-blue-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold shrink-0">1</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400 text-xs">确定起卦方式</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">{method === 'date' ? '时间起卦' : '数字起卦'}</p>
                   </div>
-                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-green-500">
-                    <span className="font-bold text-green-600 dark:text-green-400">② 日上起时：</span>
-                    <span className="text-gray-700 dark:text-gray-300 ml-2">
-                      从 {sixGodNames[sixGods[calculatedResult.dayResult]]} 起，数到{hourNames[calculatedResult.hour - 1]}时，
-                      最终落在 <span className="font-bold text-gray-900 dark:text-gray-100">{calculatedResult.godName}</span>
-                    </span>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-cyan-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-cyan-500 text-white text-xs flex items-center justify-center font-bold shrink-0">2</span>
+                      <span className="font-bold text-cyan-600 dark:text-cyan-400 text-xs">确定月日时参数</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">月={calculatedResult.month}, 日={calculatedResult.day}, 时={calculatedResult.hour}</p>
                   </div>
-                  <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-lg border-l-4 border-purple-500">
-                    <span className="font-bold text-purple-600 dark:text-purple-400">③ 五行属性：</span>
-                    <span className="text-gray-700 dark:text-gray-300 ml-2">
-                      {calculatedResult.godName} 对应五行为 
-                      <span className={`font-bold ml-1 element-color ${
-                        calculatedResult.element === '木' ? 'el-color-mu' :
-                        calculatedResult.element === '火' ? 'el-color-huo' :
-                        calculatedResult.element === '土' ? 'el-color-tu' :
-                        calculatedResult.element === '金' ? 'el-color-jin' :
-                        calculatedResult.element === '水' ? 'el-color-shui' : ''
-                      }`}>
-                        {calculatedResult.element}
-                      </span>
-                    </span>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-teal-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-teal-500 text-white text-xs flex items-center justify-center font-bold shrink-0">3</span>
+                      <span className="font-bold text-teal-600 dark:text-teal-400 text-xs">月上起日计算</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">(0+{calculatedResult.month}-1+{calculatedResult.day}-1)%6={calculatedResult.dayResult}</p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-green-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-green-500 text-white text-xs flex items-center justify-center font-bold shrink-0">4</span>
+                      <span className="font-bold text-green-600 dark:text-green-400 text-xs">确定日落地支</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">日落宫位 → <span className="font-medium text-gray-900 dark:text-gray-100">{sixGodNames[sixGods[calculatedResult.dayResult]]}</span></p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-lime-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-lime-500 text-white text-xs flex items-center justify-center font-bold shrink-0">5</span>
+                      <span className="font-bold text-lime-600 dark:text-lime-400 text-xs">日上起时计算</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">({calculatedResult.dayResult}+{calculatedResult.hour}-1)%6={calculatedResult.hourResult}</p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-amber-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold shrink-0">6</span>
+                      <span className="font-bold text-amber-600 dark:text-amber-400 text-xs">确定最终落宫</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">最终结果 → <span className="font-medium text-gray-900 dark:text-gray-100">{calculatedResult.godName}</span></p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-orange-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-orange-500 text-white text-xs flex items-center justify-center font-bold shrink-0">7</span>
+                      <span className="font-bold text-orange-600 dark:text-orange-400 text-xs">确定五行属性</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">五行属性 → <span className={`font-medium ${calculatedResult.element === '木' ? 'text-green-600' : calculatedResult.element === '火' ? 'text-red-600' : calculatedResult.element === '土' ? 'text-yellow-600' : calculatedResult.element === '金' ? 'text-gray-600' : 'text-blue-600'}`}>{calculatedResult.element}</span></p>
+                  </div>
+                  <div className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-purple-400">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-bold shrink-0">8</span>
+                      <span className="font-bold text-purple-600 dark:text-purple-400 text-xs">确定干支属性</span>
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs">干支属性 → <span className="font-medium text-gray-900 dark:text-gray-100">{calculatedResult.ganzhi}</span></p>
                   </div>
                 </div>
               </div>
@@ -710,38 +854,92 @@ export default function XiaoLiuRenPage() {
           </div>
         )}
 
-        {/* 详细信息弹窗 - 完全照抄参考站样式 */}
-        {selectedCell && (
-          <div className="info-dialog-reference" role="dialog" aria-modal="true">
-            <div className="dialog-content">
-              <div className="dialog-header">
-                <button className="close-btn" onClick={() => setSelectedCell(null)}>×</button>
+        {/* 详细信息弹窗 - 使用Portal渲染到body确保始终居中 */}
+        {selectedCell && createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setSelectedCell(null)}
+          >
+            <div
+              className="relative w-full max-w-[900px] mx-4 max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 z-10 flex justify-end p-4 bg-gradient-to-b from-white via-white to-transparent dark:from-gray-800 dark:via-gray-800">
+                <button
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xl font-bold transition-all hover:rotate-90"
+                  onClick={() => setSelectedCell(null)}
+                >
+                  ×
+                </button>
               </div>
-              <div className="content-wrapper">
-                <div className="basic-info">
-                  <p>
-                    <strong>宫位：</strong>
-                    <span className="value">
-                      {selectedCell.godName}
-                      {selectedCell.validationInfo?.position ? ` (第${selectedCell.validationInfo.position}位)` : ''}
-                    </span>
-                  </p>
-                  <p><strong>干支：</strong><span className="value">{selectedCell.ganzhi}</span></p>
-                  <p><strong>地支：</strong><span className="value">{selectedCell.earthlyBranch}</span></p>
-                  <p><strong>五行属性：</strong><span className="value">{selectedCell.branchElement}</span></p>
-                  <p><strong>六神：</strong><span className="value">{selectedCell.sixGodBeast}</span></p>
-                  <p><strong>六亲：</strong><span className="value">{selectedCell.liuqin}</span></p>
-                  <p><strong>五星：</strong><span className="value">{selectedCell.fiveStar}</span></p>
-                </div>
-                <div className="validation-section">
-                  <h4>校准验证信息</h4>
-                  <p><strong>时辰落宫：</strong><span className="value">{selectedCell.validationInfo?.isHourPosition ? '是' : '否'}</span></p>
-                  <p><strong>日落宫位：</strong><span className="value">{selectedCell.validationInfo?.isDayPosition ? '是' : '否'}</span></p>
-                  <p><strong>月落宫位：</strong><span className="value">{selectedCell.validationInfo?.isMonthPosition ? '是' : '否'}</span></p>
+              <div className="px-6 pb-6 -mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <h4 className="font-bold text-blue-700 dark:text-blue-300 mb-3 text-center border-b border-blue-200 dark:border-blue-700 pb-2">基本信息</h4>
+                    <div className="space-y-2 text-sm">
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">宫位</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {selectedCell.godName}
+                          {selectedCell.validationInfo?.position ? ` (第${selectedCell.validationInfo.position}位)` : ''}
+                        </span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">干支</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.ganzhi}</span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">地支</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.earthlyBranch}</span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">五行属性</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.branchElement}</span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">六神</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.sixGodBeast}</span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-blue-100 dark:border-blue-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">六亲</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.liuqin}</span>
+                      </p>
+                      <p className="flex justify-between py-2">
+                        <strong className="text-gray-600 dark:text-gray-400">五星</strong>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{selectedCell.fiveStar}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+                    <h4 className="font-bold text-purple-700 dark:text-purple-300 mb-3 text-center border-b border-purple-200 dark:border-purple-700 pb-2">校准验证信息</h4>
+                    <div className="space-y-2 text-sm">
+                      <p className="flex justify-between py-2 border-b border-purple-100 dark:border-purple-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">时辰落宫</strong>
+                        <span className={`font-medium ${selectedCell.validationInfo?.isHourPosition ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
+                          {selectedCell.validationInfo?.isHourPosition ? '是' : '否'}
+                        </span>
+                      </p>
+                      <p className="flex justify-between py-2 border-b border-purple-100 dark:border-purple-800/50">
+                        <strong className="text-gray-600 dark:text-gray-400">日落宫位</strong>
+                        <span className={`font-medium ${selectedCell.validationInfo?.isDayPosition ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
+                          {selectedCell.validationInfo?.isDayPosition ? '是' : '否'}
+                        </span>
+                      </p>
+                      <p className="flex justify-between py-2">
+                        <strong className="text-gray-600 dark:text-gray-400">月落宫位</strong>
+                        <span className={`font-medium ${selectedCell.validationInfo?.isMonthPosition ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
+                          {selectedCell.validationInfo?.isMonthPosition ? '是' : '否'}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* 时辰对照表 */}
@@ -766,18 +964,38 @@ export default function XiaoLiuRenPage() {
           </div>
         </div>
 
-        {/* 查看AI解读按钮 */}
-        {result && (
-          <div className="flex justify-center">
+        {/* AI解读按钮 - 排盘后显示 */}
+        {calculatedResult && (
+          <div className="flex justify-center gap-4 flex-wrap">
             <Button
-              onClick={() => setShowDrawer(true)}
-              variant="outline"
+              onClick={handleAIInterpret}
+              disabled={loading || resultLoading}
               size="lg"
-              className="gap-2 px-8 py-6 text-lg"
+              className="gap-2 px-8 py-6 text-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg"
             >
-              <Eye className="h-5 w-5" />
-              查看AI解读
+              {(loading || resultLoading) ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  AI解读中...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  获取AI详解
+                </>
+              )}
             </Button>
+            {result && (
+              <Button
+                onClick={() => setShowDrawer(true)}
+                variant="outline"
+                size="lg"
+                className="gap-2 px-8 py-6 text-lg"
+              >
+                <Eye className="h-5 w-5" />
+                查看解读
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -790,6 +1008,48 @@ export default function XiaoLiuRenPage() {
         streaming={streaming}
         title={CONFIG.title}
       />
+
+      {/* 自定义提示弹窗 - 居中显示 */}
+      {showAlert && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowAlert(false)}
+        >
+          <div
+            className="bg-gradient-to-br from-white to-amber-50/50 dark:from-gray-800 dark:to-amber-900/20 rounded-3xl shadow-2xl p-8 mx-4 max-w-[340px] w-full border border-amber-200/50 dark:border-amber-700/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              {/* 精致图标设计 */}
+              <div className="relative w-20 h-20 mx-auto mb-5">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 opacity-20 blur-xl"></div>
+                <div className="relative w-full h-full rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 border-2 border-amber-300/50 dark:border-amber-600/50 flex items-center justify-center shadow-lg">
+                  <svg className="w-10 h-10 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v2" />
+                    <path d="M12 16v2" />
+                    <path d="M6 12h2" />
+                    <path d="M16 12h2" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent mb-2">无事不起卦</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">请先输入您想要占卜的问题<br />方可开始起卦</p>
+              <Button
+                onClick={() => {
+                  setShowAlert(false)
+                  promptInputRef.current?.focus()
+                }}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl shadow-lg shadow-amber-500/25 transition-all hover:shadow-xl hover:shadow-amber-500/30 hover:-translate-y-0.5"
+              >
+                去输入问题
+              </Button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </DivinationCardHeader>
   )
 }

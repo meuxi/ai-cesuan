@@ -14,9 +14,20 @@ from src.user_router import router as user_router
 _logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Chatgpt Divination API")
+
+# CORS配置：生产环境限制允许的域名，开发环境允许所有
+if os.getenv("VERCEL") == "1":
+    allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
+    if allowed_origins_str:
+        allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+    else:
+        allowed_origins = ["*"]  # 未配置时默认允许所有（兼容现有部署）
+else:
+    allowed_origins = ["*"]  # 开发环境允许所有
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

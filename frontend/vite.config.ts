@@ -11,5 +11,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
+  },
+  // 生产构建时移除console和debugger语句
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
+  },
+  server: {
+    host: '0.0.0.0',
+    proxy: {
+      '/api': 'http://localhost:8000'
+    }
   }
 })

@@ -1,7 +1,8 @@
 import logging
+import os
 from typing import Tuple
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 _logger = logging.getLogger(__name__)
@@ -21,6 +22,14 @@ class Settings(BaseSettings):
     github_client_id: str = ""
     github_client_secret: str = Field(default="", exclude=True)
     jwt_secret: str = Field(default="secret", exclude=True)
+    
+    @field_validator('jwt_secret')
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        """验证JWT密钥安全性"""
+        if v == 'secret' and os.getenv('VERCEL') == '1':
+            _logger.warning("⚠️ 生产环境使用默认JWT密钥不安全，请配置jwt_secret环境变量")
+        return v
 
     # google ads settings
     ad_client: str = ""
