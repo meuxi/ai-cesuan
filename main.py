@@ -15,8 +15,17 @@ _logger = logging.getLogger(__name__)
 # Vercel 兼容性：在 Vercel 环境下使用 serverless 导出
 if os.getenv("VERCEL") == "1":
     _logger.info("Running on Vercel platform")
-    from mangum import Mangum
-    handler = Mangum(app)
+    try:
+        # 确保Mangum已安装
+        import mangum
+        _logger.info(f"Mangum version: {mangum.__version__}")
+        handler = mangum.Mangum(app)
+    except ImportError:
+        _logger.error("Mangum package not found. Please install with: pip install mangum")
+        raise
+    except Exception as e:
+        _logger.error(f"Error creating Mangum handler: {str(e)}", exc_info=True)
+        raise
 else:
     _logger.info(f"settings: {settings.model_dump_json(indent=2)}")
 
