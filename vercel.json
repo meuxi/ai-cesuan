@@ -15,8 +15,7 @@
             "config": {
                 "distDir": "dist",
                 "installCommand": "cd frontend && npm install",
-                "buildCommand": "cd frontend && npm run build",
-                "outputDirectory": "frontend/dist"
+                "buildCommand": "cd frontend && npm run build"
             }
         }
     ],
@@ -36,6 +35,13 @@
         {
             "src": "/health",
             "dest": "main.py"
+        },
+        {
+            "src": "/assets/(.*)",
+            "dest": "/frontend/dist/assets/$1",
+            "headers": {
+                "Cache-Control": "public, max-age=31536000, immutable"
+            }
         },
         {
             "src": "/(.*\\.(js|css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|json))",
