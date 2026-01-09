@@ -178,3 +178,11 @@ test_*.bat
 
 # Frontend build output (only keep root dist for backend)
 frontend/dist/
+
+# Temporary files
+*.tmp
+*.bak
+*.out
+*.err
+.vite/
+port*.txt
