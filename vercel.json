@@ -1,64 +1,38 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "main.py",
-            "use": "@vercel/python",
-            "config": {
-                "maxLambdaSize": "50mb",
-                "runtime": "python3.11"
-            }
-        },
-        {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist",
-                "installCommand": "cd frontend && npm install",
-                "buildCommand": "cd frontend && npm run build"
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "main.py"
-        },
-        {
-            "src": "/docs",
-            "dest": "main.py"
-        },
-        {
-            "src": "/openapi.json",
-            "dest": "main.py"
-        },
-        {
-            "src": "/health",
-            "dest": "main.py"
-        },
-        {
-            "src": "/assets/(.*)",
-            "dest": "/frontend/dist/assets/$1",
-            "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
-            }
-        },
-        {
-            "src": "/(.*\.(js|css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot))",
-            "dest": "/frontend/dist/$1",
-            "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
-            }
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/frontend/dist/index.html",
-            "headers": {
-                "Cache-Control": "no-cache, no-store, must-revalidate"
-            }
-        }
-    ],
-    "env": {
-        "VERCEL": "1"
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
     }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "main.py"
+    },
+    {
+      "src": "/docs",
+      "dest": "main.py"
+    },
+    {
+      "src": "/openapi.json",
+      "dest": "main.py"
+    },
+    {
+      "src": "/(.*)\\.(.*)",
+      "dest": "/frontend/dist/$1.$2"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/dist/index.html"
+    }
+  ]
 }
