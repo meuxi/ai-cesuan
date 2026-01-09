@@ -101,6 +101,7 @@ app.add_middleware(
 | **优化方案** | 拆分为多个独立模块 |
 
 **拆分结构：**
+
 ```
 frontend/src/pages/divination/xiaoliu/
 ├── index.tsx              # 主页面（入口）
@@ -170,6 +171,7 @@ declare module 'lunar-javascript' {
 ### 3.2 清理console.log
 
 **受影响文件（17处）：**
+
 - `utils/divinationHistory.ts` (5处)
 - `hooks/index.ts` (2处)
 - `hooks/useDivination.ts` (2处)
@@ -177,6 +179,7 @@ declare module 'lunar-javascript' {
 - 其他6个文件各1处
 
 **修复方案：**
+
 ```bash
 # 方案1：手动清理
 # 搜索并删除所有console.log
@@ -215,6 +218,7 @@ pip install pytest pytest-asyncio httpx
 ```
 
 **优先测试：**
+
 1. 小六壬计算逻辑
 2. API请求处理
 3. 速率限制逻辑
@@ -244,18 +248,19 @@ class APIResponse(BaseModel):
 
 | 优先级 | 任务 | 预计耗时 | 状态 |
 |--------|------|----------|------|
-| 1 | XSS修复（DOMPurify） | 10分钟 | ⏳ 待执行 |
-| 2 | CORS优化 | 15分钟 | ⏳ 待执行 |
-| 3 | JWT验证增强 | 10分钟 | ⏳ 待执行 |
-| 4 | CSS空规则清理 | 5分钟 | ⏳ 待执行 |
-| 5 | console.log清理配置 | 10分钟 | ⏳ 待执行 |
-| 6 | 组件拆分（可选） | 2小时 | 📋 规划中 |
+| 1 | XSS修复（DOMPurify） | 10分钟 | ✅ 已完成 |
+| 2 | CORS优化 | 15分钟 | ✅ 已完成 |
+| 3 | JWT验证增强 | 10分钟 | ✅ 已完成 |
+| 4 | CSS空规则清理 | 5分钟 | ✅ 已完成 |
+| 5 | console.log清理配置 | 10分钟 | ✅ 已完成 |
+| 6 | 组件拆分（可选） | 2小时 | ⚠️ 高风险，暂不执行 |
 
 ---
 
 ## 六、验证清单
 
 修复完成后需验证：
+
 - [ ] AI解读功能正常
 - [ ] 弹窗居中显示
 - [ ] 移动端适配正常
