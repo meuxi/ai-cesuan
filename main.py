@@ -15,15 +15,8 @@ _logger = logging.getLogger(__name__)
 # Vercel 兼容性：在 Vercel 环境下使用 serverless 导出
 if os.getenv("VERCEL") == "1":
     _logger.info("Running on Vercel platform")
-    try:
-        from mangum import Mangum
-        # 将 FastAPI 应用转换为 AWS Lambda handler
-        handler = Mangum(app)
-    except Exception as e:
-        _logger.error(f"Error creating Mangum handler: {e}")
-        # 如果Mangum失败，尝试使用简单的WSGI适配器
-        from fastapi.middleware.wsgi import WSGIMiddleware
-        handler = WSGIMiddleware(app)
+    from mangum import Mangum
+    handler = Mangum(app)
 else:
     _logger.info(f"settings: {settings.model_dump_json(indent=2)}")
 
