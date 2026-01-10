@@ -21,7 +21,7 @@ router = APIRouter()
 _logger = logging.getLogger(__name__)
 
 
-@router.post("/api/divination")
+@router.post("/divination")
 async def divination(
         request: Request,
         divination_body: DivinationBody,

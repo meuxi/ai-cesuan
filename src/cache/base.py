@@ -3,12 +3,12 @@ from typing import Optional
 
 class MetaCacheClient(type):
 
-    cilent_map = {}
+    client_map = {}
 
     def __init__(cls, name, bases, attrs):
         super().__init__(name, bases, attrs)
         if hasattr(cls, '_type'):
-            MetaCacheClient.cilent_map[cls._type] = cls
+            MetaCacheClient.client_map[cls._type] = cls
 
 
 class CacheClientBase(metaclass=MetaCacheClient):

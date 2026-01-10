@@ -23,7 +23,7 @@ GITHUB_TOEKN_URL = "https://github.com/login/oauth/access_token" \
 GITHUB_USER_URL = "https://api.github.com/user"
 
 
-@router.get("/api/v1/settings", tags=["User"])
+@router.get("/v1/settings", tags=["User"])
 async def info(user: Optional[User] = Depends(get_user)):
     return SettingsInfo(
         login_type=user.login_type if user else "",
@@ -40,17 +40,17 @@ async def info(user: Optional[User] = Depends(get_user)):
     )
 
 
-@router.get("/api/v1/login", tags=["User"])
+@router.get("/v1/login", tags=["User"])
 async def login(login_type: str, redirect_url: str):
     if login_type == "github":
         return f"{GITHUB_URL}&redirect_uri={redirect_url}"
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content="Login type not supported"
+        detail="Login type not supported"
     )
 
 
-@router.post("/api/v1/oauth", tags=["User"])
+@router.post("/v1/oauth", tags=["User"])
 async def oauth(oauth_body: OauthBody):
     if oauth_body.login_type == "github" and oauth_body.code:
         async with httpx.AsyncClient() as client:
