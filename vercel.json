@@ -12,7 +12,8 @@
             "src": "frontend/package.json",
             "use": "@vercel/static-build",
             "config": {
-                "distDir": "dist"
+                "distDir": "dist",
+                "outputDirectory": "dist"
             }
         }
     ],
@@ -34,28 +35,11 @@
             "dest": "main.py"
         },
         {
-            "src": "/assets/(.*)",
-            "dest": "frontend/dist/assets/$1",
-            "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
-            }
-        },
-        {
-            "src": "/(.*\\.(js|css|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot|json))",
-            "dest": "frontend/dist/$1",
-            "headers": {
-                "Cache-Control": "public, max-age=31536000, immutable"
-            }
-        },
-        {
             "handle": "filesystem"
         },
         {
             "src": "/(.*)",
-            "dest": "frontend/dist/index.html",
-            "headers": {
-                "Cache-Control": "no-cache, no-store, must-revalidate"
-            }
+            "dest": "/index.html"
         }
     ],
     "env": {
