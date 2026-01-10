@@ -1,20 +1,12 @@
 {
-    "version": 2,
     "builds": [
         {
-            "src": "main.py",
-            "use": "@vercel/python",
-            "config": {
-                "maxLambdaSize": "50mb"
-            }
+            "src": "frontend/package.json",
+            "use": "@vercel/static-build"
         },
         {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "dist",
-                "outputDirectory": "dist"
-            }
+            "src": "main.py",
+            "use": "@vercel/python"
         }
     ],
     "routes": [
@@ -31,18 +23,12 @@
             "dest": "main.py"
         },
         {
-            "src": "/health",
-            "dest": "main.py"
-        },
-        {
-            "handle": "filesystem"
+            "src": "/(.*)\\.(.*)",
+            "dest": "/frontend/$1.$2"
         },
         {
             "src": "/(.*)",
-            "dest": "/index.html"
+            "dest": "frontend/"
         }
-    ],
-    "env": {
-        "VERCEL": "1"
-    }
+    ]
 }
