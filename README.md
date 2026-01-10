@@ -225,122 +225,12 @@ export default defineConfig({
 
 > 📖 **详细配置说明**：请查看 `.env.example` 文件中的注释
 
----
 
-## 🧪 测试指南
-
-### 快速测试（无需 OpenAI API Key）
-
-如果你想先测试界面和基本功能：
-
-1. 在 `.env` 文件中设置一个虚拟的 `api_key`：
-   ```
-   api_key=sk-test-1234567890
-   ```
-
-2. 运行应用后，占卜功能会因 API Key 无效而失败，但可以：
-   - 测试所有页面的加载和渲染
-   - 测试响应式布局
-   - 测试主题切换
-   - 测试历史记录功能（本地存储）
-
-3. 如果需要完整功能测试，请申请有效的 OpenAI API Key
-
-### 单元测试
-
-项目包含基本的测试框架：
-
-```bash
-# 运行 Python 测试
-pytest
-
-# 运行前端测试
-cd frontend
-pnpm test
-```
-
----
-
-## 🔍 常见问题
-
-### 1. 如何获取 OpenAI API Key？
-访问 [OpenAI Platform](https://platform.openai.com/api-keys) 创建 API Key。
-
-### 2. 支持哪些 OpenAI 模型？
-默认支持 gpt-3.5-turbo，也可配置为 gpt-4、gpt-4-turbo 等。
-
-### 3. 如何修改端口？
-修改 `main.py` 中的 `uvicorn.run` 参数：
-```python
-uvicorn.run(app, host="0.0.0.0", port=8080)
-```
-
-### 4. 如何启用 Redis 缓存？
-1. 安装并运行 Redis
-2. 在 `.env` 中设置：
-   ```
-   cache_client_type=redis
-   redis_url=redis://localhost:6379/0
-   ```
-
-### 5. 如何贡献代码？
-欢迎提交 Pull Request！请确保：
-- 代码符合现有风格
-- 添加必要的测试
-- 更新相关文档
-
----
-
-## 📁 项目结构
-
-```
-divination-main/
-├── frontend/              # React + Vite 前端
-│   ├── src/
-│   │   ├── components/    # 通用组件
-│   │   ├── pages/        # 页面组件
-│   │   ├── layouts/      # 布局组件
-│   │   └── utils/        # 工具函数
-│   └── package.json
-├── src/                  # FastAPI 后端
-│   ├── cache/           # 缓存实现
-│   ├── divination/      # 占卜算法
-│   ├── models.py        # 数据模型
-│   └── app.py           # 主应用
-├── requirements.txt     # Python 依赖
-├── main.py             # 入口文件
-├── Dockerfile          # Docker 配置
-└── README.md           # 本文档
-```
-
----
-
-## 📄 相关文档
-
-- [QUICK_START.md](./QUICK_START.md) - 快速开始指南
-- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - 详细部署指南
-- [OPTIMIZATION_SUMMARY.md](./OPTIMIZATION_SUMMARY.md) - 优化总结
-- [AGENTS.md](./AGENTS.md) - AI 代理配置
-
----
-
-## 🤝 贡献
-
-欢迎任何形式的贡献！包括但不限于：
-- 报告 Bug
-- 提出新功能
-- 改进文档
-- 提交代码
-
-请阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)（如有）了解详情。
-
----
 
 ## 📜 许可证
 
-MIT License © 2024 [Meuxi](https://github.com/meuxi)
+MIT License
 
----
 
 ## 🌟 致谢
 
