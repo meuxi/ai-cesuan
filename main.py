@@ -75,33 +75,10 @@ if os.getenv("VERCEL") == "1":
     logger.info(f"Python 版本: {sys.version}")
     logger.info(f"当前目录: {os.getcwd()}")
     
-    try:
-        # 导入 mangum 适配器
-        import mangum
-        
-        # 创建 Mangum handler - 这是 Vercel 需要的
-        handler = mangum.Mangum(app, lifespan="auto")
-        logger.info("✅ Mangum handler 已创建")
-        
-        # 设置 application 变量（向后兼容）
-        application = handler
-        
-        logger.info(f"handler 类型: {type(handler)}")
-        
-    except ImportError as e:
-        logger.error(f"❌ 缺少 mangum 包: {e}")
-        logger.error("请添加 'mangum' 到 requirements.txt")
-        
-        # 如果没有 mangum，使用 FastAPI app 作为备选
-        handler = app
-        application = app
-        logger.warning("⚠️ 使用 FastAPI app 作为 handler")
-        
-    except Exception as e:
-        logger.error(f"❌ 创建 Mangum handler 时出错: {e}")
-        handler = app
-        application = app
-        logger.warning("⚠️ 使用 FastAPI app 作为 handler（出错后备）")
+    # Vercel Python运行时直接支持ASGI应用，不需要Mangum适配器
+    handler = app
+    application = app
+    logger.info("✅ 直接使用FastAPI app作为handler")
         
 else:
     # 本地开发环境
