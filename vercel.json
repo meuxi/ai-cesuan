@@ -20,19 +20,19 @@
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "main.py"
+            "dest": "/main.py"
         },
         {
             "src": "/docs",
-            "dest": "main.py"
+            "dest": "/main.py"
         },
         {
             "src": "/openapi.json",
-            "dest": "main.py"
+            "dest": "/main.py"
         },
         {
             "src": "/health",
-            "dest": "main.py"
+            "dest": "/main.py"
         },
         {
             "src": "/assets/(.*)",
@@ -47,6 +47,9 @@
             "headers": {
                 "Cache-Control": "public, max-age=31536000, immutable"
             }
+        },
+        {
+            "handle": "filesystem"
         },
         {
             "src": "/(.*)",
