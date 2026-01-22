@@ -187,5 +187,5 @@ frontend/dist/
 .vite/
 port*.txt
 
-# Runtime data
-data/
+# Runtime data (项目根目录的data文件夹)
+/data/
