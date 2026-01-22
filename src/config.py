@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     zhipu_api_key: str = Field(default="", exclude=True)
     zhipu_api_base: str = "https://open.bigmodel.cn/api/paas/v4"
     zhipu_model: str = "glm-4-air"
+    
+    # 硅基流动 SiliconFlow API settings
+    siliconflow_api_key: str = Field(default="", exclude=True)
+    siliconflow_api_base: str = "https://api.siliconflow.cn/v1"
+    siliconflow_model: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
 
     # github oauth login settings
     github_client_id: str = ""

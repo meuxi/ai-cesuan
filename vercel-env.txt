@@ -1,0 +1,32 @@
+# ==========================================
+# Vercel 环境变量配置
+# 在 Vercel 项目设置 -> Environment Variables 中逐个添加
+# ==========================================
+
+# ============ AI服务配置（硅基流动）============
+siliconflow_api_key=sk-aujizrvmvrxemkdnwhbkdnmzxgsrezptpeokpwjswbuzlrno
+siliconflow_api_base=https://api.siliconflow.cn/v1
+siliconflow_model=deepseek-ai/DeepSeek-V3.2
+
+# 同时作为主API使用（兼容OpenAI格式）
+api_key=sk-aujizrvmvrxemkdnwhbkdnmzxgsrezptpeokpwjswbuzlrno
+api_base=https://api.siliconflow.cn/v1
+model=deepseek-ai/DeepSeek-V3.2
+
+# ============ 谷歌广告配置 ============
+ad_client=ca-pub-1821747886980667
+
+# ============ 安全配置 ============
+jwt_secret=ai-cesuan-vercel-secret-key-2026
+enable_rate_limit=true
+
+# ============ 缓存配置 ============
+cache_client_type=memory
+
+# ============ 项目配置 ============
+project_name=ai-cesuan
+
+# ==========================================
+# 前端环境变量（在 Vercel 中也需要添加）
+# ==========================================
+VITE_ANALYTICS_AIZHAN=https://node95.aizhantj.com:21233/tjjs/?k=ifuz82rti2h
