@@ -2,6 +2,7 @@
 用户配额管理系统
 支持多层级用户配额控制和使用量追踪
 """
+import os
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
@@ -12,6 +13,9 @@ import json
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# 检测是否在Vercel环境（只读文件系统）
+IS_VERCEL = os.getenv("VERCEL") == "1"
 
 
 class QuotaTier(Enum):
@@ -101,12 +105,19 @@ class UserQuotaManager:
         # 用户等级映射
         self._user_tiers: Dict[str, QuotaTier] = {}
         
-        # 数据持久化目录
-        self._data_dir = Path("data/quota")
-        self._data_dir.mkdir(parents=True, exist_ok=True)
-        
-        # 加载持久化数据
-        self._load_usage_data()
+        # 数据持久化目录（Vercel环境下跳过文件存储）
+        self._data_dir = None
+        if not IS_VERCEL:
+            self._data_dir = Path("data/quota")
+            try:
+                self._data_dir.mkdir(parents=True, exist_ok=True)
+                # 加载持久化数据
+                self._load_usage_data()
+            except OSError as e:
+                logger.warning(f"无法创建数据目录，将仅使用内存存储: {e}")
+                self._data_dir = None
+        else:
+            logger.info("Vercel环境检测到，使用内存存储配额数据")
         
         self._initialized = True
         logger.info("UserQuotaManager initialized")
@@ -117,6 +128,8 @@ class UserQuotaManager:
     
     def _load_usage_data(self):
         """加载今日使用数据"""
+        if self._data_dir is None:
+            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         if today_file.exists():
             try:
@@ -130,6 +143,8 @@ class UserQuotaManager:
     
     def _save_usage_data(self):
         """保存使用数据"""
+        if self._data_dir is None:
+            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         try:
             data = {}
