@@ -66,7 +66,8 @@ class Settings(BaseSettings):
     # rate limit xxx request per xx seconds
     rate_limit: Tuple[int, int] = (60, 60 * 60)
     user_rate_limit: Tuple[int, int] = (600, 60 * 60)
-
+    # 禁止词汇配置（新增，解决报错）
+    stop_words: list[str] = Field(default=[], description="占卜输入的禁止词汇列表，命中则拒绝请求")
     # quota settings (用户配额限制)
     quota_free_daily_calls: int = 10        # 免费用户每日调用次数上限
     quota_free_daily_tokens: int = 20000    # 免费用户每日Token使用上限
