@@ -69,6 +69,8 @@ interface SkeletonProps {
   width?: string | number
   /** 高度 */
   height?: string | number
+  /** 圆角 */
+  borderRadius?: string | number
   /** 行数（仅 text 变体） */
   lines?: number
   /** 是否带动画 */
@@ -80,12 +82,13 @@ export function Skeleton({
   variant = 'text',
   width,
   height,
+  borderRadius,
   lines = 1,
   animation = true,
   className = ''
 }: SkeletonProps) {
   const baseClass = 'bg-muted'
-  
+
   if (variant === 'text') {
     return (
       <div className={`space-y-2 ${className}`} style={{ width }}>
@@ -100,7 +103,7 @@ export function Skeleton({
       </div>
     )
   }
-  
+
   if (variant === 'circular') {
     const size = width || height || 40
     return (
@@ -112,13 +115,13 @@ export function Skeleton({
       />
     )
   }
-  
+
   // rectangular
   return (
     <Shimmer
       width={width || '100%'}
       height={height || 100}
-      borderRadius={8}
+      borderRadius={borderRadius ?? 8}
       className={className}
     />
   )

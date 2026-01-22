@@ -20,6 +20,7 @@ interface NavButtonProps {
     onClick: () => void;
     icon: React.ReactElement;
     label: string;
+    isDark?: boolean;
 }
 
 const Layout: React.FC<Props> = ({ children, activeTab, onTabChange }) => {

@@ -53,21 +53,21 @@ interface TooltipProps {
 
 // Recharts 自定义 Shape 属性类型
 interface CandleShapeProps {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    payload: KLinePoint;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    payload?: KLinePoint;
     yAxis?: { scale: (value: number) => number };
 }
 
 // Recharts LabelList 属性类型
 interface LabelProps {
-    x: number;
-    y: number;
-    width: number;
-    value: number;
-    maxHigh: number;
+    x?: number;
+    y?: number;
+    width?: number;
+    value?: number;
+    maxHigh?: number;
 }
 
 const CustomTooltip = ({ active, payload }: TooltipProps) => {
@@ -123,15 +123,17 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
 
 // CandleShape with cleaner wicks - 使用主题颜色
 const CandleShape = (props: CandleShapeProps) => {
-    const { x, y, width, height, payload, yAxis } = props;
+    const { x = 0, y = 0, width = 0, height = 0, payload, yAxis } = props;
+
+    if (!payload) return null;
 
     const isUp = payload.close >= payload.open;
     // 使用主题感知的颜色
-    const color = isUp 
-        ? getThemeColor('--kline-up', THEME_COLORS.up) 
+    const color = isUp
+        ? getThemeColor('--kline-up', THEME_COLORS.up)
         : getThemeColor('--kline-down', THEME_COLORS.down);
-    const strokeColor = isUp 
-        ? getThemeColor('--kline-up-stroke', THEME_COLORS.upStroke) 
+    const strokeColor = isUp
+        ? getThemeColor('--kline-up-stroke', THEME_COLORS.upStroke)
         : getThemeColor('--kline-down-stroke', THEME_COLORS.downStroke);
 
     let highY = y;
@@ -173,10 +175,10 @@ const CandleShape = (props: CandleShapeProps) => {
 
 // Custom Label Component for the Peak Star - 使用主题颜色
 const PeakLabel = (props: LabelProps) => {
-    const { x, y, width, value, maxHigh } = props;
+    const { x = 0, y = 0, width = 0, value, maxHigh } = props;
 
     // Only render if this value equals the global max high
-    if (value !== maxHigh) return null;
+    if (value === undefined || value !== maxHigh) return null;
 
     const starFill = getThemeColor('--kline-down', THEME_COLORS.down);
     const starStroke = getThemeColor('--kline-down-stroke', THEME_COLORS.downStroke);

@@ -10,7 +10,7 @@ interface CardProps {
     title: string;
     icon: LucideIcon;
     content: string | React.ReactNode | string[];
-    score: number;
+    score?: number;
     colorClass: string;
     extraBadges?: React.ReactNode;
 }

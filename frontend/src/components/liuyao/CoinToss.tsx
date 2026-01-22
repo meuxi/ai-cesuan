@@ -29,12 +29,12 @@ interface CoinTossProps {
 }
 
 // 铜钱组件
-function Coin({ 
-  face, 
-  index, 
+function Coin({
+  face,
+  index,
   isSpinning,
-  delay = 0 
-}: { 
+  delay = 0
+}: {
   face: CoinFace
   index: number
   isSpinning: boolean
@@ -45,13 +45,13 @@ function Coin({
       className="relative w-16 h-16 md:w-20 md:h-20"
       style={{ perspective: '500px' }}
       initial={{ y: -100, opacity: 0 }}
-      animate={{ 
+      animate={{
         y: isSpinning ? [0, -50, 0] : 0,
         opacity: 1,
         rotateY: isSpinning ? [0, 1080, 1800] : (face === 1 ? 0 : 180),
       }}
       transition={{
-        y: { 
+        y: {
           duration: 1.5,
           times: [0, 0.5, 1],
           ease: "easeOut",
@@ -68,12 +68,12 @@ function Coin({
         }
       }}
     >
-      <div 
+      <div
         className="w-full h-full"
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* 正面（字） - 阳 */}
-        <div 
+        <div
           className={cn(
             "absolute inset-0 rounded-full flex items-center justify-center",
             "bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600",
@@ -89,15 +89,15 @@ function Coin({
             <div className="w-6 h-0.5 bg-amber-800/60 rounded" />
           </div>
         </div>
-        
+
         {/* 背面（背） - 阴 */}
-        <div 
+        <div
           className={cn(
             "absolute inset-0 rounded-full flex items-center justify-center",
             "bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700",
             "border-4 border-amber-800/50 shadow-lg"
           )}
-          style={{ 
+          style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)'
           }}
@@ -116,14 +116,12 @@ function Coin({
 
 // 计算爻的类型
 function getYaoType(result: TossResult): YaoType {
-  const sum = result.reduce((a, b) => a + b, 0)
-  switch (sum) {
-    case 0: return 'laoyin'    // 三背 - 老阴（变爻）
-    case 1: return 'shaoyang'  // 一字二背 - 少阳
-    case 2: return 'shaoyin'   // 二字一背 - 少阴
-    case 3: return 'laoyang'   // 三字 - 老阳（变爻）
-    default: return 'shaoyang'
-  }
+  const sum = result.reduce((a: number, b: number) => a + b, 0 as number)
+  if (sum === 0) return 'laoyin'     // 三背 - 老阴（变爻）
+  if (sum === 1) return 'shaoyang'   // 一字二背 - 少阳
+  if (sum === 2) return 'shaoyin'    // 二字一背 - 少阴
+  if (sum === 3) return 'laoyang'    // 三字 - 老阳（变爻）
+  return 'shaoyang'
 }
 
 // 爻的显示名称
@@ -143,23 +141,23 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
   // 投掷铜钱
   const toss = useCallback(() => {
     if (isSpinning || hasCompleted) return
-    
+
     setIsSpinning(true)
     setResult(null)
-    
+
     // 生成随机结果
     const newResult: TossResult = [
       Math.random() > 0.5 ? 1 : 0,
       Math.random() > 0.5 ? 1 : 0,
       Math.random() > 0.5 ? 1 : 0,
     ]
-    
+
     // 动画结束后显示结果
     setTimeout(() => {
       setResult(newResult)
       setIsSpinning(false)
       setHasCompleted(true)
-      
+
       const yaoType = getYaoType(newResult)
       onComplete(newResult, yaoType)
     }, 2000)
@@ -185,7 +183,7 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
           {i18n.language === 'en' ? `Line ${yaoIndex + 1}` : `第${['初', '二', '三', '四', '五', '上'][yaoIndex]}爻`}
         </span>
       </div>
-      
+
       {/* 铜钱 */}
       <div className="flex items-center justify-center gap-3">
         {[0, 1, 2].map((i) => (
@@ -198,7 +196,7 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
           />
         ))}
       </div>
-      
+
       {/* 结果显示 */}
       <AnimatePresence>
         {result && yaoInfo && (
@@ -212,8 +210,8 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
               <span className="text-2xl">{yaoInfo.symbol}</span>
               <span className={cn(
                 "font-bold",
-                yaoType === 'laoyang' || yaoType === 'shaoyang' 
-                  ? 'text-amber-600 dark:text-amber-400' 
+                yaoType === 'laoyang' || yaoType === 'shaoyang'
+                  ? 'text-amber-600 dark:text-amber-400'
                   : 'text-slate-600 dark:text-slate-400'
               )}>
                 {yaoLabel}
@@ -230,7 +228,7 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* 投掷按钮 */}
       {!autoToss && !hasCompleted && (
         <motion.button
@@ -246,8 +244,8 @@ export function CoinToss({ yaoIndex, onComplete, autoToss = false, delay = 0 }: 
             "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
         >
-          {isSpinning 
-            ? (i18n.language === 'en' ? 'Tossing...' : '投掷中...') 
+          {isSpinning
+            ? (i18n.language === 'en' ? 'Tossing...' : '投掷中...')
             : (i18n.language === 'en' ? 'Toss Coins' : '投掷铜钱')
           }
         </motion.button>
@@ -271,7 +269,7 @@ export function SixCoinToss({ onComplete, autoToss = false }: SixCoinTossProps) 
   const handleYaoComplete = useCallback((result: TossResult, yaoType: YaoType) => {
     const newResults = [...results, { result, yaoType }]
     setResults(newResults)
-    
+
     if (currentYao < 5) {
       setTimeout(() => setCurrentYao(prev => prev + 1), 500)
     } else {
