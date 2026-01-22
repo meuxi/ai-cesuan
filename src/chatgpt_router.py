@@ -277,8 +277,12 @@ async def divination(
             latency = time.time() - request_start_time
             input_tokens = estimate_tokens(system_prompt + prompt)
             output_tokens = estimate_tokens(result.response.content)
-            cost = result.cost if hasattr(result, 'cost') else estimate_cost(
-                input_tokens + output_tokens, 0.002
+            # 新增：确保 token 数不为空/0
+total_tokens = input_tokens + output_tokens
+# 修复空值问题：避免空值参与计算
+cost = result.cost if (hasattr(result, 'cost') and result.cost is not None) else (
+    estimate_cost(total_tokens, 0.002) if total_tokens > 0 else 0.0
+)
             )
             
             cost_monitor.record_call(
