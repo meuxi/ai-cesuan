@@ -50,6 +50,7 @@ class DivinationBody(BaseModel):
     birthday: Optional[str] = None
     lunar_birthday: Optional[str] = None  # 农历生日字符串
     bazi_data: Optional[dict] = None  # 八字排盘数据（用于增强AI分析）
+    ziwei_data: Optional[dict] = None  # 紫微斗数排盘数据（用于增强AI分析）
     new_name: Optional[NewName] = None
     plum_flower: Optional[PlumFlower] = None
     fate: Optional[Fate] = None

@@ -76,6 +76,10 @@ TOOL_OUTPUT_OVERRIDES: Dict[str, Dict[OutputMode, Dict[str, Any]]] = {
     },
     "dream_divination": {
         OutputMode.QUICK: {"max_chars": 350, "max_tokens": 300}
+    },
+    "ziwei": {
+        OutputMode.STANDARD: {"max_chars": 2500, "max_tokens": 2000},
+        OutputMode.DETAILED: {"max_chars": 5000, "max_tokens": 4000}
     }
 }
 
