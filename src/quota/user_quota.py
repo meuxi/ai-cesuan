@@ -17,6 +17,11 @@ logger = logging.getLogger(__name__)
 # 检测是否在Vercel环境（只读文件系统）
 IS_VERCEL = os.getenv("VERCEL") == "1"
 
+# 延迟导入 settings 避免循环引用
+def _get_settings():
+    from src.config import settings
+    return settings
+
 
 class QuotaTier(Enum):
     """用户等级"""
@@ -36,37 +41,39 @@ class TierQuotaConfig:
     priority: int              # 请求优先级 (越高越优先)
 
 
-# 预定义等级配置
-TIER_CONFIGS: Dict[QuotaTier, TierQuotaConfig] = {
-    QuotaTier.FREE: TierQuotaConfig(
-        daily_calls=10,
-        daily_tokens=20000,
-        max_output_tokens=500,
-        allowed_models=["gpt-3.5-turbo", "deepseek-chat"],
-        priority=1
-    ),
-    QuotaTier.VIP: TierQuotaConfig(
-        daily_calls=50,
-        daily_tokens=100000,
-        max_output_tokens=1000,
-        allowed_models=["gpt-3.5-turbo", "gpt-4", "deepseek-chat", "claude-3-haiku"],
-        priority=5
-    ),
-    QuotaTier.PREMIUM: TierQuotaConfig(
-        daily_calls=200,
-        daily_tokens=500000,
-        max_output_tokens=2000,
-        allowed_models=["gpt-4", "gpt-4-turbo", "claude-3-sonnet", "deepseek-chat"],
-        priority=10
-    ),
-    QuotaTier.UNLIMITED: TierQuotaConfig(
-        daily_calls=-1,  # -1 表示无限制
-        daily_tokens=-1,
-        max_output_tokens=4000,
-        allowed_models=["*"],  # * 表示所有模型
-        priority=100
-    )
-}
+def get_tier_configs() -> Dict[QuotaTier, TierQuotaConfig]:
+    """动态获取等级配置（从环境变量读取）"""
+    settings = _get_settings()
+    return {
+        QuotaTier.FREE: TierQuotaConfig(
+            daily_calls=settings.quota_free_daily_calls,
+            daily_tokens=settings.quota_free_daily_tokens,
+            max_output_tokens=500,
+            allowed_models=["gpt-3.5-turbo", "deepseek-chat"],
+            priority=1
+        ),
+        QuotaTier.VIP: TierQuotaConfig(
+            daily_calls=settings.quota_vip_daily_calls,
+            daily_tokens=settings.quota_vip_daily_tokens,
+            max_output_tokens=1000,
+            allowed_models=["gpt-3.5-turbo", "gpt-4", "deepseek-chat", "claude-3-haiku"],
+            priority=5
+        ),
+        QuotaTier.PREMIUM: TierQuotaConfig(
+            daily_calls=settings.quota_premium_daily_calls,
+            daily_tokens=settings.quota_premium_daily_tokens,
+            max_output_tokens=2000,
+            allowed_models=["gpt-4", "gpt-4-turbo", "claude-3-sonnet", "deepseek-chat"],
+            priority=10
+        ),
+        QuotaTier.UNLIMITED: TierQuotaConfig(
+            daily_calls=-1,  # -1 表示无限制
+            daily_tokens=-1,
+            max_output_tokens=4000,
+            allowed_models=["*"],  # * 表示所有模型
+            priority=100
+        )
+    }
 
 
 @dataclass
@@ -128,8 +135,6 @@ class UserQuotaManager:
     
     def _load_usage_data(self):
         """加载今日使用数据"""
-        if self._data_dir is None:
-            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         if today_file.exists():
             try:
@@ -143,8 +148,6 @@ class UserQuotaManager:
     
     def _save_usage_data(self):
         """保存使用数据"""
-        if self._data_dir is None:
-            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         try:
             data = {}
@@ -175,7 +178,8 @@ class UserQuotaManager:
     
     def get_tier_config(self, tier: QuotaTier) -> TierQuotaConfig:
         """获取等级配置"""
-        return TIER_CONFIGS.get(tier, TIER_CONFIGS[QuotaTier.FREE])
+        configs = get_tier_configs()
+        return configs.get(tier, configs[QuotaTier.FREE])
     
     def get_user_usage(self, user_id: str) -> UserUsage:
         """获取用户今日使用情况"""
