@@ -57,11 +57,13 @@ allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
 
 if is_vercel:
     allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
-    allow_credentials = bool(allowed_origins)  # 有具体源才允许凭证
     if not allowed_origins:
-        allowed_origins = []
-        _logger.warning("⚠️  生产环境未配置ALLOWED_ORIGINS，CORS限制所有跨域请求")
+        # Vercel环境默认允许所有源（适用于单域名部署）
+        allowed_origins = ["*"]
+        allow_credentials = False
+        _logger.info("Vercel环境CORS设置为允许所有源")
     else:
+        allow_credentials = True
         _logger.info(f"生产环境CORS允许的源: {allowed_origins}")
 else:
     allowed_origins = ["*"]
