@@ -14,6 +14,9 @@ import os
 
 logger = logging.getLogger(__name__)
 
+# 检测是否在Vercel环境（只读文件系统）
+IS_VERCEL = os.getenv("VERCEL") == "1"
+
 
 class PromptCacheConfig:
     """缓存配置"""
@@ -64,9 +67,17 @@ class MultiLevelPromptCache:
         # L2: Redis缓存 (延迟初始化)
         self._redis_client = None
         
-        # L3: 文件缓存目录
-        self._cache_dir = Path(PromptCacheConfig.L3_CACHE_DIR)
-        self._cache_dir.mkdir(parents=True, exist_ok=True)
+        # L3: 文件缓存目录（Vercel环境下跳过）
+        self._cache_dir = None
+        if not IS_VERCEL:
+            self._cache_dir = Path(PromptCacheConfig.L3_CACHE_DIR)
+            try:
+                self._cache_dir.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                logger.warning(f"无法创建缓存目录，将仅使用内存和Redis缓存: {e}")
+                self._cache_dir = None
+        else:
+            logger.info("Vercel环境检测到，跳过文件缓存")
         
         # 统计信息
         self._stats = {
@@ -167,6 +178,9 @@ class MultiLevelPromptCache:
     # ========== L3 文件缓存 ==========
     def _l3_get(self, key: str) -> Optional[str]:
         """从L3文件缓存获取"""
+        if self._cache_dir is None:
+            self._update_stats("l3_misses")
+            return None
         cache_file = self._cache_dir / f"{key}.json"
         
         if not cache_file.exists():
@@ -193,6 +207,8 @@ class MultiLevelPromptCache:
     
     def _l3_set(self, key: str, value: str):
         """设置L3文件缓存"""
+        if self._cache_dir is None:
+            return
         cache_file = self._cache_dir / f"{key}.json"
         
         try:
@@ -282,12 +298,15 @@ class MultiLevelPromptCache:
                 pass
         
         # L3
-        cache_file = self._cache_dir / f"{key}.json"
-        if cache_file.exists():
-            cache_file.unlink()
+        if self._cache_dir is not None:
+            cache_file = self._cache_dir / f"{key}.json"
+            if cache_file.exists():
+                cache_file.unlink()
     
     def _invalidate_template(self, template_id: str):
         """失效模板所有缓存（仅清理L3，因为L1/L2有TTL）"""
+        if self._cache_dir is None:
+            return
         for cache_file in self._cache_dir.glob("*.json"):
             try:
                 with open(cache_file, "r", encoding="utf-8") as f:
@@ -334,11 +353,12 @@ class MultiLevelPromptCache:
             self._l1_cache.clear()
         
         # L3
-        for cache_file in self._cache_dir.glob("*.json"):
-            try:
-                cache_file.unlink()
-            except Exception:
-                pass
+        if self._cache_dir is not None:
+            for cache_file in self._cache_dir.glob("*.json"):
+                try:
+                    cache_file.unlink()
+                except Exception:
+                    pass
         
         logger.info("All caches cleared")
 
