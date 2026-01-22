@@ -1,0 +1,12 @@
+{
+    "name": "iztro-bridge",
+    "version": "1.0.0",
+    "description": "Node.js bridge for iztro library",
+    "main": "iztro_bridge.js",
+    "scripts": {
+        "start": "node iztro_bridge.js"
+    },
+    "dependencies": {
+        "iztro": "^2.4.7"
+    }
+}

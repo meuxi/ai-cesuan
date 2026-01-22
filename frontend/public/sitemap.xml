@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 首页 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 塔罗牌占卜 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/tarot</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 生辰八字 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/birthday</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 周公解梦 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/dream</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 姓名五格 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/name</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 起名取名 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/new_name</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 梅花易数 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/plum_flower</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 姻缘配对 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/fate</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 关于页面 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/about</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- 设置页面 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/settings</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- 紫微斗数 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/ziwei</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 六爻占卜 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/liuyao</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 合婚配对 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/hehun</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 小六壬 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/xiaoliu</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 老黄历 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/laohuangli</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 奇门遁甲 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/qimen</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 诸葛神算 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/zhuge</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 抽签 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/chouqian</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 每日运势 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/daily</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 生肖运势 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/divination/zodiac</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 服务条款 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/terms</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- 隐私政策 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/privacy</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- 免责声明 -->
+  <url>
+    <loc>https://divination.app.awsl.uk/disclaimer</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>

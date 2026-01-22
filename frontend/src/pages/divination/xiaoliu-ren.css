@@ -1,0 +1,1422 @@
+.xiaoliu-card {
+  width: 180px;
+  height: 200px;
+  font-family: "Noto Serif SC", serif;
+  overflow: hidden;
+  position: relative;
+  border-radius: 0;
+  box-shadow: none;
+  transition: all 0.3s ease;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .xiaoliu-card {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* 响应式 - 平板设备（768px以下） */
+@media (max-width: 768px) {
+  .xiaoliu-card {
+    width: 140px;
+    height: 160px;
+  }
+
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 11px;
+  }
+
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 10px;
+  }
+
+  .xiaoliu-inner {
+    padding: 10px 8px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 1rem;
+  }
+
+  .xiaoliu-liuqin {
+    font-size: 0.9rem;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 1.1rem;
+  }
+
+  .branchName {
+    font-size: 1rem;
+  }
+
+  .branchElement {
+    font-size: 0.75rem;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.9rem;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.85rem;
+  }
+}
+
+
+
+/* 传统美学风格 - 斜角朱砂红印章标签 */
+.xiaoliu-card {
+  overflow: hidden;
+}
+
+/* 标签容器 - 参考源码 .time-tags-container */
+.xiaoliu-badge-container {
+  position: absolute;
+  top: 39px;
+  right: -34px;
+  transform-origin: right top;
+  transform: rotate(45deg);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.xiaoliu-badge {
+  font-weight: 700;
+  color: hsl(var(--destructive-foreground));
+
+  /* 朱砂红纯色 */
+  background-color: hsl(var(--destructive));
+
+  /* 尺寸和间距 - 参考源码 */
+  padding: 5px 49px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+
+  /* 简洁线条，圆角适中 */
+  border-radius: 4px;
+
+  /* 适当阴影增强层次感 */
+  box-shadow:
+    0 2px 4px hsl(var(--destructive) / 0.3),
+    0 1px 2px hsl(var(--foreground) / 0.1);
+
+  /* 细边框增加精致感 */
+  border: 1px solid hsl(var(--destructive-foreground) / 0.15);
+
+  /* 字体优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.08em;
+
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* 小标签模式 - 当只有1-2个字时使用 */
+.xiaoliu-badge.small {
+  padding: 4px 38px;
+  font-size: 11px;
+}
+
+/* 响应式调整 - 移动设备（480px以下） */
+@media (max-width: 480px) {
+  .xiaoliu-card {
+    width: 100%;
+    height: 160px;
+  }
+
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 10px;
+  }
+
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 9px;
+  }
+
+  .xiaoliu-inner {
+    padding: 14px 12px;
+    padding-bottom: 10px;
+  }
+
+  .xiaoliu-top {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 0.7rem;
+    padding: 1px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .xiaoliu-dot {
+    right: -8px;
+    top: -2px;
+    font-size: 0.5rem;
+  }
+
+  .xiaoliu-liuqin {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+
+  .xiaoliu-mid {
+    gap: 1px;
+    margin: 2px 0;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+
+  .branchName {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+  }
+
+  .branchElement {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.65rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .xiaoliu-fiveSix {
+    margin-top: 4px;
+    gap: 1px;
+  }
+}
+
+/* 响应式调整 - 小屏移动设备（360px以下） */
+@media (max-width: 360px) {
+  .xiaoliu-card {
+    width: 100%;
+    min-width: 90px;
+    height: 130px;
+  }
+
+  .xiaoliu-badge-container {
+    top: 34px;
+    right: -27px;
+  }
+
+  .xiaoliu-badge {
+    padding: 4px 38px;
+    font-size: 9px;
+  }
+
+  .xiaoliu-badge.small {
+    padding: 3px 28px;
+    font-size: 8px;
+  }
+
+  .xiaoliu-inner {
+    padding: 12px 10px;
+    padding-bottom: 8px;
+  }
+
+  .xiaoliu-top {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .xiaoliu-godname {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .xiaoliu-dot {
+    right: -6px;
+    top: -2px;
+    font-size: 0.4rem;
+  }
+
+  .xiaoliu-liuqin {
+    font-size: 0.7rem;
+    padding: 1px 5px;
+  }
+
+  .xiaoliu-mid {
+    gap: 0;
+    margin: 0;
+  }
+
+  .xiaoliu-tianGan {
+    font-size: 0.8rem;
+    margin-bottom: 1px;
+    letter-spacing: 0;
+  }
+
+  .branchName {
+    font-size: 0.7rem;
+    padding: 1px 5px;
+  }
+
+  .branchElement {
+    font-size: 0.6rem;
+    padding: 1px 3px;
+  }
+
+  .xiaoliu-fiveStar {
+    font-size: 0.6rem;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .xiaoliu-sixGodBeast {
+    font-size: 0.6rem;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1.1;
+  }
+
+  .xiaoliu-fiveSix {
+    margin-top: 2px;
+    gap: 1px;
+  }
+}
+
+/* 弹窗样式 - 使用绝对定位和层级确保在最上层 */
+.info-dialog-reference {
+  position: fixed;
+  inset: 0;
+  background-color: hsl(var(--foreground) / 0.65);
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  /* center modal and allow interactions */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.info-dialog-reference .dialog-wrap {
+  /* Ensure the dialog container is fixed to the viewport center so it
+     always appears in the user's current view even when the page is scrolled.
+     Use fixed positioning to avoid being affected by transformed ancestors. */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  max-width: 950px;
+  padding: 0;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-dialog-reference .dialog-content {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+  border: 2px solid hsl(var(--secondary) / 0.2);
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  box-shadow:
+    0 25px 50px hsl(var(--foreground) / 0.15),
+    0 10px 20px hsl(var(--foreground) / 0.1),
+    0 0 0 1px hsl(var(--background) / 0.8);
+  position: relative;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 桌面端动画 */
+@media (min-width: 641px) {
+  .info-dialog-reference .dialog-content {
+    animation: slideUp 0.28s ease-out;
+  }
+}
+
+/* 移动端禁用动画，防止晃动 */
+@media (max-width: 640px) {
+  .info-dialog-reference .dialog-content {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.info-dialog-reference .dialog-header {
+  background: linear-gradient(135deg, hsl(var(--secondary) / 0.12) 0%, hsl(var(--secondary) / 0.06) 100%);
+  border-bottom: 2px solid hsl(var(--secondary) / 0.3);
+  padding: 16px 24px;
+  margin: 0;
+  text-align: right;
+  position: relative;
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-dialog-reference .close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+  border: 2px solid hsl(var(--secondary) / 0.2);
+  color: hsl(var(--muted-foreground));
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 12px hsl(var(--foreground) / 0.15),
+    0 2px 4px hsl(var(--foreground) / 0.1);
+  z-index: 100;
+  position: relative;
+  outline: none;
+}
+
+.info-dialog-reference .close-btn:hover {
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--border)) 100%);
+  color: hsl(var(--foreground));
+  transform: scale(1.05) rotate(90deg);
+  box-shadow:
+    0 6px 20px hsl(var(--foreground) / 0.2),
+    0 4px 8px hsl(var(--foreground) / 0.15);
+}
+
+.info-dialog-reference .close-btn:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+.info-dialog-reference .content-wrapper {
+  padding: 28px 32px 48px 32px;
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
+  display: flex;
+  flex-direction: row;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.info-dialog-reference .basic-info {
+  flex: 1;
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--card)) 100%);
+  border: 2px solid hsl(var(--secondary) / 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 8px 25px hsl(var(--foreground) / 0.08),
+    0 4px 12px hsl(var(--foreground) / 0.06),
+    inset 0 1px 0 hsl(var(--background) / 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-dialog-reference .basic-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, hsl(var(--secondary)) 0%, hsl(var(--accent)) 50%, hsl(var(--primary)) 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.info-dialog-reference .validation-section {
+  flex: 1;
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--card)) 100%);
+  border: 2px solid hsl(var(--secondary) / 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 0;
+  box-shadow:
+    0 8px 25px hsl(var(--foreground) / 0.08),
+    0 4px 12px hsl(var(--foreground) / 0.06),
+    inset 0 1px 0 hsl(var(--background) / 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-dialog-reference .validation-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, hsl(var(--secondary)) 0%, hsl(var(--primary)) 50%, hsl(var(--accent)) 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.info-dialog-reference .validation-section h4 {
+  margin-bottom: 20px;
+  color: hsl(var(--secondary));
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 2px solid hsl(var(--secondary) / 0.3);
+  padding-bottom: 12px;
+  position: relative;
+}
+
+.info-dialog-reference .basic-info p {
+  margin: 16px 0;
+  line-height: 1.7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid hsl(var(--secondary) / 0.1);
+  border-radius: 8px;
+  background: hsl(var(--card) / 0.6);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.info-dialog-reference .basic-info p:hover {
+  background: hsl(var(--secondary) / 0.05);
+  transform: translateX(2px);
+}
+
+.info-dialog-reference .basic-info p:last-child {
+  border-bottom: none;
+}
+
+.info-dialog-reference .validation-section p {
+  margin: 16px 0;
+  line-height: 1.7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid hsl(var(--secondary) / 0.1);
+  border-radius: 8px;
+  background: hsl(var(--card) / 0.6);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.info-dialog-reference .validation-section p:hover {
+  background: hsl(var(--secondary) / 0.05);
+  transform: translateX(2px);
+}
+
+.info-dialog-reference .validation-section p:last-child {
+  border-bottom: none;
+}
+
+.info-dialog-reference .basic-info strong,
+.info-dialog-reference .validation-section strong {
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+  flex: 1;
+  font-size: 16px;
+  letter-spacing: 0.025em;
+}
+
+.info-dialog-reference .basic-info .value,
+.info-dialog-reference .validation-section .value {
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  text-align: right;
+  min-width: 130px;
+  font-size: 16px;
+  letter-spacing: 0.025em;
+  background: linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground) / 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 暗色模式适配 */
+.dark .info-dialog-reference .dialog-content {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
+  border-color: hsl(var(--border) / 0.8);
+  box-shadow:
+    0 25px 50px hsl(var(--foreground) / 0.4),
+    0 10px 20px hsl(var(--foreground) / 0.3);
+}
+
+.dark .info-dialog-reference .dialog-header {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
+  border-bottom-color: hsl(var(--border) / 0.8);
+  border-radius: 18px 18px 0 0;
+}
+
+.dark .info-dialog-reference .close-btn {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+  border-color: hsl(var(--border) / 0.6);
+  color: hsl(var(--foreground) / 0.85);
+  box-shadow:
+    0 4px 12px hsl(var(--foreground) / 0.3),
+    0 2px 4px hsl(var(--foreground) / 0.2);
+}
+
+.dark .info-dialog-reference .close-btn:hover {
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--border)) 100%);
+  color: hsl(var(--foreground));
+  transform: scale(1.05) rotate(90deg);
+  box-shadow:
+    0 6px 20px hsl(var(--foreground) / 0.4),
+    0 4px 8px hsl(var(--foreground) / 0.3);
+}
+
+.dark .info-dialog-reference .content-wrapper {
+  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
+}
+
+.dark .info-dialog-reference .basic-info {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
+  border-color: hsl(var(--secondary) / 0.3);
+  box-shadow:
+    0 8px 25px hsl(var(--foreground) / 0.2),
+    0 4px 12px hsl(var(--foreground) / 0.15);
+}
+
+.dark .info-dialog-reference .basic-info::before {
+  background: linear-gradient(90deg, hsl(var(--secondary)) 0%, hsl(var(--accent)) 50%, hsl(var(--primary)) 100%);
+}
+
+.dark .info-dialog-reference .validation-section {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
+  border-color: hsl(var(--secondary) / 0.3);
+  box-shadow:
+    0 8px 25px hsl(var(--foreground) / 0.2),
+    0 4px 12px hsl(var(--foreground) / 0.15);
+}
+
+.dark .info-dialog-reference .validation-section::before {
+  background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--destructive)) 50%, hsl(var(--accent)) 100%);
+}
+
+.dark .info-dialog-reference .basic-info strong,
+.dark .info-dialog-reference .validation-section strong {
+  color: hsl(var(--foreground));
+}
+
+.dark .info-dialog-reference .basic-info .value,
+.dark .info-dialog-reference .validation-section .value {
+  background: linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground) / 0.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .info-dialog-reference .validation-section h4 {
+  color: hsl(var(--secondary));
+  border-bottom-color: hsl(var(--secondary) / 0.4);
+}
+
+.dark .info-dialog-reference .basic-info p,
+.dark .info-dialog-reference .validation-section p {
+  border-bottom-color: hsl(var(--border) / 0.6);
+  background: hsl(var(--foreground) / 0.05);
+}
+
+.dark .info-dialog-reference .basic-info p:hover {
+  background: hsl(var(--secondary) / 0.1);
+}
+
+.dark .info-dialog-reference .validation-section p:hover {
+  background: hsl(var(--secondary) / 0.1);
+}
+
+/* 卦象解读弹窗样式 */
+.interpretation-content {
+  padding: 12px;
+  background-color: hsl(var(--card));
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 0;
+}
+
+/* 卦象解读弹窗样式 */
+.interpretation-content {
+  padding: 12px;
+  background-color: hsl(var(--card));
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 0;
+}
+
+.interpretation-title {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  position: relative;
+}
+
+
+
+.interpretation-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.interpretation-section {
+  padding: 0 0 10px 0;
+}
+
+.basic-section {
+  padding-bottom: 10px;
+}
+
+.section-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.basic-section .section-title {
+  color: hsl(var(--foreground));
+}
+
+.combination-section .section-title {
+  color: hsl(var(--foreground));
+}
+
+.section-content {
+  color: hsl(var(--muted-foreground));
+  line-height: 1.4;
+  font-size: 13px;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+.combination-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.combination-item {
+  padding: 3px 0;
+  margin-bottom: 6px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.combination-item:last-child {
+  border-bottom: none;
+}
+
+.combination-name {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.combination-desc {
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* 暗色模式适配 - 卦象解读弹窗 */
+.dark .interpretation-content {
+  background-color: hsl(var(--card));
+}
+
+.dark .interpretation-title {
+  color: hsl(var(--foreground));
+}
+
+.dark .basic-section .section-title {
+  color: hsl(var(--secondary));
+}
+
+.dark .combination-section .section-title {
+  color: hsl(var(--accent));
+}
+
+.dark .section-content {
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.dark .combination-name {
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.dark .combination-desc {
+  color: hsl(var(--muted-foreground));
+}
+
+/* 防止页面晃动 - 弹窗打开时 */
+body.modal-open {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* 移动端暗色模式适配 */
+@media (max-width: 640px) {
+  .dark .info-dialog-reference .dialog-content {
+    background: hsl(var(--card));
+  }
+
+  .dark .info-dialog-reference .dialog-header {
+    background-color: hsl(var(--background));
+    border-bottom-color: hsl(var(--border));
+  }
+
+  .dark .info-dialog-reference .basic-info,
+  .dark .info-dialog-reference .validation-section {
+    background-color: hsl(var(--background));
+    border-color: hsl(var(--border));
+  }
+
+  .dark .info-dialog-reference .basic-info strong,
+  .dark .info-dialog-reference .validation-section strong {
+    color: hsl(var(--foreground) / 0.85);
+  }
+
+  .dark .info-dialog-reference .basic-info .value,
+  .dark .info-dialog-reference .validation-section .value {
+    color: hsl(var(--foreground));
+  }
+
+  .dark .info-dialog-reference .basic-info p,
+  .dark .info-dialog-reference .validation-section p {
+    border-bottom-color: hsl(var(--border));
+  }
+
+  .info-dialog-reference .content-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+/* 移动端弹窗适配 */
+@media (max-width: 640px) {
+  .info-dialog-reference {
+    padding: 8px;
+  }
+
+  .info-dialog-reference .dialog-wrap {
+    padding: 8px;
+    width: calc(100% - 16px);
+    max-width: calc(100% - 16px);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .info-dialog-reference .dialog-content {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    border-radius: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+  }
+
+  .info-dialog-reference .dialog-header {
+    padding: 16px 20px;
+    position: relative;
+    background: transparent;
+    border-bottom: 1px solid hsl(var(--border) / 0.3);
+    justify-content: center;
+  }
+
+  .info-dialog-reference .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+
+  .info-dialog-reference .content-wrapper {
+    padding: 20px 24px 32px 24px;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .info-dialog-reference .basic-info,
+  .info-dialog-reference .validation-section {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .info-dialog-reference .basic-info p,
+  .info-dialog-reference .validation-section p {
+    font-size: 15px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .info-dialog-reference .basic-info strong,
+  .info-dialog-reference .validation-section strong {
+    font-size: 15px;
+    min-width: auto;
+    flex: none;
+    color: hsl(var(--muted-foreground));
+    font-weight: 500;
+  }
+
+  .info-dialog-reference .basic-info .value,
+  .info-dialog-reference .validation-section .value {
+    font-size: 16px;
+    min-width: auto;
+    text-align: left;
+    font-weight: 600;
+    background: none;
+    -webkit-text-fill-color: hsl(var(--foreground));
+  }
+
+  .interpretation-content {
+    padding: 24px 20px;
+    max-width: 100%;
+  }
+
+  .interpretation-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .interpretation-sections {
+    gap: 20px;
+  }
+
+  .interpretation-section {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .section-content {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .combination-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .combination-item {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* increase close button touch target on mobile */
+  .info-dialog-reference .close-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    border-radius: 50%;
+    /* 移动端关闭按钮位置 */
+    top: 12px;
+    right: 12px;
+  }
+
+  .dark .info-dialog-reference .close-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  /* 移动端弹窗内容在暗色模式下的滚动条样式 */
+  .info-dialog-reference .dialog-content::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .info-dialog-reference .dialog-content::-webkit-scrollbar-track {
+    background: hsl(var(--foreground) / 0.1);
+  }
+
+  .info-dialog-reference .dialog-content::-webkit-scrollbar-thumb {
+    background: hsl(var(--foreground) / 0.2);
+    border-radius: 2px;
+  }
+
+  .info-dialog-reference .dialog-content::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground) / 0.3);
+  }
+
+  .dark .info-dialog-reference .dialog-content::-webkit-scrollbar-track {
+    background: hsl(var(--foreground) / 0.05);
+  }
+
+  .dark .info-dialog-reference .dialog-content::-webkit-scrollbar-thumb {
+    background: hsl(var(--foreground) / 0.1);
+  }
+
+  .dark .info-dialog-reference .dialog-content::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground) / 0.2);
+  }
+
+  /* 禁用弹窗内容的transform，防止晃动 */
+  .info-dialog-reference .dialog-content,
+  .info-dialog-reference .content-wrapper,
+  .info-dialog-reference .basic-info,
+  .info-dialog-reference .validation-section,
+  .interpretation-content,
+  .interpretation-sections,
+  .interpretation-section,
+  .combination-grid,
+  .combination-item {
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+}
+
+/* 小屏幕移动设备（480px以下）优化 */
+@media (max-width: 480px) {
+  .info-dialog-reference .dialog-content {
+    max-height: 85vh;
+  }
+
+  .info-dialog-reference .content-wrapper {
+    padding: 12px;
+  }
+
+  .info-dialog-reference .basic-info,
+  .info-dialog-reference .validation-section {
+    padding: 12px;
+  }
+
+  .info-dialog-reference .basic-info p,
+  .info-dialog-reference .validation-section p {
+    font-size: 13px;
+  }
+
+  .interpretation-content {
+    padding: 12px;
+  }
+
+  .interpretation-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .interpretation-section {
+    padding: 12px;
+  }
+
+  .combination-grid {
+    gap: 8px;
+  }
+
+  .combination-item {
+    padding: 10px;
+  }
+
+  .combination-name {
+    font-size: 13px;
+  }
+
+  .combination-desc {
+    font-size: 12px;
+  }
+
+  /* 小屏幕下关闭按钮更大，更容易点击 */
+  .info-dialog-reference .close-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+    top: 16px;
+    right: 16px;
+  }
+
+  .dark .info-dialog-reference .close-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+  }
+}
+
+/* accessibility: larger close button on touch devices */
+@media (pointer: coarse) {
+  .info-dialog-reference .close-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+}
+
+/* Steps grid - mobile friendly horizontal cards */
+@media (max-width: 640px) {
+  .steps-grid {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .steps-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .steps-grid>div {
+    flex: 0 0 auto;
+    min-width: 260px;
+    max-width: 260px;
+  }
+
+  /* card look for steps */
+  .steps-grid>div .rounded-lg {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .steps-grid .step-number-badge {
+    display: inline-block;
+    background: hsl(var(--foreground) / 0.06);
+    color: hsl(var(--foreground));
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+}
+
+/* Improve step card typography on all sizes */
+.steps-grid .font-bold {
+  font-size: 14px;
+}
+
+.steps-grid .text-xs {
+  font-size: 13px;
+}
+
+/* Improve step card typography on all sizes */
+.steps-grid .font-bold {
+  font-size: 14px;
+}
+
+.steps-grid .text-xs {
+  font-size: 13px;
+}
+
+
+
+/* 暗色模式适配 */
+.dark .xiaoliu-badge {
+  background-color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive-foreground) / 0.2);
+  box-shadow:
+    0 2px 4px hsl(var(--destructive) / 0.4),
+    0 1px 2px hsl(var(--foreground) / 0.3);
+}
+
+.xiaoliu-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-top: 1px solid hsl(var(--border) / 0.5);
+}
+
+.xiaoliu-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  padding-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.xiaoliu-top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.xiaoliu-godname {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: hsl(var(--foreground));
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  text-align: center;
+  text-shadow: none;
+  position: relative;
+}
+
+.xiaoliu-godname.final {
+  color: hsl(var(--secondary));
+  text-shadow: 0 1px 2px hsl(var(--secondary) / 0.3);
+}
+
+.xiaoliu-dot {
+  color: hsl(var(--secondary));
+  position: absolute;
+  right: -12px;
+  top: -4px;
+  font-size: 0.6rem;
+}
+
+.xiaoliu-liuqin {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
+  border: 1px solid hsl(var(--destructive) / 0.2);
+}
+
+.xiaoliu-liuqin.final {
+  background-color: hsl(var(--secondary) / 0.1);
+  color: hsl(var(--secondary));
+  border: 1px solid hsl(var(--secondary) / 0.3);
+}
+
+.xiaoliu-mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin: 2px 0;
+}
+
+.xiaoliu-tianGan {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: hsl(var(--muted-foreground));
+  letter-spacing: 1px;
+}
+
+.xiaoliu-branch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -2px;
+}
+
+.branchName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.branchElement {
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground) / 0.7);
+  font-style: italic;
+}
+
+.xiaoliu-fiveSix {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.xiaoliu-fiveStar {
+  font-size: 1rem;
+  color: hsl(var(--accent-foreground));
+  font-style: italic;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background-color: hsl(var(--accent) / 0.1);
+}
+
+.xiaoliu-sixGodBeast {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: hsl(var(--foreground));
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid hsl(var(--foreground));
+  min-width: 60px;
+  text-align: center;
+}
+
+.element-color {
+  color: var(--el-color);
+}
+
+.el-default {
+  background: linear-gradient(90deg, hsl(var(--muted-foreground)), hsl(var(--muted-foreground) / 0.8));
+}
+
+.el-mu {
+  background: linear-gradient(90deg, hsl(120 61% 50%), hsl(120 61% 50% / 0.87));
+}
+
+.el-huo {
+  background: linear-gradient(90deg, hsl(4 90% 58%), hsl(4 90% 58% / 0.87));
+}
+
+.el-tu {
+  background: linear-gradient(90deg, hsl(45 100% 51%), hsl(45 100% 51% / 0.87));
+}
+
+.el-jin {
+  background: linear-gradient(90deg, hsl(0 0% 62%), hsl(0 0% 62% / 0.87));
+}
+
+.el-shui {
+  background: linear-gradient(90deg, hsl(207 90% 54%), hsl(207 90% 54% / 0.87));
+}
+
+.el-color-mu {
+  color: hsl(120 61% 50%);
+}
+
+.el-color-huo {
+  color: hsl(4 90% 58%);
+}
+
+.el-color-tu {
+  color: hsl(45 100% 51%);
+}
+
+.el-color-jin {
+  color: hsl(0 0% 62%);
+}
+
+.el-color-shui {
+  color: hsl(207 90% 54%);
+}
+
+/* Desktop 优化：防止电脑端不必要换行，提升排版密度，减少垂直滚动 */
+@media (min-width: 1024px) {
+  .info-dialog-reference .content-wrapper {
+    gap: 32px;
+  }
+
+  /* 保持标签和值在一行显示，标签不换行，值可省略超出部分 */
+  .info-dialog-reference .basic-info p,
+  .info-dialog-reference .validation-section p {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+
+  .info-dialog-reference .basic-info strong,
+  .info-dialog-reference .validation-section strong {
+    white-space: nowrap;
+    flex: 0 0 auto;
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .info-dialog-reference .basic-info .value,
+  .info-dialog-reference .validation-section .value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    text-align: right;
+    min-width: 0;
+  }
+
+  /* 桌面端弹窗更宽，优先横向利用空间，减少垂直滚动 */
+  .info-dialog-reference .dialog-content {
+    max-width: 1100px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* 卦象解读：在宽屏上采用两列布局，更多内容同时展示，减少滚动 */
+  .interpretation-content {
+    max-width: 1000px;
+    padding: 36px;
+  }
+
+  .interpretation-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .interpretation-section {
+    padding: 24px;
+  }
+}

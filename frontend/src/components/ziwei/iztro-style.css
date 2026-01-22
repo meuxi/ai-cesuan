@@ -1,0 +1,475 @@
+/**
+ * 紫微斗数命盘样式 - 完全照抄官方react-iztro实现
+ * @see https://github.com/SylarLong/react-iztro
+ */
+
+/* ===== 官方default.css ===== */
+.iztro-astrolabe-theme-default {
+  --iztro-star-font-size-big: 13px;
+  --iztro-star-font-size-small: 12px;
+  --iztro-color-major: #531dab;
+  --iztro-color-focus: #000;
+  --iztro-color-quan: #2f54eb;
+  --iztro-color-tough: #612500;
+  --iztro-color-awesome: #d4380d;
+  --iztro-color-active: #1890ff;
+  --iztro-color-happy: #c41d7f;
+  --iztro-color-nice: #237804;
+  --iztro-color-decorator-1: #90983c;
+  --iztro-color-decorator-2: #813359;
+  --iztro-color-text: #8c8c8c;
+  --iztro-color-border: #00152912;
+  --iztro-color-decadal: var(--iztro-color-active);
+  --iztro-color-yearly: var(--iztro-color-decorator-2);
+  --iztro-color-monthly: var(--iztro-color-nice);
+  --iztro-color-daily: var(--iztro-color-decorator-1);
+  --iztro-color-hourly: var(--iztro-color-text);
+}
+
+/* 暗色模式适配 */
+.dark .iztro-astrolabe-theme-default {
+  --iztro-color-major: #b37feb;
+  --iztro-color-focus: #fff;
+  --iztro-color-quan: #597ef7;
+  --iztro-color-tough: #ffa39e;
+  --iztro-color-awesome: #ff7a45;
+  --iztro-color-active: #40a9ff;
+  --iztro-color-happy: #f759ab;
+  --iztro-color-nice: #73d13d;
+  --iztro-color-decorator-1: #d3e066;
+  --iztro-color-decorator-2: #eb6ea5;
+  --iztro-color-text: #a6a6a6;
+}
+
+.iztro-astrolabe {
+  text-align: left;
+}
+
+.iztro-palace {
+  border: 1px solid var(--iztro-color-border);
+}
+
+.iztro-star-soft,
+.iztro-star-tough,
+.iztro-star-adjective,
+.iztro-star-flower,
+.iztro-star-helper,
+.iztro-palace-fate,
+.iztro-palace-horo-star,
+.iztro-palace-scope,
+.iztro-palace-dynamic-name,
+.iztro-palace-lft24,
+.iztro-palace-rgt24 {
+  font-size: var(--iztro-star-font-size-small);
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+.iztro-palace-scope-age {
+  text-wrap: balance;
+}
+
+.iztro-palace-scope-age,
+.iztro-palace-scope-decadal {
+  color: var(--iztro-color-text);
+}
+
+.iztro-palace-lft24 {
+  color: var(--iztro-color-decorator-1);
+}
+
+.iztro-palace-rgt24 {
+  color: var(--iztro-color-decorator-2);
+  white-space: nowrap;
+}
+
+.iztro-star-major,
+.iztro-star-tianma,
+.iztro-star-lucun,
+.iztro-palace-name,
+.iztro-palace-gz {
+  font-size: var(--iztro-star-font-size-big);
+  font-weight: bold;
+}
+
+.iztro-star-tianma {
+  color: var(--iztro-color-active);
+}
+
+.iztro-star-lucun {
+  color: var(--iztro-color-awesome);
+}
+
+.iztro-palace-horo-star .iztro-star {
+  opacity: 0.75;
+}
+
+.iztro-palace-horo-star .iztro-star-tianma,
+.iztro-palace-horo-star .iztro-star-lucun {
+  font-weight: normal;
+  font-size: var(--iztro-star-font-size-small);
+}
+
+.iztro-star-brightness,
+.iztro-star-adjective {
+  font-style: normal;
+  font-weight: normal;
+  color: var(--iztro-color-text);
+}
+
+.iztro-star-brightness {
+  opacity: 0.5;
+}
+
+.iztro-star-major,
+.iztro-star-soft,
+.iztro-palace-name {
+  color: var(--iztro-color-major);
+}
+
+.iztro-star-tough {
+  color: var(--iztro-color-tough);
+}
+
+.iztro-star-flower {
+  color: var(--iztro-color-happy);
+}
+
+.iztro-star-helper,
+.iztro-palace-gz {
+  color: var(--iztro-color-nice);
+}
+
+.iztro-star-mutagen.mutagen-0 {
+  background-color: var(--iztro-color-awesome);
+}
+
+.iztro-star-mutagen.mutagen-1 {
+  background-color: var(--iztro-color-quan);
+}
+
+.iztro-star-mutagen.mutagen-2 {
+  background-color: var(--iztro-color-nice);
+}
+
+.iztro-star-mutagen.mutagen-3 {
+  background-color: var(--iztro-color-focus);
+}
+
+.iztro-star-mutagen.mutagen-decadal {
+  background-color: var(--iztro-color-decadal);
+  opacity: 0.6;
+}
+
+.iztro-star-mutagen.mutagen-yearly {
+  background-color: var(--iztro-color-yearly);
+  opacity: 0.6;
+}
+
+.iztro-star-mutagen.mutagen-monthly {
+  background-color: var(--iztro-color-monthly);
+  opacity: 0.6;
+}
+
+.iztro-star-mutagen.mutagen-daily {
+  background-color: var(--iztro-color-daily);
+  opacity: 0.6;
+}
+
+.iztro-star-mutagen.mutagen-hourly {
+  background-color: var(--iztro-color-hourly);
+  opacity: 0.6;
+}
+
+.iztro-palace-gz .iztro-palace-gz-active {
+  background-color: var(--iztro-color-nice);
+  color: #fff;
+  font-weight: normal;
+}
+
+.iztro-star-mutagen-0 {
+  background-color: var(--iztro-color-awesome);
+  color: #fff;
+  font-weight: normal;
+}
+
+.iztro-star-mutagen-1 {
+  background-color: var(--iztro-color-quan);
+  color: #fff;
+  font-weight: normal;
+}
+
+.iztro-star-mutagen-2 {
+  background-color: var(--iztro-color-nice);
+  color: #fff;
+  font-weight: normal;
+}
+
+.iztro-star-mutagen-3 {
+  background-color: var(--iztro-color-focus);
+  color: #fff;
+  font-weight: normal;
+}
+
+.iztro-star-self-mutagen-0::before {
+  background-color: var(--iztro-color-awesome);
+}
+
+.iztro-star-self-mutagen-1::before {
+  background-color: var(--iztro-color-quan);
+}
+
+.iztro-star-self-mutagen-2::before {
+  background-color: var(--iztro-color-nice);
+}
+
+.iztro-star-self-mutagen-3::before {
+  background-color: var(--iztro-color-focus);
+}
+
+.iztro-star-hover-mutagen-0::after {
+  background-color: var(--iztro-color-awesome);
+}
+
+.iztro-star-hover-mutagen-1::after {
+  background-color: var(--iztro-color-quan);
+}
+
+.iztro-star-hover-mutagen-2::after {
+  background-color: var(--iztro-color-nice);
+}
+
+.iztro-star-hover-mutagen-3::after {
+  background-color: var(--iztro-color-focus);
+}
+
+.iztro-palace-name-body {
+  font-size: var(--iztro-star-font-size-small);
+  font-weight: normal;
+  position: absolute;
+  margin-top: 2px;
+}
+
+.iztro-palace-fate span {
+  display: block;
+  padding: 0 3px;
+  border-radius: 4px;
+  color: #fff;
+  background-color: var(--iztro-color-major);
+  cursor: pointer;
+}
+
+/* ===== 官方Iztrolabe.css ===== */
+.iztro-star-mutagen {
+  font-weight: normal;
+  font-size: var(--iztro-star-font-size-small);
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  margin-left: 1px;
+  padding: 0 2px;
+}
+
+.star-with-mutagen {
+  position: relative;
+}
+
+.star-with-mutagen::before {
+  bottom: 0;
+  content: " ";
+  left: -4px;
+  position: absolute;
+  top: 0;
+  width: 4px;
+  transition: all 0.25s ease-in-out;
+}
+
+.star-with-mutagen::after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  right: 0;
+  height: 4px;
+  transition: all 0.25s ease-in-out;
+}
+
+/* ===== 官方Izpalace.css ===== */
+.iztro-palace {
+  padding: 3px;
+  display: grid;
+  text-transform: capitalize;
+  grid-template-rows: auto auto auto 50px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas:
+    "major minor adj"
+    "horo  horo adj"
+    "fate  fate fate"
+    "ft   ft  ft";
+  transition: all 0.25s ease-in-out;
+  grid-auto-flow: column;
+}
+
+.iztro-palace.focused-palace {
+  background-color: #aab8d32f;
+}
+
+.iztro-palace.opposite-palace {
+  background-color: #93f73d4f;
+}
+
+.iztro-palace.surrounded-palace {
+  background-color: #aff46f24;
+}
+
+.iztro-palace-major {
+  grid-area: major;
+}
+
+.iztro-palace-minor {
+  grid-area: minor;
+  justify-self: center;
+}
+
+.iztro-palace-adj {
+  grid-area: adj;
+  display: inline-flex;
+  justify-self: flex-end;
+  gap: 3px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.iztro-palace-horo-star {
+  grid-area: horo;
+  align-self: center;
+}
+
+.iztro-palace-horo-star .stars {
+  display: flex;
+  gap: 3px;
+}
+
+.iztro-palace-scope {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.iztro-palace-scope-decadal {
+  font-weight: 700;
+}
+
+.iztro-palace-fate {
+  grid-area: fate;
+  align-self: flex-end;
+  white-space: nowrap;
+  justify-content: center;
+  display: flex;
+  gap: 3px;
+  height: 17px;
+}
+
+.iztro-palace-fate .iztro-palace-decadal-active {
+  background-color: var(--iztro-color-decadal);
+}
+
+.iztro-palace-fate .iztro-palace-yearly-active {
+  background-color: var(--iztro-color-yearly);
+}
+
+.iztro-palace-fate .iztro-palace-monthly-active {
+  background-color: var(--iztro-color-monthly);
+}
+
+.iztro-palace-fate .iztro-palace-daily-active {
+  background-color: var(--iztro-color-daily);
+}
+
+.iztro-palace-fate .iztro-palace-hourly-active {
+  background-color: var(--iztro-color-hourly);
+}
+
+.iztro-palace-footer {
+  grid-area: ft;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-self: flex-start;
+}
+
+.iztro-palace-lft24 {
+  text-align: left;
+}
+
+.iztro-palace-rgt24 {
+  text-align: right;
+}
+
+.iztro-palace-name {
+  cursor: pointer;
+  text-wrap: nowrap;
+}
+
+.iztro-palace-name .iztro-palace-name-wrapper {
+  position: relative;
+}
+
+.iztro-palace-name .iztro-palace-name-taichi {
+  position: absolute;
+  font-size: 12px;
+  line-height: 14px;
+  background-color: var(--iztro-color-major);
+  padding: 0 2px;
+  color: #fff;
+  z-index: 2;
+  border-radius: 0 4px 4px 0;
+  font-weight: normal !important;
+  bottom: 0;
+}
+
+.iztro-palace-gz {
+  text-align: right;
+  cursor: pointer;
+}
+
+.iztro-palace-gz span {
+  display: inline-block;
+  padding: 0 1px;
+  white-space: nowrap;
+}
+
+.iztro-palace-dynamic-name {
+  text-align: center;
+  display: flex;
+  white-space: nowrap;
+  gap: 3px;
+  justify-content: center;
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-decadal {
+  color: var(--iztro-color-decadal);
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-yearly {
+  color: var(--iztro-color-yearly);
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-monthly {
+  color: var(--iztro-color-monthly);
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-daily {
+  color: var(--iztro-color-daily);
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-hourly {
+  color: var(--iztro-color-hourly);
+}
+
+/* ===== 星曜基础样式 ===== */
+.iztro-star {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  white-space: nowrap;
+  font-size: var(--iztro-star-font-size-small);
+}

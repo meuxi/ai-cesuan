@@ -1,0 +1,403 @@
+/* 老黄历样式 */
+.laohuangli-wrapper {
+    background: hsl(var(--background));
+    min-height: calc(100vh - 120px);
+    padding-bottom: 20px;
+}
+
+/* 导航栏 */
+.laohuangli-nav {
+    font-weight: bold;
+    padding: 12px 16px;
+    color: hsl(var(--foreground));
+    background: hsl(var(--card));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.laohuangli-nav-back {
+    flex: 1;
+}
+
+.laohuangli-nav-date {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.laohuangli-nav-date:hover {
+    color: hsl(var(--primary));
+}
+
+.laohuangli-nav-jin {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 日历卡片 */
+.laohuangli-calendar {
+    margin-bottom: 12px;
+}
+
+/* 星期头 */
+.laohuangli-week-header {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.laohuangli-week-item {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+}
+
+/* 日期网格 */
+.laohuangli-date-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.laohuangli-date-item {
+    width: calc(100% / 7);
+    text-align: center;
+    padding: 8px 0;
+    cursor: pointer;
+    position: relative;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.laohuangli-date-item:hover {
+    background: hsl(var(--accent));
+}
+
+.laohuangli-date-item .date-solar {
+    font-weight: bold;
+    font-size: 16px;
+    color: hsl(var(--foreground));
+}
+
+.laohuangli-date-item .date-lunar {
+    font-size: 10px;
+    color: hsl(var(--muted-foreground));
+    margin-top: 2px;
+}
+
+.laohuangli-date-item .date-festival {
+    font-size: 10px;
+    color: hsl(var(--destructive));
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 2px;
+}
+
+.laohuangli-date-item .date-jieqi {
+    font-size: 10px;
+    color: hsl(var(--primary));
+    margin-top: 2px;
+}
+
+/* 非当月日期 */
+.laohuangli-date-item.not-now-month {
+    opacity: 0.3;
+}
+
+/* 今天 */
+.laohuangli-date-item.today {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.laohuangli-date-item.today .date-solar,
+.laohuangli-date-item.today .date-lunar,
+.laohuangli-date-item.today .date-festival,
+.laohuangli-date-item.today .date-jieqi {
+    color: hsl(var(--primary-foreground));
+}
+
+/* 选中日期 */
+.laohuangli-date-item.selected {
+    border: 2px solid hsl(var(--primary));
+    padding: 6px 0;
+}
+
+/* 休息日/调休 标签 */
+.work-tag休,
+.work-tag班 {
+    position: absolute;
+    top: 0;
+    right: 2px;
+    font-size: 10px;
+    padding: 1px 3px;
+    border-radius: 3px;
+    transform: scale(0.8);
+}
+
+.work-tag休 {
+    background: hsl(var(--destructive));
+    color: white;
+}
+
+.work-tag班 {
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+}
+
+/* 信息卡片 */
+.laohuangli-info-card {
+    margin-bottom: 12px;
+}
+
+/* 阴历信息 */
+.laohuangli-yinli {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.laohuangli-yinli-mid {
+    flex: 1;
+    text-align: center;
+}
+
+.laohuangli-yinli-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: hsl(var(--foreground));
+}
+
+.laohuangli-yinli-info {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 13px;
+    margin-top: 8px;
+    color: hsl(var(--muted-foreground));
+}
+
+/* 宜忌信息 */
+.laohuangli-yiji {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.laohuangli-yiji-content {
+    flex: 1;
+}
+
+.yiji-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.yiji-row:last-child {
+    margin-bottom: 0;
+}
+
+.yiji-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.yiji-icon.yi {
+    border: 2px solid hsl(var(--chart-2));
+    color: hsl(var(--chart-2));
+    background: hsl(var(--chart-2) / 0.1);
+}
+
+.yiji-icon.ji {
+    border: 2px solid hsl(var(--muted-foreground));
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted-foreground) / 0.1);
+}
+
+.yiji-items {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 10px;
+    gap: 4px 10px;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* 吉日查询按钮 */
+.laohuangli-jiri-btn {
+    background: linear-gradient(135deg, hsl(var(--chart-4)), hsl(var(--chart-5)));
+    padding: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.laohuangli-jiri-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px hsl(var(--chart-4) / 0.4);
+}
+
+.jiri-btn-inner {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+    padding: 10px 6px;
+    font-size: 13px;
+    writing-mode: vertical-rl;
+    letter-spacing: 2px;
+}
+
+/* 五行冲煞信息 */
+.laohuangli-wxcs {
+    border: 1px solid hsl(var(--chart-4));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wxcs-row-top {
+    display: flex;
+    border-bottom: 1px solid hsl(var(--chart-4));
+}
+
+.wxcs-item {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-right: 1px solid hsl(var(--chart-4));
+}
+
+.wxcs-item.no-border {
+    border-right: none;
+}
+
+.wxcs-label {
+    color: hsl(var(--chart-4));
+    font-size: 14px;
+}
+
+.wxcs-value {
+    font-size: 14px;
+    color: hsl(var(--foreground));
+}
+
+/* 时宜辰忌 */
+.wxcs-time-row {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid hsl(var(--chart-4));
+}
+
+.time-label {
+    color: hsl(var(--chart-4));
+    font-size: 14px;
+    width: 56px;
+    flex-shrink: 0;
+}
+
+.time-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex: 1;
+}
+
+.time-item {
+    font-size: 12px;
+    color: hsl(var(--muted-foreground));
+}
+
+.time-item.current {
+    color: hsl(var(--chart-4));
+    font-weight: bold;
+}
+
+/* 财神福神等 */
+.wxcs-shen-row {
+    display: flex;
+    border-bottom: 1px solid hsl(var(--chart-4));
+}
+
+.wxcs-shen-row:last-of-type {
+    border-bottom: none;
+}
+
+.shen-item {
+    flex: 1;
+    display: flex;
+    padding: 10px;
+}
+
+.shen-item:first-child {
+    border-right: 1px solid hsl(var(--chart-4));
+}
+
+.shen-label {
+    color: hsl(var(--chart-4));
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+}
+
+.shen-value {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* 彭祖百忌 */
+.wxcs-pzbj {
+    border-top: 1px solid hsl(var(--chart-4));
+    padding: 12px;
+    text-align: center;
+}
+
+.pzbj-label {
+    color: hsl(var(--chart-4));
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.pzbj-value {
+    font-size: 14px;
+}
+
+/* 滚动条隐藏 */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

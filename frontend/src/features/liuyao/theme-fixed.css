@@ -1,0 +1,301 @@
+/**
+ * 六爻工具主题样式
+ * 支持暗黑和明亮两种主题
+ */
+
+/* ===================== 明亮主题基础颜色覆盖 ===================== */
+
+/* 背景颜色 */
+.liuyao-light .bg-ink-950 {
+    background-color: hsl(var(--background)) !important;
+}
+
+.liuyao-light .bg-ink-900 {
+    background-color: hsl(var(--background)) !important;
+}
+
+.liuyao-light .bg-ink-850 {
+    background-color: hsl(var(--card)) !important;
+}
+
+.liuyao-light .bg-ink-800 {
+    background-color: hsl(var(--muted)) !important;
+}
+
+.liuyao-light .bg-ink-700 {
+    background-color: hsl(var(--muted)) !important;
+}
+
+/* 文字颜色 - paper系列 */
+.liuyao-light .text-paper-100 {
+    color: hsl(var(--foreground)) !important;
+}
+
+.liuyao-light .text-paper-200 {
+    color: hsl(var(--foreground) / 0.9) !important;
+}
+
+.liuyao-light .text-paper-300 {
+    color: hsl(var(--foreground) / 0.8) !important;
+}
+
+/* 文字颜色 - ink系列 */
+.liuyao-light .text-ink-400 {
+    color: hsl(var(--muted-foreground) / 0.8) !important;
+}
+
+.liuyao-light .text-ink-500 {
+    color: hsl(var(--muted-foreground)) !important;
+}
+
+.liuyao-light .text-ink-600 {
+    color: hsl(var(--muted-foreground) / 0.9) !important;
+}
+
+.liuyao-light .text-ink-700 {
+    color: hsl(var(--foreground)) !important;
+}
+
+/* 文字颜色 - gold系列 */
+.liuyao-light .text-gold-100 {
+    color: hsl(var(--liuyao-gold) / 0.75) !important;
+}
+
+.liuyao-light .text-gold-200 {
+    color: hsl(var(--liuyao-gold) / 0.85) !important;
+}
+
+.liuyao-light .text-gold-300 {
+    color: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .text-gold-400 {
+    color: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .text-gold-500 {
+    color: hsl(var(--liuyao-gold) / 0.9) !important;
+}
+
+.liuyao-light .text-gold-600 {
+    color: hsl(var(--liuyao-gold) / 0.85) !important;
+}
+
+/* 边框颜色 */
+.liuyao-light .border-ink-800 {
+    border-color: hsl(var(--border)) !important;
+}
+
+.liuyao-light .border-ink-700 {
+    border-color: hsl(var(--border)) !important;
+}
+
+.liuyao-light .border-gold-600 {
+    border-color: hsl(var(--liuyao-gold)) !important;
+}
+
+/* ===================== 透明度背景覆盖 ===================== */
+
+.liuyao-light .bg-ink-900\/30 {
+    background-color: hsl(var(--background) / 0.7) !important;
+}
+
+.liuyao-light .bg-ink-900\/40 {
+    background-color: hsl(var(--background) / 0.8) !important;
+}
+
+.liuyao-light .bg-ink-850\/90 {
+    background-color: hsl(var(--card) / 0.95) !important;
+}
+
+.liuyao-light .bg-ink-850\/80 {
+    background-color: hsl(var(--card) / 0.9) !important;
+}
+
+.liuyao-light .bg-ink-850\/50 {
+    background-color: hsl(var(--card) / 0.7) !important;
+}
+
+.liuyao-light .bg-ink-950\/20 {
+    background-color: hsl(var(--background) / 0.3) !important;
+}
+
+.liuyao-light .bg-ink-950\/10 {
+    background-color: hsl(var(--background) / 0.2) !important;
+}
+
+.liuyao-light .bg-gold-900\/10 {
+    background-color: hsl(var(--liuyao-gold) / 0.15) !important;
+}
+
+/* ===================== 透明度边框覆盖 ===================== */
+
+.liuyao-light .border-ink-800\/50 {
+    border-color: hsl(var(--border) / 0.7) !important;
+}
+
+.liuyao-light .border-ink-800\/30 {
+    border-color: hsl(var(--border) / 0.5) !important;
+}
+
+.liuyao-light .border-ink-700\/50 {
+    border-color: hsl(var(--border) / 0.7) !important;
+}
+
+.liuyao-light .border-gold-600\/50 {
+    border-color: hsl(var(--liuyao-gold) / 0.6) !important;
+}
+
+.liuyao-light .border-gold-600\/30 {
+    border-color: hsl(var(--liuyao-gold) / 0.4) !important;
+}
+
+.liuyao-light .border-gold-500\/30 {
+    border-color: hsl(var(--liuyao-gold) / 0.4) !important;
+}
+
+/* ===================== 渐变颜色覆盖 ===================== */
+
+.liuyao-light .from-gold-600 {
+    --tw-gradient-from: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .via-gold-400 {
+    --tw-gradient-via: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .to-gold-500 {
+    --tw-gradient-to: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .from-ink-800 {
+    --tw-gradient-from: hsl(var(--muted)) !important;
+}
+
+.liuyao-light .to-ink-900 {
+    --tw-gradient-to: hsl(var(--background)) !important;
+}
+
+/* ===================== 特殊颜色覆盖 ===================== */
+
+.liuyao-light .text-cinnabar {
+    color: hsl(var(--destructive)) !important;
+}
+
+.liuyao-light .bg-cinnabar {
+    background-color: hsl(var(--destructive)) !important;
+}
+
+.liuyao-light .border-cinnabar {
+    border-color: hsl(var(--destructive)) !important;
+}
+
+.liuyao-light .bg-gold-600 {
+    background-color: hsl(var(--liuyao-gold)) !important;
+}
+
+/* ===================== 阴影效果覆盖 ===================== */
+
+.liuyao-light .shadow-2xl {
+    box-shadow: 0 25px 50px -12px hsl(var(--foreground) / 0.1) !important;
+}
+
+.liuyao-light .shadow-lg {
+    box-shadow: 0 10px 15px -3px hsl(var(--foreground) / 0.08) !important;
+}
+
+.liuyao-light .shadow-sm {
+    box-shadow: 0 1px 2px hsl(var(--foreground) / 0.05) !important;
+}
+
+/* ===================== 输入框样式 ===================== */
+
+.liuyao-light input::placeholder {
+    color: hsl(var(--muted-foreground) / 0.6) !important;
+}
+
+.liuyao-light .placeholder-ink-500::placeholder {
+    color: hsl(var(--muted-foreground) / 0.7) !important;
+}
+
+/* ===================== 圆形起卦按钮 ===================== */
+
+.liuyao-light .bg-gradient-to-b.from-ink-800.to-ink-900 {
+    background: linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background))) !important;
+    border-color: hsl(var(--border)) !important;
+}
+
+/* ===================== prose 内容区域 ===================== */
+
+.liuyao-light .prose-invert {
+    --tw-prose-body: hsl(var(--foreground) / 0.9) !important;
+    --tw-prose-headings: hsl(var(--foreground)) !important;
+}
+
+/* ===================== 历史记录页面样式 ===================== */
+
+.liuyao-light .hover\:bg-ink-800\/50:hover {
+    background-color: hsl(var(--muted) / 0.8) !important;
+}
+
+.liuyao-light .hover\:border-gold-700\/50:hover {
+    border-color: hsl(var(--liuyao-gold) / 0.5) !important;
+}
+
+.liuyao-light .group:hover .group-hover\:text-gold-300 {
+    color: hsl(var(--liuyao-gold)) !important;
+}
+
+.liuyao-light .group:hover .group-hover\:text-gold-500 {
+    color: hsl(var(--liuyao-gold) / 0.9) !important;
+}
+
+.liuyao-light .group:hover .group-hover\:text-paper-200 {
+    color: hsl(var(--foreground) / 0.9) !important;
+}
+
+/* ===================== 透明度文字颜色 ===================== */
+
+.liuyao-light .text-gold-200\/90 {
+    color: hsl(var(--liuyao-gold) / 0.95) !important;
+}
+
+.liuyao-light .text-gold-500\/90 {
+    color: hsl(var(--liuyao-gold) / 0.95) !important;
+}
+
+.liuyao-light .text-gold-500\/80 {
+    color: hsl(var(--liuyao-gold) / 0.9) !important;
+}
+
+.liuyao-light .text-gold-500\/70 {
+    color: hsl(var(--liuyao-gold) / 0.85) !important;
+}
+
+.liuyao-light .text-gold-600\/70 {
+    color: hsl(var(--liuyao-gold) / 0.85) !important;
+}
+
+.liuyao-light .text-gold-600\/60 {
+    color: hsl(var(--liuyao-gold) / 0.75) !important;
+}
+
+.liuyao-light .text-gold-600\/50 {
+    color: hsl(var(--liuyao-gold) / 0.65) !important;
+}
+
+/* ===================== 导航栏明亮主题 ===================== */
+
+.liuyao-light .backdrop-blur-xl {
+    backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* ===================== drop-shadow 覆盖 ===================== */
+
+.liuyao-light .drop-shadow-2xl {
+    filter: drop-shadow(0 10px 20px hsl(var(--foreground) / 0.1)) !important;
+}
+
+.liuyao-light .drop-shadow-md {
+    filter: drop-shadow(0 4px 6px hsl(var(--foreground) / 0.1)) !important;
+}
