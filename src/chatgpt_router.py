@@ -79,7 +79,19 @@ def _init_ai_manager() -> AIProviderManager:
         ))
         _logger.info(f"[AI] 已配置智谱AI: {settings.zhipu_model}")
     
-    # 4. OpenAI - 最后备用
+    # 4. 硅基流动 SiliconFlow - 备用
+    if settings.siliconflow_api_key:
+        config.add_model(AIModel(
+            name="SiliconFlow",
+            provider="openai",
+            api_key=settings.siliconflow_api_key,
+            base_url=settings.siliconflow_api_base,
+            status=ModelStatus.ACTIVE,
+            parameters={"model": settings.siliconflow_model}
+        ))
+        _logger.info(f"[AI] 已配置SiliconFlow: {settings.siliconflow_model}")
+    
+    # 5. OpenAI - 最后备用（兼容所有OpenAI格式的API）
     if settings.api_key and settings.api_key != "sk-test-1234567890":
         config.add_model(AIModel(
             name="OpenAI",
