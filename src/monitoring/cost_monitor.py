@@ -2,6 +2,7 @@
 成本监控和告警系统
 追踪AI调用成本，支持阈值告警
 """
+import os
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime, timedelta
@@ -12,6 +13,9 @@ import json
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# 检测是否在Vercel环境（只读文件系统）
+IS_VERCEL = os.getenv("VERCEL") == "1"
 
 
 @dataclass
@@ -76,9 +80,17 @@ class CostMonitor:
         # 告警回调
         self._alert_callbacks: List[Callable] = []
         
-        # 数据持久化
-        self._data_dir = Path("data/monitoring")
-        self._data_dir.mkdir(parents=True, exist_ok=True)
+        # 数据持久化（Vercel环境下跳过文件存储）
+        self._data_dir = None
+        if not IS_VERCEL:
+            self._data_dir = Path("data/monitoring")
+            try:
+                self._data_dir.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
+                logger.warning(f"无法创建监控数据目录，将仅使用内存存储: {e}")
+                self._data_dir = None
+        else:
+            logger.info("Vercel环境检测到，使用内存存储监控数据")
         
         self._initialized = True
         logger.info("CostMonitor initialized")
@@ -342,10 +354,14 @@ class CostMonitor:
             "error_rate": self.get_error_rate(24)
         }
         
-        # 保存报告
-        report_file = self._data_dir / f"report_{day_key}.json"
-        with open(report_file, "w", encoding="utf-8") as f:
-            json.dump(report, f, ensure_ascii=False, indent=2, default=str)
+        # 保存报告（仅在有数据目录时）
+        if self._data_dir is not None:
+            try:
+                report_file = self._data_dir / f"report_{day_key}.json"
+                with open(report_file, "w", encoding="utf-8") as f:
+                    json.dump(report, f, ensure_ascii=False, indent=2, default=str)
+            except Exception as e:
+                logger.warning(f"无法保存报告文件: {e}")
         
         return report
 
