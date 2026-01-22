@@ -98,7 +98,7 @@ class Settings(BaseSettings):
     upstash_api_token: str = Field(default="", exclude=True, alias="KV_REST_API_TOKEN")
 
     # rate limit settings
-    enable_rate_limit: bool = True
+    enable_rate_limit: bool = False  # 默认关闭，生产环境通过环境变量开启
     # rate limit xxx request per xx seconds
     rate_limit: Tuple[int, int] = (60, 60 * 60)
     user_rate_limit: Tuple[int, int] = (600, 60 * 60)
