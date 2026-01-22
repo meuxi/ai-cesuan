@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     # rate limit xxx request per xx seconds
     rate_limit: Tuple[int, int] = (60, 60 * 60)
     user_rate_limit: Tuple[int, int] = (600, 60 * 60)
+    
+    # 停止词列表：包含这些词的prompt将被拒绝
+    stop_words: list = [
+        "忽略", "ignore", "指令", "命令", "command", "help", "帮助", "之前",
+        "幫助", "現在", "開始", "开始", "start", "restart", "重新开始", "重新開始",
+        "遵守", "遵循", "遵从", "遵從"
+    ]
 
     def get_human_rate_limit(self) -> str:
         max_reqs, time_window_seconds = self.rate_limit
