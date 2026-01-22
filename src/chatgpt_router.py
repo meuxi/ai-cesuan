@@ -283,7 +283,6 @@ total_tokens = input_tokens + output_tokens
 cost = result.cost if (hasattr(result, 'cost') and result.cost is not None) else (
     estimate_cost(total_tokens, 0.002) if total_tokens > 0 else 0.0
 )
-            )
             
             cost_monitor.record_call(
                 model=result.model_used.name,
