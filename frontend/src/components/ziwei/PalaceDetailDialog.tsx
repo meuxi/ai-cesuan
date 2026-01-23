@@ -3,6 +3,7 @@
  * 显示选中宫位的完整星曜信息和解读
  */
 
+import { useEffect, useRef } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -87,6 +88,21 @@ function StarItem({ star, showDesc = false }: { star: StarWithMutagen; showDesc?
 }
 
 export function PalaceDetailDialog({ palace, open, onOpenChange }: PalaceDetailDialogProps) {
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    // 弹窗打开时重置滚动位置到顶部
+    useEffect(() => {
+        if (open && scrollRef.current) {
+            // 延迟一帧确保 DOM 已更新
+            requestAnimationFrame(() => {
+                const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+                if (viewport) {
+                    viewport.scrollTop = 0
+                }
+            })
+        }
+    }, [open, palace])
+
     if (!palace) return null
 
     const meaning = PALACE_MEANINGS[palace.name] || '宫位含义'
@@ -108,7 +124,7 @@ export function PalaceDetailDialog({ palace, open, onOpenChange }: PalaceDetailD
                     </DialogTitle>
                 </DialogHeader>
 
-                <ScrollArea className="max-h-[65vh] pr-4">
+                <ScrollArea ref={scrollRef} className="max-h-[65vh] pr-4">
                     <div className="space-y-4">
                         {/* 宫位含义 */}
                         <div className="p-3 bg-secondary/50 rounded-lg">
