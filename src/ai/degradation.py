@@ -33,12 +33,12 @@ class DegradationPolicy:
     description: str
 
 
-# 预定义降级策略
+# 预定义降级策略（用户体验优先：提升 max_output_tokens）
 DEGRADATION_POLICIES: Dict[DegradationLevel, DegradationPolicy] = {
     DegradationLevel.NORMAL: DegradationPolicy(
         level=DegradationLevel.NORMAL,
-        output_mode="standard",
-        max_output_tokens=1000,
+        output_mode="detailed",
+        max_output_tokens=16000,  # 用户体验优先：确保完整输出
         model_tier="premium",
         cache_only=False,
         reject_new_requests=False,
@@ -47,7 +47,7 @@ DEGRADATION_POLICIES: Dict[DegradationLevel, DegradationPolicy] = {
     DegradationLevel.LIGHT: DegradationPolicy(
         level=DegradationLevel.LIGHT,
         output_mode="standard",
-        max_output_tokens=800,
+        max_output_tokens=12000,  # 用户体验优先：保证完整输出
         model_tier="standard",
         cache_only=False,
         reject_new_requests=False,
@@ -55,17 +55,17 @@ DEGRADATION_POLICIES: Dict[DegradationLevel, DegradationPolicy] = {
     ),
     DegradationLevel.MODERATE: DegradationPolicy(
         level=DegradationLevel.MODERATE,
-        output_mode="quick",
-        max_output_tokens=500,
+        output_mode="standard",
+        max_output_tokens=8000,   # 用户体验优先：保证基本完整
         model_tier="economy",
         cache_only=False,
         reject_new_requests=False,
-        description="中度降级：快速模式，经济模型"
+        description="中度降级：标准模式，经济模型"
     ),
     DegradationLevel.SEVERE: DegradationPolicy(
         level=DegradationLevel.SEVERE,
         output_mode="quick",
-        max_output_tokens=300,
+        max_output_tokens=4000,   # 严重降级时仍保证基本输出
         model_tier="economy",
         cache_only=True,
         reject_new_requests=False,
@@ -74,7 +74,7 @@ DEGRADATION_POLICIES: Dict[DegradationLevel, DegradationPolicy] = {
     DegradationLevel.CRITICAL: DegradationPolicy(
         level=DegradationLevel.CRITICAL,
         output_mode="quick",
-        max_output_tokens=200,
+        max_output_tokens=2000,   # 紧急降级保留最小输出
         model_tier="economy",
         cache_only=True,
         reject_new_requests=True,
