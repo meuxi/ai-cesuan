@@ -469,15 +469,16 @@ export function useIztro(input: IztroInput | null) {
         lines.push('')
         lines.push('【十二宫位】')
 
-        (astrolabe.palaces as IztroPalace[]).forEach((palace) => {
+        const palaces = Array.isArray(astrolabe.palaces) ? (astrolabe.palaces as IztroPalace[]) : []
+        palaces.forEach((palace: IztroPalace) => {
             const bodyMark = palace.isBodyPalace ? '（身宫）' : ''
-            const majorStars = palace.majorStars.map((s) => {
+            const majorStars = palace.majorStars.map((s: IztroStar) => {
                 let str = s.name
                 if (s.brightness) str += s.brightness
                 if (s.mutagen) str += `化${s.mutagen}`
                 return str
             }).join('、') || '无主星'
-            const minorStars = palace.minorStars.map((s) => s.name + (s.brightness || '')).join('、')
+            const minorStars = palace.minorStars.map((s: IztroStar) => s.name + (s.brightness || '')).join('、')
             lines.push(`${palace.name}${bodyMark}（${palace.heavenlyStem}${palace.earthlyBranch}）`)
             lines.push(`  主星：${majorStars}`)
             if (minorStars) lines.push(`  辅星：${minorStars}`)

@@ -16,7 +16,7 @@ export interface HistoryMetadata {
     isReversed: boolean
   }>
   spread?: { code: string; name: string }
-  master?: { id: string; name: string }
+  master?: { id: string; name: string; prompt?: string }
 
   // 八字/紫微/合婚相关
   birthday?: string           // 生日

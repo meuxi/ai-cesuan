@@ -121,8 +121,7 @@ export default function TarotPage() {
       master: {
         id: selectedMaster.id,
         name: selectedMaster.name,
-        prompt: selectedMaster.prompt,
-        gamePrompt: selectedMaster.gamePrompts.tarot
+        prompt: selectedMaster.prompt
       }
     })
   }

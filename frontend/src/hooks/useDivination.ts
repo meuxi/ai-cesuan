@@ -21,9 +21,15 @@ interface DivinationParams {
   gender?: string
   num1?: number
   num2?: number
-  cards?: Array<{ name: string; isReversed: boolean }>
-  spread?: string
-  master?: { id: string; name: string }
+  cards?: Array<{
+    position: string
+    name: string
+    code: string
+    isReversed: boolean
+    meaning?: string
+  }>
+  spread?: { code: string; name: string }
+  master?: { id: string; name: string; prompt?: string; gamePrompt?: string }
   [key: string]: unknown  // 允许其他动态属性
 }
 
@@ -112,7 +118,12 @@ export function useDivination(promptType: string) {
 
               // 塔罗牌特定数据
               if (params.cards) {
-                metadata.cards = params.cards
+                metadata.cards = params.cards.map(c => ({
+                  position: c.position,
+                  name: c.name,
+                  code: c.code,
+                  isReversed: c.isReversed
+                }))
                 metadata.spread = params.spread
                 metadata.master = params.master ? { id: params.master.id, name: params.master.name } : undefined
               }
@@ -131,7 +142,7 @@ export function useDivination(promptType: string) {
               // 构建prompt摘要
               let promptSummary = params.prompt || ''
               if (!promptSummary && params.cards) {
-                promptSummary = params.cards.map((c: { name: string; isReversed: boolean }) =>
+                promptSummary = params.cards.map(c =>
                   `${c.name}${c.isReversed ? '(逆位)' : ''}`
                 ).join(', ')
               }
