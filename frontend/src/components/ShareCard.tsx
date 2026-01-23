@@ -7,6 +7,7 @@ import React, { useRef, useState } from 'react';
 import { Download, Share2, Copy, Check, Loader2 } from 'lucide-react';
 import { downloadShareCard, copyToClipboard, shareCard } from '../utils/shareCard';
 import { logger } from '@/utils/logger';
+import { SITE_CONFIG } from '@/config/constants';
 
 interface ShareCardProps {
     title: string;
@@ -23,7 +24,7 @@ interface ShareCardProps {
 export const ShareCard: React.FC<ShareCardProps> = ({
     title,
     children,
-    watermark = '由 AI占卜 生成',
+    watermark = SITE_CONFIG.watermark,
     showShareButton = true,
     showDownloadButton = true,
     showCopyButton = true,
@@ -76,7 +77,7 @@ export const ShareCard: React.FC<ShareCardProps> = ({
         try {
             await shareCard(
                 { element: cardRef.current },
-                { title, text: `查看我的${title}结果` }
+                { title: `${SITE_CONFIG.name} - ${title}`, text: `查看我的${title}结果 | ${SITE_CONFIG.url}` }
             );
             onShare?.();
         } catch (error) {

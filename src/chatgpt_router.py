@@ -198,13 +198,9 @@ async def divination(
             system_prompt = f"{system_prompt}\n\n{lang_prompt}"
             _logger.info(f"[多语言] 已启用{translator.get_language_name(target_lang)}输出")
     
-    # 获取降级策略推荐的输出模式
-    output_mode = degradation_manager.get_output_mode()
-    max_tokens = min(
-        degradation_manager.get_max_output_tokens(),
-        quota_manager.get_max_output_tokens(user_id),
-        get_output_max_tokens(output_mode, divination_body.prompt_type)
-    )
+    # 用户体验优先：固定最大输出，不设降级限制，确保报告完整
+    output_mode = "detailed"
+    max_tokens = 32000  # 用户体验优先：无限制输出，确保完整报告
     
     # 应用输出长度控制
     prompt = enhance_prompt_with_length_control(

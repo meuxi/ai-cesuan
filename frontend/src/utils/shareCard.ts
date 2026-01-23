@@ -168,4 +168,4 @@ export const shareCardStyles = {
 /**
  * 默认水印文字
  */
-export const defaultWatermark = '由 AI占卜 生成';
+export const defaultWatermark = '由 AI测算 (cesuan.tech) 生成';

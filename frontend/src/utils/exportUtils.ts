@@ -4,6 +4,8 @@
  * 移植自 lifekline3 项目
  */
 
+import { SITE_CONFIG } from '@/config/constants';
+
 // 通用数据导出接口
 export interface ExportableData {
     title: string;
@@ -143,8 +145,9 @@ function generateHtmlReport(content: ExportableData): string {
         ${renderDataSections(content.data)}
         
         <div class="footer">
-            <p>此报告由 AI 占卜系统生成，仅供娱乐参考</p>
-            <p>命理仅供参考，人生路径最终取决于个人选择与努力</p>
+            <p>🔮 ${SITE_CONFIG.name} | <a href="${SITE_CONFIG.url}" style="color: #ffd700;">${SITE_CONFIG.url}</a></p>
+            <p>${SITE_CONFIG.slogan}</p>
+            <p style="margin-top: 10px;">${SITE_CONFIG.copyright} | 仅供娱乐参考，命理不可全信</p>
         </div>
     </div>
 </body>
@@ -277,7 +280,7 @@ export function importFromJson<T>(file: File): Promise<T> {
 }
 
 /**
- * 生成分享文本
+ * 生成分享文本（带网站信息）
  */
 export function generateShareText(data: ExportableData): string {
     let text = `🔮 ${data.title}\n`;
@@ -293,7 +296,9 @@ export function generateShareText(data: ExportableData): string {
     }
 
     text += `━━━━━━━━━━━━━━━\n`;
-    text += `仅供娱乐参考，请勿迷信`;
+    text += `🔮 ${SITE_CONFIG.name} | ${SITE_CONFIG.url}\n`;
+    text += `${SITE_CONFIG.slogan}\n`;
+    text += `${SITE_CONFIG.copyright}`;
 
     return text;
 }
@@ -457,8 +462,9 @@ export function exportLifeKLineHtmlReport(data: LifeKLineExportData): void {
         </div>
 
         <div class="footer">
-            <p>&copy; ${now.getFullYear()} 人生K线 | 仅供娱乐与文化研究，请勿迷信</p>
-            <p style="margin-top: 8px;">命理仅供参考，人生路径最终取决于个人选择与努力</p>
+            <p>🔮 ${SITE_CONFIG.name} | <a href="${SITE_CONFIG.url}" style="color: #6366f1;">${SITE_CONFIG.url}</a></p>
+            <p style="margin-top: 8px;">${SITE_CONFIG.slogan} | ${SITE_CONFIG.copyright}</p>
+            <p style="margin-top: 8px; color: #94a3b8;">命理仅供参考，人生路径最终取决于个人选择与努力</p>
         </div>
     </div>
 </body>

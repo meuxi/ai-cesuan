@@ -18,6 +18,16 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+// ====== 网站信息配置 ======
+export const SITE_CONFIG = {
+  name: 'AI智能占卜',
+  domain: 'cesuan.tech',
+  url: 'https://cesuan.meuxi.com',
+  slogan: '古今智慧，洞见未来',
+  copyright: '© 2026 AI智能占卜 - 仅供娱乐参考',
+  watermark: '由 AI智能占卜 (cesuan.meuxi.com) 生成',
+} as const
+
 export interface DivinationOption {
   key: string
   label: string
