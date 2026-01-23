@@ -315,11 +315,11 @@
 }
 
 .iztro-palace.opposite-palace {
-  background-color: #93f73d4f;
+  background-color: #d4380d2f;  /* 橙红色 - 对宫 (react-iztro) */
 }
 
 .iztro-palace.surrounded-palace {
-  background-color: #aff46f24;
+  background-color: #d4380d1a;  /* 橙红色 - 三方宫 (react-iztro) */
 }
 
 .iztro-palace-major {

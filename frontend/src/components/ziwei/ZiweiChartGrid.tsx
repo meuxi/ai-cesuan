@@ -295,7 +295,7 @@ function PalaceCard({
         // 飞星源宫高亮
         if (isFlyingSource) return 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-500/10'
 
-        if (isSanFangSiZheng) return 'border-green-500/50 bg-green-500/5'
+        if (isSanFangSiZheng) return 'border-orange-600/50 bg-orange-600/5'
         if (isMingGong) return 'border-amber-500/50 bg-amber-500/5'
         return 'border-border/60 hover:border-border'
     }
@@ -908,12 +908,12 @@ export function ZiweiChartGrid({ data, onPalaceSelect, horoscopeHighlight = {}, 
 
                         const startPoint = getAnchorPoint(sourcePos)
 
-                        // 根据来源类型设置线条颜色
+                        // 根据来源类型设置线条颜色（参考 react-iztro 配色）
                         const lineColor = sanFangSiZhengSource.type === 'decadal'
-                            ? '#a855f7'  // 大限紫色
+                            ? '#1890ff'  // 大限蓝色 (--iztro-color-decadal)
                             : sanFangSiZhengSource.type === 'yearly'
-                                ? '#3b82f6'  // 流年蓝色
-                                : '#22c55e'  // 默认绿色
+                                ? '#813359'  // 流年紫红色 (--iztro-color-yearly)
+                                : '#d4380d'  // 默认橙红色 (--iztro-color-awesome)
 
                         return sanFangSiZhengIndexes.map((palaceIdx, i) => {
                             if (palaceIdx === sanFangSiZhengSource.index) return null
