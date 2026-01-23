@@ -1,9 +1,9 @@
+/* 专业字体导入 - 更具命理文化特色（必须放在最前面） */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 专业字体导入 - 更具命理文化特色 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap');
 
 /* 字体变量 */
 :root {
