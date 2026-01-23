@@ -200,7 +200,7 @@ async def divination(
     
     # 用户体验优先：固定最大输出，不设降级限制，确保报告完整
     output_mode = "detailed"
-    max_tokens = 32000  # 用户体验优先：无限制输出，确保完整报告
+    max_tokens = 8000  # 约 4000 汉字，确保报告完整且不过长
     
     # 应用输出长度控制
     prompt = enhance_prompt_with_length_control(
