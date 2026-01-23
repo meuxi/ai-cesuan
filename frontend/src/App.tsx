@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@vercel/analytics/react'
 import { useGlobalState } from '@/store'
 import MarketPage from '@/pages/Market'
 import DivinationHub from '@/pages/DivinationHub'
@@ -148,6 +149,7 @@ function App() {
         ) : null}
       </MainLayout>
       <Toaster />
+      <Analytics />
     </ErrorBoundary>
   )
 }
