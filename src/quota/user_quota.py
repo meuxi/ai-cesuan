@@ -42,35 +42,47 @@ class TierQuotaConfig:
 
 
 def get_tier_configs() -> Dict[QuotaTier, TierQuotaConfig]:
-    """动态获取等级配置（从环境变量读取）"""
+    """
+    动态获取等级配置（从环境变量读取）
+    
+    【用户体验优先模式】
+    - 移除所有输出限制，所有等级统一使用最大配置
+    - 专注于生成深度、专业的命理解析
+    - 让AI充分发挥专业能力
+    """
     settings = _get_settings()
+    
+    # 统一的无限制输出配置
+    unlimited_output_tokens = 32000
+    all_models = ["*"]  # 所有用户都可以使用所有模型
+    
     return {
         QuotaTier.FREE: TierQuotaConfig(
             daily_calls=settings.quota_free_daily_calls,
             daily_tokens=settings.quota_free_daily_tokens,
-            max_output_tokens=500,
-            allowed_models=["gpt-3.5-turbo", "deepseek-chat"],
+            max_output_tokens=unlimited_output_tokens,  # 无限制输出
+            allowed_models=all_models,
             priority=1
         ),
         QuotaTier.VIP: TierQuotaConfig(
             daily_calls=settings.quota_vip_daily_calls,
             daily_tokens=settings.quota_vip_daily_tokens,
-            max_output_tokens=1000,
-            allowed_models=["gpt-3.5-turbo", "gpt-4", "deepseek-chat", "claude-3-haiku"],
+            max_output_tokens=unlimited_output_tokens,  # 无限制输出
+            allowed_models=all_models,
             priority=5
         ),
         QuotaTier.PREMIUM: TierQuotaConfig(
             daily_calls=settings.quota_premium_daily_calls,
             daily_tokens=settings.quota_premium_daily_tokens,
-            max_output_tokens=2000,
-            allowed_models=["gpt-4", "gpt-4-turbo", "claude-3-sonnet", "deepseek-chat"],
+            max_output_tokens=unlimited_output_tokens,  # 无限制输出
+            allowed_models=all_models,
             priority=10
         ),
         QuotaTier.UNLIMITED: TierQuotaConfig(
             daily_calls=-1,  # -1 表示无限制
             daily_tokens=-1,
-            max_output_tokens=4000,
-            allowed_models=["*"],  # * 表示所有模型
+            max_output_tokens=unlimited_output_tokens,  # 无限制输出
+            allowed_models=all_models,
             priority=100
         )
     }
@@ -135,6 +147,8 @@ class UserQuotaManager:
     
     def _load_usage_data(self):
         """加载今日使用数据"""
+        if self._data_dir is None:
+            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         if today_file.exists():
             try:
@@ -148,6 +162,8 @@ class UserQuotaManager:
     
     def _save_usage_data(self):
         """保存使用数据"""
+        if self._data_dir is None:
+            return
         today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
         try:
             data = {}
@@ -309,7 +325,9 @@ class UserQuotaManager:
     
     def cleanup_old_data(self, days_to_keep: int = 7):
         """清理过期数据"""
-        import os
+        if self._data_dir is None:
+            return
+        
         from datetime import timedelta
         
         cutoff_date = date.today() - timedelta(days=days_to_keep)

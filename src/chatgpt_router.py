@@ -1,6 +1,9 @@
 import json
+import os
+import re
 import time
 from typing import Optional
+from urllib.parse import urlparse
 from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 
@@ -207,7 +210,7 @@ async def divination(
         prompt, output_mode, divination_body.prompt_type
     )
 
-    # custom api key, model and base url support
+    # ========== 安全增强：自定义API密钥处理 ==========
     custom_base_url = request.headers.get("x-api-url")
     custom_api_key = request.headers.get("x-api-key")
     custom_api_model = request.headers.get("x-api-model")
@@ -216,14 +219,49 @@ async def divination(
     use_custom_api = custom_api_key and custom_api_key.strip()
     
     if use_custom_api:
-        # 使用用户自定义的API配置
+        # 安全检查1：验证HTTPS协议（生产环境强制）
+        is_production = os.getenv("VERCEL") == "1" or os.getenv("ENVIRONMENT") == "production"
+        if is_production:
+            # 检查请求是否通过HTTPS
+            forwarded_proto = request.headers.get("x-forwarded-proto", "http")
+            if forwarded_proto != "https":
+                _logger.warning(f"拒绝非HTTPS请求传输自定义API密钥: {get_real_ipaddr(request)}")
+                raise APIConfigError(message="安全错误：自定义API密钥仅支持HTTPS传输")
+        
+        # 安全检查2：API密钥格式验证
         final_api_key = custom_api_key.strip().replace('\xa0', '').replace('\u200b', '')
         if final_api_key.startswith("Bearer "):
             final_api_key = final_api_key[7:].strip()
+        
+        # 安全检查3：验证API密钥长度和格式
+        if len(final_api_key) < 20:
+            _logger.warning(f"API密钥格式无效（长度不足）: {get_real_ipaddr(request)}")
+            raise APIConfigError(message="API密钥格式无效，请检查密钥是否完整")
+        
+        # 安全检查4：禁止可疑字符
+        if not re.match(r'^[a-zA-Z0-9_\-\.]+$', final_api_key):
+            _logger.warning(f"API密钥包含非法字符: {get_real_ipaddr(request)}")
+            raise APIConfigError(message="API密钥包含无效字符")
+        
+        # 使用用户自定义的API配置
         final_base_url = custom_base_url or settings.api_base or "https://api.openai.com/v1"
         api_model = custom_api_model or settings.model or "gpt-3.5-turbo"
         
+        # 安全检查5：验证API Base URL格式
+        if final_base_url:
+            parsed = urlparse(final_base_url)
+            if parsed.scheme not in ("http", "https"):
+                raise APIConfigError(message="API地址格式无效")
+            # 生产环境强制HTTPS
+            if is_production and parsed.scheme != "https":
+                _logger.warning(f"生产环境拒绝非HTTPS的API地址: {final_base_url}")
+                raise APIConfigError(message="生产环境仅支持HTTPS的API地址")
+        
         is_zhipu = final_base_url and "bigmodel.cn" in final_base_url
+        
+        # 日志记录（不记录完整密钥）
+        masked_key = f"{final_api_key[:8]}...{final_api_key[-4:]}" if len(final_api_key) > 12 else "***"
+        _logger.info(f"使用自定义API配置: base={final_base_url}, model={api_model}, key={masked_key}")
         
         api_client = AsyncOpenAI(
             api_key=final_api_key, 
@@ -275,13 +313,17 @@ async def divination(
             
             # 记录成本监控
             latency = time.time() - request_start_time
-            input_tokens = estimate_tokens(system_prompt + prompt)
-            output_tokens = estimate_tokens(result.response.content)
-            # 新增：确保 token 数不为空/0
+            input_tokens = estimate_tokens(system_prompt + prompt) or 0
+            output_tokens = estimate_tokens(result.response.content) or 0
             total_tokens = input_tokens + output_tokens
-            # 修复空值问题：避免空值参与计算
-            cost = result.cost if (hasattr(result, 'cost') and result.cost is not None) else (
-    estimate_cost(total_tokens, 0.002) if total_tokens > 0 else 0.0  )
+            
+            # 安全计算成本（避免空值）
+            if hasattr(result, 'cost') and result.cost is not None:
+                cost = result.cost
+            elif total_tokens > 0:
+                cost = estimate_cost(total_tokens, 0.002)
+            else:
+                cost = 0.0
             cost_monitor.record_call(
                 model=result.model_used.name,
                 input_tokens=input_tokens,

@@ -41,41 +41,54 @@ interface DivinationCategory {
 
 const DIVINATION_CATEGORIES: DivinationCategory[] = [
     {
-        title: '🌟 东方玄学',
+        title: '🌟 命理分析',
         items: [
-            { name: '生辰八字', icon: <Calendar className="w-5 h-5" />, path: '/divination/bazi', description: '四柱命理推算' },
+            { name: '生辰八字', icon: <Calendar className="w-5 h-5" />, path: '/divination/birthday', description: '四柱命理推算' },
             { name: '紫微斗数', icon: <Star className="w-5 h-5" />, path: '/divination/ziwei', description: '星曜命盘分析' },
-            { name: '梅花易数', icon: <Flame className="w-5 h-5" />, path: '/divination/plum-flower', description: '以数起卦' },
-            { name: '六爻占卜', icon: <Layers className="w-5 h-5" />, path: '/divination/liuyao', description: '铜钱摇卦' },
-            { name: '奇门遁甲', icon: <Compass className="w-5 h-5" />, path: '/divination/qimen', description: '时空奇门局' },
-            { name: '大六壬', icon: <Droplets className="w-5 h-5" />, path: '/divination/daliuren', description: '课传神算' },
-            { name: '小六壬', icon: <Dice1 className="w-5 h-5" />, path: '/divination/xiaoliu', description: '掐指一算' },
-            { name: '诸葛神算', icon: <BookOpen className="w-5 h-5" />, path: '/divination/zhuge', description: '三百八十四签' },
+            { name: '八字合婚', icon: <Heart className="w-5 h-5" />, path: '/divination/hehun', description: '婚配吉凶分析' },
+            { name: '人生K线', icon: <TrendingUp className="w-5 h-5" />, path: '/divination/life-kline', description: '百年运势图' },
         ]
     },
     {
-        title: '🔮 西方神秘学',
+        title: '🔮 周易卜卦',
+        items: [
+            { name: '六爻占卜', icon: <Layers className="w-5 h-5" />, path: '/divination/liuyao', description: '铜钱摇卦' },
+            { name: '梅花易数', icon: <Flame className="w-5 h-5" />, path: '/divination/plum_flower', description: '以数起卦' },
+            { name: '小六壬', icon: <Dice1 className="w-5 h-5" />, path: '/divination/xiaoliu', description: '掐指一算' },
+            { name: '奇门遁甲', icon: <Compass className="w-5 h-5" />, path: '/divination/qimen', description: '时空奇门局' },
+            { name: '大六壬', icon: <Droplets className="w-5 h-5" />, path: '/divination/daliuren', description: '课传神算' },
+        ]
+    },
+    {
+        title: '🌙 西方占卜',
         items: [
             { name: '塔罗占卜', icon: <FileText className="w-5 h-5" />, path: '/divination/tarot', description: '78张神秘牌' },
             { name: '星座运势', icon: <Sun className="w-5 h-5" />, path: '/divination/zodiac', description: '十二星座详解' },
         ]
     },
     {
-        title: '📊 运势分析',
+        title: '📊 运势预测',
         items: [
-            { name: '人生K线', icon: <TrendingUp className="w-5 h-5" />, path: '/divination/life-kline', description: '百年运势图' },
-            { name: '每日运势', icon: <Sun className="w-5 h-5" />, path: '/divination/daily-fortune', description: '今日吉凶' },
-            { name: '每月运势', icon: <Moon className="w-5 h-5" />, path: '/divination/monthly-fortune', description: '本月运程' },
+            { name: '每日运势', icon: <Sun className="w-5 h-5" />, path: '/divination/daily', description: '今日吉凶' },
+            { name: '每月运势', icon: <Moon className="w-5 h-5" />, path: '/divination/monthly', description: '本月运程' },
         ]
     },
     {
         title: '🎯 实用工具',
         items: [
             { name: '姓名测算', icon: <Users className="w-5 h-5" />, path: '/divination/name', description: '五格剖象' },
-            { name: '择吉日', icon: <Calendar className="w-5 h-5" />, path: '/divination/jiri', description: '黄道吉日' },
+            { name: '起名取名', icon: <Users className="w-5 h-5" />, path: '/divination/new_name', description: '结合八字起名' },
             { name: '老黄历', icon: <BookOpen className="w-5 h-5" />, path: '/divination/laohuangli', description: '每日宜忌' },
+            { name: '择吉日', icon: <Calendar className="w-5 h-5" />, path: '/divination/laohuangli/select', description: '黄道吉日' },
             { name: '周公解梦', icon: <Brain className="w-5 h-5" />, path: '/divination/dream', description: '梦境解析' },
-            { name: '抽签求卦', icon: <Sparkles className="w-5 h-5" />, path: '/chouqian', description: '观音灵签' },
+            { name: '姻缘测试', icon: <Heart className="w-5 h-5" />, path: '/divination/fate', description: '缘分指数' },
+        ]
+    },
+    {
+        title: '🙏 传统祈福',
+        items: [
+            { name: '灵签问路', icon: <Sparkles className="w-5 h-5" />, path: '/divination/chouqian', description: '观音灵签' },
+            { name: '诸葛神算', icon: <BookOpen className="w-5 h-5" />, path: '/divination/zhuge', description: '三字测吉凶' },
         ]
     }
 ];

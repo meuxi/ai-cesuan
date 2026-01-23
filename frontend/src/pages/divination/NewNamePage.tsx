@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Solar } from 'lunar-javascript'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -14,6 +15,7 @@ import { Sparkles } from 'lucide-react'
 const CONFIG = getDivinationOption('new_name')!
 
 export default function NewNamePage() {
+  const { t } = useTranslation()
   const [birthday, setBirthday] = useLocalStorage('birthday', '2000-08-17T00:00')
   const [sex, setSex] = useState('')
   const [surname, setSurname] = useState('')
@@ -82,20 +84,20 @@ export default function NewNamePage() {
       <div className="max-w-2xl mx-auto w-full">
         <div className="space-y-5">
           <div>
-            <Label className="text-sm font-medium text-foreground">姓氏</Label>
+            <Label className="text-sm font-medium text-foreground">{t('newName.surnameLabel')}</Label>
             <input
               value={surname}
               onChange={(e) => setSurname(e.target.value)}
-              placeholder="请输入姓氏"
+              placeholder={t('newName.surnamePlaceholder')}
               maxLength={2}
               className="w-full px-3 py-2 mt-2 text-sm border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
           <div>
-            <Label className="text-sm font-medium text-foreground">性别</Label>
+            <Label className="text-sm font-medium text-foreground">{t('newName.genderLabel')}</Label>
             <Select value={sex} onValueChange={setSex}>
               <SelectTrigger className="mt-2 border-input">
-                <SelectValue placeholder="请选择性别" />
+                <SelectValue placeholder={t('newName.genderPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="男">男</SelectItem>

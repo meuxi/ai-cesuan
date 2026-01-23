@@ -48,10 +48,10 @@ export function TarotCard({
     const rotateYParallax = useTransform(x, [-100, 100], [170, 190])
 
     const sizeClasses = {
-        sm: 'w-20 h-32',
-        md: 'w-28 h-44',
-        lg: 'w-36 h-56',
-        xl: 'w-44 h-68'
+        sm: 'w-16 h-24 sm:w-20 sm:h-32',
+        md: 'w-20 h-32 sm:w-28 sm:h-44',
+        lg: 'w-24 h-36 sm:w-32 sm:h-48 md:w-36 md:h-56',
+        xl: 'w-32 h-48 sm:w-40 sm:h-60 md:w-44 md:h-68'
     }
 
     const handleClick = () => {

@@ -109,6 +109,18 @@ class ShenShaAnalyzer:
         results.extend(cls._check_luomawangxiang(bazi))          # 马入天罗地网
         results.extend(cls._check_tongziminggong(bazi, gender))  # 童子命
         
+        # 新增神煞（基于mingpan参考资料）
+        results.extend(cls._check_wenqu(day_master, bazi))       # 文曲贵人
+        results.extend(cls._check_dexiu(bazi))                   # 德秀贵人
+        results.extend(cls._check_liue(bazi))                    # 六厄
+        results.extend(cls._check_xianchi(bazi))                 # 咸池
+        results.extend(cls._check_tiancai(day_master, bazi))     # 天财
+        results.extend(cls._check_liuxia(day_master, bazi))      # 流霞
+        results.extend(cls._check_yuanchen(bazi, gender))        # 元辰
+        results.extend(cls._check_bazhuan(bazi))                 # 八专
+        results.extend(cls._check_sidakongwang(bazi))            # 四大空亡
+        results.extend(cls._check_diku(bazi))                    # 财库
+        
         return results
     
     @classmethod
@@ -1444,6 +1456,275 @@ class ShenShaAnalyzer:
         
         return results
     
+    # ========== 补充神煞（基于mingpan参考资料）==========
+    
+    @classmethod
+    def _check_wenqu(cls, day_master: str, bazi: Dict) -> List[ShenShaInfo]:
+        """文曲贵人（与文昌不同）"""
+        results = []
+        
+        # 文曲贵人查法（基于日干）
+        wenqu_map = {
+            '甲': '巳', '乙': '未', '丙': '酉', '丁': '亥',
+            '戊': '酉', '己': '亥', '庚': '子', '辛': '寅',
+            '壬': '辰', '癸': '午'
+        }
+        
+        wenqu = wenqu_map.get(day_master)
+        if wenqu:
+            for key, pos_name in [('year', '年支'), ('month', '月支'), ('day', '日支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == wenqu:
+                    results.append(ShenShaInfo(
+                        name='文曲贵人',
+                        type='吉星',
+                        position=pos_name,
+                        description='文曲贵人，主口才便给，能言善辩。适合教学、演讲、销售等需要表达能力的工作。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_dexiu(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """德秀贵人（基于季节）"""
+        results = []
+        
+        # 德秀贵人查法：春月见丙丁，夏月见甲乙，秋月见庚辛，冬月见壬癸
+        month_branch = bazi['month']['branch']
+        
+        # 确定季节
+        season_stems = []
+        spring = ['寅', '卯', '辰']  # 春
+        summer = ['巳', '午', '未']  # 夏
+        autumn = ['申', '酉', '戌']  # 秋
+        winter = ['亥', '子', '丑']  # 冬
+        
+        if month_branch in spring:
+            season_stems = ['丙', '丁']
+        elif month_branch in summer:
+            season_stems = ['甲', '乙']
+        elif month_branch in autumn:
+            season_stems = ['庚', '辛']
+        elif month_branch in winter:
+            season_stems = ['壬', '癸']
+        
+        for key, pos_name in [('year', '年干'), ('month', '月干'), ('day', '日干'), ('hour', '时干')]:
+            if bazi[key]['stem'] in season_stems:
+                results.append(ShenShaInfo(
+                    name='德秀贵人',
+                    type='吉星',
+                    position=pos_name,
+                    description='德秀贵人，主品德高尚，受人尊敬。为人正直，易得他人信任和支持。'
+                ))
+        
+        return results
+    
+    @classmethod
+    def _check_liue(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """六厄"""
+        results = []
+        
+        # 六厄查法：以日支查
+        liue_map = {
+            '子': '巳', '丑': '午', '寅': '未', '卯': '申',
+            '辰': '酉', '巳': '戌', '午': '亥', '未': '子',
+            '申': '丑', '酉': '寅', '戌': '卯', '亥': '辰'
+        }
+        
+        day_branch = bazi['day']['branch']
+        liue = liue_map.get(day_branch)
+        
+        if liue:
+            for key, pos_name in [('year', '年支'), ('month', '月支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == liue:
+                    results.append(ShenShaInfo(
+                        name='六厄',
+                        type='凶煞',
+                        position=pos_name,
+                        description='六厄，主六亲不睦，人际不顺。需要改善人际关系，多行善事。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_xianchi(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """咸池（沐浴桃花，比普通桃花更凶）"""
+        results = []
+        
+        # 咸池查法：以年支或日支查
+        xianchi_map = {
+            '寅': '卯', '午': '卯', '戌': '卯',
+            '申': '酉', '子': '酉', '辰': '酉',
+            '亥': '子', '卯': '子', '未': '子',
+            '巳': '午', '酉': '午', '丑': '午'
+        }
+        
+        year_branch = bazi['year']['branch']
+        day_branch = bazi['day']['branch']
+        
+        # 以年支查
+        xianchi_year = xianchi_map.get(year_branch)
+        if xianchi_year:
+            for key, pos_name in [('month', '月支'), ('day', '日支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == xianchi_year:
+                    results.append(ShenShaInfo(
+                        name='咸池',
+                        type='凶煞',
+                        position=pos_name,
+                        description='咸池星，主风流多情，异性缘重。感情丰富，但需注意节制，防烂桃花。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_tiancai(cls, day_master: str, bazi: Dict) -> List[ShenShaInfo]:
+        """天财（横财星）"""
+        results = []
+        
+        # 天财查法：以日干查
+        tiancai_map = {
+            '甲': '丑', '乙': '辰', '丙': '未', '丁': '戌',
+            '戊': '丑', '己': '辰', '庚': '未', '辛': '戌',
+            '壬': '丑', '癸': '辰'
+        }
+        
+        tiancai = tiancai_map.get(day_master)
+        if tiancai:
+            for key, pos_name in [('year', '年支'), ('month', '月支'), ('day', '日支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == tiancai:
+                    results.append(ShenShaInfo(
+                        name='天财',
+                        type='吉星',
+                        position=pos_name,
+                        description='天财星，主横财运佳，意外之财。投资运好，但需谨慎理财。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_liuxia(cls, day_master: str, bazi: Dict) -> List[ShenShaInfo]:
+        """流霞（女性不利）"""
+        results = []
+        
+        # 流霞查法
+        liuxia_map = {
+            '甲': '酉', '乙': '戌', '丙': '未', '丁': '申',
+            '戊': '巳', '己': '午', '庚': '辰', '辛': '卯',
+            '壬': '亥', '癸': '寅'
+        }
+        
+        liuxia = liuxia_map.get(day_master)
+        if liuxia:
+            for key, pos_name in [('year', '年支'), ('month', '月支'), ('day', '日支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == liuxia:
+                    results.append(ShenShaInfo(
+                        name='流霞',
+                        type='凶煞',
+                        position=pos_name,
+                        description='流霞煞，主产厄血光，女性不利。女性需注意妇科健康，生产时需谨慎。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_yuanchen(cls, bazi: Dict, gender: str) -> List[ShenShaInfo]:
+        """元辰（大耗的另一种形式）"""
+        results = []
+        
+        # 元辰查法：男女不同
+        if gender == 'male':
+            yuanchen_map = {
+                '子': '未', '丑': '申', '寅': '酉', '卯': '戌',
+                '辰': '亥', '巳': '子', '午': '丑', '未': '寅',
+                '申': '卯', '酉': '辰', '戌': '巳', '亥': '午'
+            }
+        else:
+            yuanchen_map = {
+                '子': '巳', '丑': '午', '寅': '未', '卯': '申',
+                '辰': '酉', '巳': '戌', '午': '亥', '未': '子',
+                '申': '丑', '酉': '寅', '戌': '卯', '亥': '辰'
+            }
+        
+        year_branch = bazi['year']['branch']
+        yuanchen = yuanchen_map.get(year_branch)
+        
+        if yuanchen:
+            for key, pos_name in [('month', '月支'), ('day', '日支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == yuanchen:
+                    results.append(ShenShaInfo(
+                        name='元辰',
+                        type='凶煞',
+                        position=pos_name,
+                        description='元辰星，主运势反复，起伏不定。需要更加努力，方能成功。'
+                    ))
+        
+        return results
+    
+    @classmethod
+    def _check_bazhuan(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """八专（干支同气）"""
+        results = []
+        
+        # 八专日：甲寅、乙卯、丁未、戊戌、己未、庚申、辛酉、癸丑
+        bazhuan_pillars = ['甲寅', '乙卯', '丁未', '戊戌', '己未', '庚申', '辛酉', '癸丑']
+        
+        day_pillar = bazi['day']['stem'] + bazi['day']['branch']
+        if day_pillar in bazhuan_pillars:
+            results.append(ShenShaInfo(
+                name='八专',
+                type='吉星',
+                position='日柱',
+                description='八专，主专心致志，执着专注。做事认真，有毅力，但较为固执。'
+            ))
+        
+        return results
+    
+    @classmethod
+    def _check_sidakongwang(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """四大空亡"""
+        results = []
+        
+        # 四大空亡：甲子、甲午、甲申、甲寅日
+        sidakongwang_pillars = ['甲子', '甲午', '甲申', '甲寅']
+        
+        day_pillar = bazi['day']['stem'] + bazi['day']['branch']
+        if day_pillar in sidakongwang_pillars:
+            results.append(ShenShaInfo(
+                name='四大空亡',
+                type='凶煞',
+                position='日柱',
+                description='四大空亡，主大起大落，成败无常。人生波折较多，需要坚持和耐心。'
+            ))
+        
+        return results
+    
+    @classmethod
+    def _check_diku(cls, bazi: Dict) -> List[ShenShaInfo]:
+        """地库（财库）"""
+        results = []
+        
+        # 地库查法：以日支查
+        diku_map = {
+            '寅': '丑', '午': '丑', '戌': '丑',
+            '申': '未', '子': '未', '辰': '未',
+            '亥': '辰', '卯': '辰', '未': '辰',
+            '巳': '戌', '酉': '戌', '丑': '戌'
+        }
+        
+        day_branch = bazi['day']['branch']
+        diku = diku_map.get(day_branch)
+        
+        if diku:
+            for key, pos_name in [('year', '年支'), ('month', '月支'), ('hour', '时支')]:
+                if bazi[key]['branch'] == diku:
+                    results.append(ShenShaInfo(
+                        name='财库',
+                        type='吉星',
+                        position=pos_name,
+                        description='财库星，主财运亨通，聚财有道。理财能力强，善于积累财富。'
+                    ))
+        
+        return results
+
     @classmethod
     def get_summary(cls, shen_sha_list: List[ShenShaInfo]) -> Dict[str, Any]:
         """

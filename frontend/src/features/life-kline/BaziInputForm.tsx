@@ -39,7 +39,7 @@ const BaziInputForm: React.FC<BaziInputFormProps> = ({ onSubmit, isLoading = fal
         startAge: 1,
         firstDaYun: '甲子',
         isForward: undefined,
-        useAi: true,  // 默认使用AI
+        useAi: false,  // 默认使用本地算法（快速），AI模式需要配置API Key且耗时较长
         apiKey: '',
         apiBaseUrl: '',
         modelName: '',

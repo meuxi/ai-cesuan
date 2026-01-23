@@ -41,47 +41,47 @@ export function DivinationCardHeader({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* 顶部导航栏 */}
       <div className="flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-1"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           {t('common.back')}
         </button>
 
         {divinationType && (
           <button
             onClick={() => navigate(`/history/${divinationType}`)}
-            className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-1"
           >
-            <History className="h-4 w-4" />
+            <History className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             {t('common.history')}
           </button>
         )}
       </div>
 
       {/* 标题区域 */}
-      <div className="text-center py-6">
-        <div className="flex items-center justify-center gap-3 mb-3">
+      <div className="text-center py-4 sm:py-6">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3">
           {Icon && (
-            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-              <Icon className="w-5 h-5 text-muted-foreground" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
             </div>
           )}
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
             {title}
           </h1>
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground px-2">
           {description}
         </p>
       </div>
 
       {/* 内容卡片 */}
-      <div className="rounded-xl border border-border bg-card p-4 md:p-6">
+      <div className="rounded-lg sm:rounded-xl border border-border bg-card p-3 sm:p-4 md:p-6">
         {children}
       </div>
     </div>

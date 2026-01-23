@@ -51,24 +51,60 @@ async def add_request_id(request: Request, call_next):
     response.headers["X-Request-ID"] = request_id  # 透传给前端
     return response
 
-# ========== CORS 配置修复2：解决 credentials 与 * 冲突 ==========
+# ========== CORS 配置修复2：安全的CORS策略 ==========
 is_vercel = os.getenv("VERCEL") == "1"
+is_development = os.getenv("ENVIRONMENT", "development") == "development"
 allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "")
 
-if is_vercel:
+# 默认安全的允许源列表
+DEFAULT_ALLOWED_ORIGINS = [
+    "https://*.vercel.app",  # Vercel 预览部署
+]
+
+if is_development:
+    # 开发环境：允许所有源，便于本地调试
+    allowed_origins = ["*"]
+    allow_credentials = False
+    _logger.info("开发环境CORS设置为允许所有源（仅用于调试）")
+elif is_vercel:
+    # Vercel 生产环境：优先使用环境变量配置
+    allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+    if allowed_origins:
+        allow_credentials = True
+        _logger.info(f"生产环境CORS允许的源: {allowed_origins}")
+    else:
+        # 未配置 ALLOWED_ORIGINS 时，使用严格的默认策略
+        # 获取 Vercel 自动注入的域名
+        vercel_url = os.getenv("VERCEL_URL", "")
+        vercel_project_domain = os.getenv("VERCEL_PROJECT_PRODUCTION_URL", "")
+        
+        allowed_origins = []
+        if vercel_url:
+            allowed_origins.append(f"https://{vercel_url}")
+        if vercel_project_domain:
+            allowed_origins.append(f"https://{vercel_project_domain}")
+        
+        # 如果仍为空，使用通配符但记录警告
+        if not allowed_origins:
+            allowed_origins = ["*"]
+            allow_credentials = False
+            _logger.warning(
+                "⚠️ 生产环境未配置 ALLOWED_ORIGINS，默认允许所有源。"
+                "建议设置环境变量 ALLOWED_ORIGINS 限制跨域请求来源。"
+            )
+        else:
+            allow_credentials = True
+            _logger.info(f"Vercel环境自动检测CORS允许的源: {allowed_origins}")
+else:
+    # 其他生产环境：必须配置 ALLOWED_ORIGINS
     allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
     if not allowed_origins:
-        # Vercel环境默认允许所有源（适用于单域名部署）
-        allowed_origins = ["*"]
+        _logger.error("❌ 生产环境必须配置 ALLOWED_ORIGINS 环境变量！")
+        allowed_origins = []  # 拒绝所有跨域请求
         allow_credentials = False
-        _logger.info("Vercel环境CORS设置为允许所有源")
     else:
         allow_credentials = True
         _logger.info(f"生产环境CORS允许的源: {allowed_origins}")
-else:
-    allowed_origins = ["*"]
-    allow_credentials = False  # 开发环境通配符时关闭凭证
-    _logger.info("开发环境CORS设置为允许所有源（关闭凭证）")
 
 app.add_middleware(
     CORSMiddleware,

@@ -21,6 +21,7 @@ export class ZiweiServiceProfessional {
 
     /**
      * 计算紫微斗数命盘 - 调用后端API
+     * 支持派别选择（全书派/中州派）
      */
     async calculate(input: ZiweiInput): Promise<ZiweiResult> {
         try {
@@ -36,7 +37,8 @@ export class ZiweiServiceProfessional {
                     hour: input.hour,
                     minute: input.minute || 0,
                     gender: input.gender,
-                    language: input.language || 'zh-CN'
+                    language: input.language || 'zh-CN',
+                    algorithm: input.algorithm || 'default'  // 派别参数
                 })
             })
 

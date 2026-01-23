@@ -1,6 +1,7 @@
 """
 紫微斗数计算服务 - 使用iztro-py纯Python库
 核心算法在后端执行，前端只负责展示
+支持全书派/中州派配置切换（参考py-iztro）
 """
 
 from typing import Dict, Any, List, Optional
@@ -12,6 +13,10 @@ from iztro_py import by_solar
 from iztro_py.i18n import t, set_language
 from lunar_python import Solar
 from .adjective_stars import apply_adjective_stars_to_palaces
+from .ziwei_config import (
+    ZiweiConfig, AlgorithmType, YearDivideType, AgeDivideType,
+    get_config, set_config, reset_config
+)
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +223,34 @@ def translate_name(key: str, category: str = '') -> str:
 
 
 class IztroService:
-    """紫微斗数计算服务"""
+    """紫微斗数计算服务 - 支持派别配置"""
+    
+    def __init__(self):
+        """初始化服务"""
+        self._config: ZiweiConfig = get_config()
+        self._astrolabe_cache: Dict[str, Any] = {}  # 缓存命盘用于运限计算
+    
+    def config(self, config: ZiweiConfig) -> None:
+        """
+        设置全局配置（四化、亮度、派别等）
+        参考 py-iztro 的 astro.config() 方法
+        
+        Args:
+            config: 配置对象
+        """
+        self._config = config
+        set_config(config)
+        logger.info(f"紫微配置已更新: algorithm={config.algorithm.value}")
+    
+    def get_config(self) -> ZiweiConfig:
+        """获取当前配置"""
+        return self._config
+    
+    def reset_config(self) -> None:
+        """重置为默认配置"""
+        reset_config()
+        self._config = get_config()
+        logger.info("紫微配置已重置为默认")
     
     def calculate(
         self,
@@ -228,7 +260,8 @@ class IztroService:
         hour: int,
         minute: int = 0,
         gender: str = "male",
-        language: str = "zh-CN"
+        language: str = "zh-CN",
+        algorithm: Optional[str] = None  # 新增：派别参数
     ) -> Dict[str, Any]:
         """
         计算紫微斗数命盘
@@ -241,11 +274,19 @@ class IztroService:
             minute: 出生分
             gender: 性别 ('male'/'female')
             language: 语言 ('zh-CN'/'zh-TW'/'en-US'/'ko-KR'/'ja-JP')
+            algorithm: 派别 ('default'=全书派, 'zhongzhou'=中州派)
         
         Returns:
             完整的紫微斗数命盘数据
         """
         try:
+            # 如果指定了派别，临时更新配置
+            if algorithm:
+                algo_type = AlgorithmType.ZHONGZHOU if algorithm == 'zhongzhou' else AlgorithmType.DEFAULT
+                if self._config.algorithm != algo_type:
+                    self._config.algorithm = algo_type
+                    logger.info(f"使用派别: {algo_type.value}")
+            
             # 构建日期字符串
             date_str = f"{year}-{month}-{day}"
             
@@ -267,12 +308,241 @@ class IztroService:
             if not astrolabe:
                 raise ValueError("创建命盘失败")
             
+            # 缓存命盘用于后续运限计算
+            cache_key = f"{date_str}_{time_index}_{gender}"
+            self._astrolabe_cache[cache_key] = {
+                'astrolabe': astrolabe,
+                'birth_year': year,
+                'gender': gender
+            }
+            
             # 转换为API响应格式
-            return self._convert_to_response(astrolabe, year, month, day, hour, minute, gender, language)
+            response = self._convert_to_response(astrolabe, year, month, day, hour, minute, gender, language)
+            
+            # 添加配置信息
+            response['config'] = {
+                'algorithm': self._config.algorithm.value,
+                'yearDivide': self._config.year_divide.value,
+                'ageDivide': self._config.age_divide.value,
+            }
+            
+            return response
             
         except Exception as e:
             logger.error(f"紫微斗数计算失败: {e}")
             raise
+    
+    def horoscope(
+        self,
+        birth_date: str,
+        birth_time_index: int,
+        gender: str,
+        target_date: Optional[str] = None,
+        target_time_index: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        计算运限信息（大限/小限/流年/流月/流日/流时）
+        参考 py-iztro 的 astrolabe.horoscope() 方法
+        
+        Args:
+            birth_date: 出生日期 YYYY-MM-DD
+            birth_time_index: 出生时辰索引 0-12
+            gender: 性别 'male'/'female'
+            target_date: 目标日期（默认当天）
+            target_time_index: 目标时辰索引（默认当前时辰）
+        
+        Returns:
+            运限数据（大限/小限/流年/流月/流日/流时）
+        """
+        try:
+            # 检查缓存
+            cache_key = f"{birth_date}_{birth_time_index}_{gender}"
+            cached = self._astrolabe_cache.get(cache_key)
+            
+            if not cached:
+                # 需要先计算命盘
+                parts = birth_date.split('-')
+                year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
+                hour = birth_time_index * 2 if birth_time_index < 12 else 23
+                self.calculate(year, month, day, hour, gender=gender)
+                cached = self._astrolabe_cache.get(cache_key)
+            
+            if not cached:
+                raise ValueError("无法获取命盘数据")
+            
+            astrolabe = cached['astrolabe']
+            birth_year = cached['birth_year']
+            
+            # 目标日期
+            if target_date:
+                target_dt = datetime.strptime(target_date, "%Y-%m-%d")
+            else:
+                target_dt = datetime.now()
+            
+            # 计算虚岁
+            nominal_age = target_dt.year - birth_year + 1
+            
+            # 计算各运限
+            horoscope_data = self._calculate_horoscope(
+                astrolabe, birth_year, nominal_age, target_dt, target_time_index
+            )
+            
+            return horoscope_data
+            
+        except Exception as e:
+            logger.error(f"运限计算失败: {e}")
+            raise
+    
+    def _calculate_horoscope(
+        self,
+        astrolabe: Any,
+        birth_year: int,
+        nominal_age: int,
+        target_date: datetime,
+        target_time_index: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """计算运限详情"""
+        stems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
+        branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+        palace_names = ['命宮', '兄弟', '夫妻', '子女', '财帛', '疾厄', 
+                       '迁移', '交友', '官禄', '田宅', '福德', '父母']
+        
+        target_year = target_date.year
+        target_month = target_date.month
+        target_day = target_date.day
+        
+        # 流年天干地支
+        yearly_stem_idx = (target_year - 4) % 10
+        yearly_branch_idx = (target_year - 4) % 12
+        yearly_stem = stems[yearly_stem_idx]
+        yearly_branch = branches[yearly_branch_idx]
+        
+        # 流年宫位 = 流年地支所在宫
+        yearly_palace_idx = yearly_branch_idx
+        
+        # 大限计算（根据五行局起运年龄）
+        five_element = str(getattr(astrolabe, 'five_elements_class', '水二局'))
+        start_age_map = {'二': 2, '三': 3, '四': 4, '五': 5, '六': 6}
+        start_age = 2
+        for key, val in start_age_map.items():
+            if key in five_element:
+                start_age = val
+                break
+        
+        decadal_idx = max(0, (nominal_age - start_age) // 10)
+        decadal_start_age = start_age + decadal_idx * 10
+        decadal_palace_idx = decadal_idx % 12
+        
+        # 获取大限天干
+        decadal_stem = ''
+        decadal_branch = ''
+        if hasattr(astrolabe, 'palaces') and len(astrolabe.palaces) > decadal_palace_idx:
+            palace = astrolabe.palaces[decadal_palace_idx]
+            decadal_stem = translate_name(str(getattr(palace, 'heavenly_stem', '')))
+            decadal_branch = translate_name(str(getattr(palace, 'earthly_branch', '')))
+        
+        # 流月计算
+        monthly_stem_idx = ((target_year % 10) * 2 + target_month) % 10
+        monthly_branch_idx = (target_month + 1) % 12  # 寅月=正月
+        monthly_stem = stems[monthly_stem_idx]
+        monthly_branch = branches[monthly_branch_idx]
+        monthly_palace_idx = monthly_branch_idx
+        
+        # 流日计算（使用干支纪日）
+        base_date = datetime(1900, 1, 31)  # 甲子日
+        diff_days = (target_date - base_date).days
+        daily_stem_idx = (diff_days % 10 + 10) % 10
+        daily_branch_idx = (diff_days % 12 + 12) % 12
+        daily_stem = stems[daily_stem_idx]
+        daily_branch = branches[daily_branch_idx]
+        daily_palace_idx = daily_branch_idx
+        
+        # 流时计算
+        if target_time_index is not None:
+            hourly_idx = target_time_index % 12
+        else:
+            current_hour = datetime.now().hour
+            hourly_idx = self._hour_to_time_index(current_hour) % 12
+        
+        hourly_branch_idx = hourly_idx
+        hourly_stem_idx = (daily_stem_idx * 2 + hourly_idx) % 10
+        hourly_stem = stems[hourly_stem_idx]
+        hourly_branch = branches[hourly_branch_idx]
+        hourly_palace_idx = hourly_branch_idx
+        
+        # 获取四化（使用当前配置）
+        decadal_mutagen = self._config.get_mutagen_by_stem(decadal_stem) if decadal_stem else {}
+        yearly_mutagen = self._config.get_mutagen_by_stem(yearly_stem)
+        monthly_mutagen = self._config.get_mutagen_by_stem(monthly_stem)
+        daily_mutagen = self._config.get_mutagen_by_stem(daily_stem)
+        hourly_mutagen = self._config.get_mutagen_by_stem(hourly_stem)
+        
+        # 计算运限重排宫名
+        def get_palace_names_from(start_idx: int) -> List[str]:
+            return [palace_names[(i - start_idx + 12) % 12] for i in range(12)]
+        
+        # 计算农历日期
+        try:
+            solar = Solar.fromYmd(target_date.year, target_date.month, target_date.day)
+            lunar = solar.getLunar()
+            lunar_date_str = f"{lunar.getYearInChinese()}年{lunar.getMonthInChinese()}月{lunar.getDayInChinese()}"
+        except Exception:
+            lunar_date_str = ''
+        
+        return {
+            'solarDate': target_date.strftime('%Y-%m-%d'),
+            'lunarDate': lunar_date_str,
+            'decadal': {
+                'index': decadal_palace_idx,
+                'name': f'{decadal_start_age}岁大限',
+                'heavenlyStem': decadal_stem,
+                'earthlyBranch': decadal_branch,
+                'palaceNames': get_palace_names_from(decadal_palace_idx),
+                'mutagen': decadal_mutagen,
+                'startAge': decadal_start_age,
+                'endAge': decadal_start_age + 9,
+            },
+            'age': {
+                'index': (nominal_age - 1) % 12,  # 小限简化计算
+                'name': f'{nominal_age}岁',
+                'nominalAge': nominal_age,
+                'heavenlyStem': yearly_stem,
+                'earthlyBranch': yearly_branch,
+                'palaceNames': palace_names,
+            },
+            'yearly': {
+                'index': yearly_palace_idx,
+                'name': f'{target_year}年',
+                'heavenlyStem': yearly_stem,
+                'earthlyBranch': yearly_branch,
+                'palaceNames': get_palace_names_from(yearly_palace_idx),
+                'mutagen': yearly_mutagen,
+            },
+            'monthly': {
+                'index': monthly_palace_idx,
+                'name': f'{target_month}月',
+                'heavenlyStem': monthly_stem,
+                'earthlyBranch': monthly_branch,
+                'palaceNames': get_palace_names_from(monthly_palace_idx),
+                'mutagen': monthly_mutagen,
+            },
+            'daily': {
+                'index': daily_palace_idx,
+                'name': f'{target_day}日',
+                'heavenlyStem': daily_stem,
+                'earthlyBranch': daily_branch,
+                'palaceNames': get_palace_names_from(daily_palace_idx),
+                'mutagen': daily_mutagen,
+            },
+            'hourly': {
+                'index': hourly_palace_idx,
+                'name': f'{branches[hourly_branch_idx]}时',
+                'heavenlyStem': hourly_stem,
+                'earthlyBranch': hourly_branch,
+                'palaceNames': get_palace_names_from(hourly_palace_idx),
+                'mutagen': hourly_mutagen,
+            },
+        }
     
     def _hour_to_time_index(self, hour: int) -> int:
         """

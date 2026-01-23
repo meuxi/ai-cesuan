@@ -12,6 +12,32 @@ import { logger } from '@/utils/logger'
 type FunctionalAstrolabe = ReturnType<typeof astro.bySolar>
 type FunctionalHoroscope = ReturnType<FunctionalAstrolabe['horoscope']>
 
+// 定义 iztro 库内部类型（避免 any）
+interface IztroPalace {
+    name: string
+    heavenlyStem: string
+    earthlyBranch: string
+    isBodyPalace?: boolean
+    majorStars: IztroStar[]
+    minorStars: IztroStar[]
+}
+
+interface IztroStar {
+    name: string
+    brightness?: string
+    mutagen?: string
+}
+
+interface IztroHoroscopeItem {
+    index?: number
+    heavenlyStem?: string
+    earthlyBranch?: string
+    palaceIndex?: number
+    name?: string
+    range?: [number, number]
+    mutagen?: [string, string, string, string] | string[]
+}
+
 // 输入参数类型（参考iztro-hook的IztroInput）
 export interface IztroInput {
     birthday: string           // 生日 YYYY-MM-DD 格式
@@ -186,7 +212,16 @@ export function useIztro(input: IztroInput | null) {
     const horoscopeData = useMemo<HoroscopeData | null>(() => {
         if (!horoscope) return null
 
-        const parseFlowPeriod = (data: any): FlowPeriodInfo | null => {
+        // 类型断言为包含运限数据的对象
+        const horoscopeObj = horoscope as unknown as {
+            decadal?: IztroHoroscopeItem
+            yearly?: IztroHoroscopeItem
+            monthly?: IztroHoroscopeItem
+            daily?: IztroHoroscopeItem
+            hourly?: IztroHoroscopeItem
+        }
+
+        const parseFlowPeriod = (data: IztroHoroscopeItem | undefined): FlowPeriodInfo | null => {
             if (!data) return null
             return {
                 heavenlyStem: data.heavenlyStem || '',
@@ -202,7 +237,7 @@ export function useIztro(input: IztroInput | null) {
             }
         }
 
-        const decadalData = (horoscope as any).decadal
+        const decadalData = horoscopeObj.decadal
         const decadal: DecadalInfo | null = decadalData ? {
             index: decadalData.index ?? 0,
             startAge: decadalData.range?.[0] ?? 0,
@@ -221,10 +256,10 @@ export function useIztro(input: IztroInput | null) {
 
         return {
             decadal,
-            yearly: parseFlowPeriod((horoscope as any).yearly),
-            monthly: parseFlowPeriod((horoscope as any).monthly),
-            daily: parseFlowPeriod((horoscope as any).daily),
-            hourly: parseFlowPeriod((horoscope as any).hourly)
+            yearly: parseFlowPeriod(horoscopeObj.yearly),
+            monthly: parseFlowPeriod(horoscopeObj.monthly),
+            daily: parseFlowPeriod(horoscopeObj.daily),
+            hourly: parseFlowPeriod(horoscopeObj.hourly)
         }
     }, [horoscope])
 
@@ -233,11 +268,11 @@ export function useIztro(input: IztroInput | null) {
         if (!astrolabe) return []
 
         const result: ChildhoodInfo[] = []
-        const palaces = astrolabe.palaces as any[]
+        const palaces = astrolabe.palaces as IztroPalace[]
         
         // 建立宫位名称到宫位对象的映射
-        const palaceMap: Record<string, any> = {}
-        palaces.forEach((palace: any) => {
+        const palaceMap: Record<string, IztroPalace> = {}
+        palaces.forEach((palace) => {
             palaceMap[palace.name] = palace
         })
 
@@ -247,7 +282,7 @@ export function useIztro(input: IztroInput | null) {
             const palace = palaceMap[palaceName]
             
             if (palace) {
-                const palaceIndex = palaces.findIndex((p: any) => p.name === palaceName)
+                const palaceIndex = palaces.findIndex((p) => p.name === palaceName)
                 result.push({
                     age,
                     palaceIndex,
@@ -281,7 +316,7 @@ export function useIztro(input: IztroInput | null) {
         const isMale = astrolabe.gender === '男'
         const isClockwise = (isYangStem && isMale) || (!isYangStem && !isMale)
 
-        const palaces = astrolabe.palaces as any[]
+        const palaces = astrolabe.palaces as IztroPalace[]
         const result: DecadalInfo[] = []
 
         for (let i = 0; i < 12; i++) {
@@ -303,13 +338,19 @@ export function useIztro(input: IztroInput | null) {
         return result
     }, [astrolabe])
 
+    // 辅助函数：从运限对象中提取数据
+    const extractHoroscopeItem = (horoscopeObj: FunctionalHoroscope, key: 'yearly' | 'monthly' | 'daily' | 'hourly'): IztroHoroscopeItem | undefined => {
+        const obj = horoscopeObj as unknown as Record<string, IztroHoroscopeItem | undefined>
+        return obj[key]
+    }
+
     // 获取指定年份的流年信息
     const getYearlyHoroscope = useCallback((year: number): FlowPeriodInfo | null => {
         if (!astrolabe) return null
         try {
             const yearDate = new Date(year, 5, 15)  // 年中日期
             const yearHoroscope = astrolabe.horoscope(yearDate)
-            const yearly = (yearHoroscope as any).yearly
+            const yearly = extractHoroscopeItem(yearHoroscope, 'yearly')
             if (!yearly) return null
             return {
                 heavenlyStem: yearly.heavenlyStem || '',
@@ -334,7 +375,7 @@ export function useIztro(input: IztroInput | null) {
         try {
             const monthDate = new Date(year, month - 1, 15)
             const monthHoroscope = astrolabe.horoscope(monthDate)
-            const monthly = (monthHoroscope as any).monthly
+            const monthly = extractHoroscopeItem(monthHoroscope, 'monthly')
             if (!monthly) return null
             return {
                 heavenlyStem: monthly.heavenlyStem || '',
@@ -358,7 +399,7 @@ export function useIztro(input: IztroInput | null) {
         if (!astrolabe) return null
         try {
             const dayHoroscope = astrolabe.horoscope(date)
-            const daily = (dayHoroscope as any).daily
+            const daily = extractHoroscopeItem(dayHoroscope, 'daily')
             if (!daily) return null
             return {
                 heavenlyStem: daily.heavenlyStem || '',
@@ -383,7 +424,7 @@ export function useIztro(input: IztroInput | null) {
         try {
             const hourIdx = timeIndex ?? hourToTimeIndex(date.getHours())
             const hourHoroscope = astrolabe.horoscope(date, hourIdx)
-            const hourly = (hourHoroscope as any).hourly
+            const hourly = extractHoroscopeItem(hourHoroscope, 'hourly')
             if (!hourly) return null
             return {
                 heavenlyStem: hourly.heavenlyStem || '',
@@ -428,15 +469,15 @@ export function useIztro(input: IztroInput | null) {
         lines.push('')
         lines.push('【十二宫位】')
 
-        astrolabe.palaces.forEach((palace: any) => {
+        (astrolabe.palaces as IztroPalace[]).forEach((palace) => {
             const bodyMark = palace.isBodyPalace ? '（身宫）' : ''
-            const majorStars = palace.majorStars.map((s: any) => {
+            const majorStars = palace.majorStars.map((s) => {
                 let str = s.name
                 if (s.brightness) str += s.brightness
                 if (s.mutagen) str += `化${s.mutagen}`
                 return str
             }).join('、') || '无主星'
-            const minorStars = palace.minorStars.map((s: any) => s.name + (s.brightness || '')).join('、')
+            const minorStars = palace.minorStars.map((s) => s.name + (s.brightness || '')).join('、')
             lines.push(`${palace.name}${bodyMark}（${palace.heavenlyStem}${palace.earthlyBranch}）`)
             lines.push(`  主星：${majorStars}`)
             if (minorStars) lines.push(`  辅星：${minorStars}`)

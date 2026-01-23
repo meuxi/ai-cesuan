@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { logger } from '@/utils/logger'
 import { Star, Heart, Briefcase, TrendingUp, Activity, Calendar, Users } from 'lucide-react'
+import { ZodiacIcon } from '@/components/ZodiacIcons'
 
 const API_BASE = import.meta.env.VITE_API_BASE || ''
 
@@ -160,13 +161,15 @@ export default function ZodiacPage() {
                         <button
                             key={z.name}
                             onClick={() => setSelectedZodiac(z.name)}
-                            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${selectedZodiac === z.name
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-secondary text-secondary-foreground hover:bg-accent border border-border'
+                            className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 ${selectedZodiac === z.name
+                                ? 'bg-gradient-to-br from-primary/20 to-primary/10 ring-2 ring-primary shadow-lg scale-105'
+                                : 'bg-secondary/50 text-secondary-foreground hover:bg-accent hover:scale-102 border border-border/50 hover:border-primary/30'
                                 }`}
                         >
-                            <span className="text-xl">{z.symbol}</span>
-                            <span className="text-xs mt-1">{z.name.replace('座', '')}</span>
+                            <ZodiacIcon zodiac={z.name} size={36} className="transition-transform duration-300 hover:scale-110" />
+                            <span className={`text-xs mt-1 font-medium ${selectedZodiac === z.name ? 'text-primary' : ''}`}>
+                                {z.name.replace('座', '')}
+                            </span>
                         </button>
                     ))}
                 </div>
@@ -180,13 +183,15 @@ export default function ZodiacPage() {
                                 <button
                                     key={z.name}
                                     onClick={() => setSelectedZodiac2(z.name)}
-                                    className={`flex flex-col items-center p-2 rounded-lg transition-colors ${selectedZodiac2 === z.name
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-secondary text-secondary-foreground hover:bg-accent border border-border'
+                                    className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 ${selectedZodiac2 === z.name
+                                        ? 'bg-gradient-to-br from-pink-500/20 to-pink-500/10 ring-2 ring-pink-500 shadow-lg scale-105'
+                                        : 'bg-secondary/50 text-secondary-foreground hover:bg-accent hover:scale-102 border border-border/50 hover:border-pink-500/30'
                                         }`}
                                 >
-                                    <span className="text-xl">{z.symbol}</span>
-                                    <span className="text-xs mt-1">{z.name.replace('座', '')}</span>
+                                    <ZodiacIcon zodiac={z.name} size={36} className="transition-transform duration-300 hover:scale-110" />
+                                    <span className={`text-xs mt-1 font-medium ${selectedZodiac2 === z.name ? 'text-pink-500' : ''}`}>
+                                        {z.name.replace('座', '')}
+                                    </span>
                                 </button>
                             ))}
                         </div>
@@ -260,15 +265,11 @@ export default function ZodiacPage() {
                             <div className="space-y-6">
                                 <div className="text-center">
                                     <div className="flex items-center justify-center gap-4">
-                                        <span className="text-2xl">
-                                            {ZODIACS.find((z) => z.name === compatibility.zodiac1)?.symbol}
-                                        </span>
-                                        <Heart className="w-6 h-6 text-pink-500" />
-                                        <span className="text-2xl">
-                                            {ZODIACS.find((z) => z.name === compatibility.zodiac2)?.symbol}
-                                        </span>
+                                        <ZodiacIcon zodiac={compatibility.zodiac1} size={48} className="drop-shadow-lg" />
+                                        <Heart className="w-8 h-8 text-pink-500 animate-pulse" />
+                                        <ZodiacIcon zodiac={compatibility.zodiac2} size={48} className="drop-shadow-lg" />
                                     </div>
-                                    <p className="text-foreground mt-2">
+                                    <p className="text-foreground mt-3 font-medium">
                                         {compatibility.zodiac1} & {compatibility.zodiac2}
                                     </p>
                                 </div>
@@ -313,7 +314,9 @@ export default function ZodiacPage() {
                         {activeTab === 'info' && zodiacInfo && (
                             <div className="space-y-6">
                                 <div className="text-center">
-                                    <span className="text-5xl">{zodiacInfo.symbol}</span>
+                                    <div className="flex justify-center mb-2">
+                                        <ZodiacIcon zodiac={zodiacInfo.name} size={72} className="drop-shadow-xl" />
+                                    </div>
                                     <h2 className="text-xl font-bold text-foreground mt-2">{zodiacInfo.name}</h2>
                                     <p className="text-muted-foreground">{zodiacInfo.english}</p>
                                     <p className="text-muted-foreground text-sm">{zodiacInfo.date_range}</p>

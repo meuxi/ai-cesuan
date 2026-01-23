@@ -525,8 +525,8 @@ export default function XiaoLiuRenPage() {
                     {t('xiaoliu.lunarMonth')}
                   </label>
                   <select
-                    title="农历月份"
-                    aria-label="农历月份"
+                    title={t('xiaoliu.lunarMonthLabel')}
+                    aria-label={t('xiaoliu.lunarMonthLabel')}
                     value={month}
                     onChange={(e) => setMonth(parseInt(e.target.value))}
                     className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -541,8 +541,8 @@ export default function XiaoLiuRenPage() {
                     {t('xiaoliu.lunarDay')}
                   </label>
                   <select
-                    title="农历日期"
-                    aria-label="农历日期"
+                    title={t('xiaoliu.lunarDayLabel')}
+                    aria-label={t('xiaoliu.lunarDayLabel')}
                     value={day}
                     onChange={(e) => setDay(parseInt(e.target.value))}
                     className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -557,8 +557,8 @@ export default function XiaoLiuRenPage() {
                     {t('xiaoliu.hour')}
                   </label>
                   <select
-                    title="时辰"
-                    aria-label="时辰"
+                    title={t('xiaoliu.hourLabel')}
+                    aria-label={t('xiaoliu.hourLabel')}
                     value={hour}
                     onChange={(e) => setHour(parseInt(e.target.value))}
                     className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -639,7 +639,7 @@ export default function XiaoLiuRenPage() {
               <button
                 onClick={useCurrentTime}
                 className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-md border border-input bg-background text-foreground hover:bg-secondary transition-colors"
-                title="使用当前时间"
+                title={t('xiaoliu.useCurrentTime')}
               >
                 <Calendar className="h-4 w-4 mr-2" />
                 {t('xiaoliu.getCurrentTime')}

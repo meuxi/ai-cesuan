@@ -1,6 +1,10 @@
 """
-输出长度控制模块
-根据不同场景和用户需求控制AI输出的长度和结构
+输出控制模块 - 用户体验优先模式
+
+【核心理念】
+- 每个工具有专业的输出框架
+- 从多角度生成完整的分析报告
+- 结构清晰，内容专业，不冗余
 """
 from enum import Enum
 from dataclasses import dataclass, field
@@ -12,193 +16,459 @@ logger = logging.getLogger(__name__)
 
 class OutputMode(Enum):
     """输出模式"""
-    QUICK = "quick"        # 快速模式：简洁回复
-    STANDARD = "standard"  # 标准模式：平衡详细度
-    DETAILED = "detailed"  # 详细模式：完整分析
+    DETAILED = "detailed"   # 详细模式（统一使用）
 
 
 @dataclass
 class OutputConfig:
     """输出配置"""
-    mode: OutputMode = OutputMode.STANDARD
-    min_chars: int = 800
-    max_chars: int = 1200
-    max_tokens: int = 800
-    require_sections: List[str] = field(default_factory=list)
-    forbid_sections: List[str] = field(default_factory=list)
+    mode: OutputMode = OutputMode.DETAILED
+    max_tokens: int = 16000
+    output_framework: str = ""  # 输出框架模板
 
 
-# 预定义模式配置
-MODE_CONFIGS: Dict[OutputMode, OutputConfig] = {
-    OutputMode.QUICK: OutputConfig(
-        mode=OutputMode.QUICK,
-        min_chars=300,
-        max_chars=500,
-        max_tokens=400,
-        require_sections=["核心结论"],
-        forbid_sections=["详细分析", "历史背景", "延伸阅读"]
-    ),
-    OutputMode.STANDARD: OutputConfig(
-        mode=OutputMode.STANDARD,
-        min_chars=800,
-        max_chars=1200,
-        max_tokens=800,
-        require_sections=["核心结论", "简要分析", "建议"],
-        forbid_sections=["延伸阅读"]
-    ),
-    OutputMode.DETAILED: OutputConfig(
-        mode=OutputMode.DETAILED,
-        min_chars=2500,
-        max_chars=5000,
-        max_tokens=4000,
-        require_sections=["核心结论", "详细分析", "深度解读", "量化评估", "应期推断", "建议", "注意事项"],
-        forbid_sections=[]
-    )
-}
+# ==================== 各工具输出框架 ====================
 
-# 工具特定配置覆盖
-TOOL_OUTPUT_OVERRIDES: Dict[str, Dict[OutputMode, Dict[str, Any]]] = {
-    "bazi_analysis": {
-        OutputMode.QUICK: {"max_chars": 600, "max_tokens": 500},
-        OutputMode.DETAILED: {"max_chars": 3000, "max_tokens": 2000}
-    },
-    "tarot_reading": {
-        OutputMode.QUICK: {"max_chars": 400, "max_tokens": 350},
-        OutputMode.STANDARD: {"max_chars": 1000, "max_tokens": 700}
-    },
-    "liuyao_analysis": {
-        OutputMode.STANDARD: {"max_chars": 2000, "max_tokens": 1500},
-        OutputMode.DETAILED: {"max_chars": 6000, "max_tokens": 5000, 
-                              "require_sections": ["卦名与核心数据", "大师断语", "卦象总览", 
-                                                   "六爻逐爻分析", "用神深度分析", "神系作用链推演",
-                                                   "动爻变化详解", "世应关系深度分析", "应期精准推断",
-                                                   "量化评估总表", "综合建议与指导"]}
-    },
-    "dream_divination": {
-        OutputMode.QUICK: {"max_chars": 350, "max_tokens": 300}
-    },
-    "ziwei": {
-        OutputMode.STANDARD: {"max_chars": 2500, "max_tokens": 2000},
-        OutputMode.DETAILED: {"max_chars": 5000, "max_tokens": 4000}
-    }
+# 八字命理输出框架
+BAZI_FRAMEWORK = """
+## 📊 八字命盘
+[简洁展示四柱八字、纳音五行、藏干透出]
+
+## 🎯 核心结论
+- **日主强弱**：[强/弱/中和，一句话说明]
+- **格局判定**：[XX格，简述格局特点]
+- **用神喜忌**：喜[X]忌[X]
+
+## 📈 五行分析
+| 五行 | 力量 | 状态 |
+|------|------|------|
+[五行力量表格]
+
+## 👤 性格特征
+[基于十神配置分析性格，3-5条要点]
+
+## 💼 事业财运
+- **适合行业**：[列出2-3个]
+- **发展方向**：[简述]
+- **财运特点**：[正财/偏财倾向，求财方式]
+
+## 💕 婚姻感情
+- **配偶特征**：[简述]
+- **婚期预测**：[具体年份或年龄段]
+
+## 🏥 健康提醒
+[根据五行偏枯指出需注意的方面]
+
+## 📅 大运流年
+- **当前大运**：[X岁-X岁，干支，运势特点]
+- **关键年份**：[列出未来3-5个重要年份及简析]
+
+## 💡 调理建议
+- **吉利方位**：[X方]
+- **幸运颜色**：[X色]
+- **开运建议**：[1-2条具体建议]
+"""
+
+# 六爻预测输出框架
+LIUYAO_FRAMEWORK = """
+## 🎲 卦象信息
+- **本卦**：[卦名] → **变卦**：[卦名]
+- **世爻**：[X爻] | **应爻**：[X爻]
+- **动爻**：[第X爻]
+
+## 🎯 核心断语
+[一句话直断吉凶结果]
+
+**成功概率**：[XX%]
+**应期**：[农历X月/X日前后]
+
+## 📊 用神分析
+- **用神**：[XX爻，六亲，五行]
+- **用神状态**：[旺相休囚死]
+- **原神**：[状态] | **忌神**：[状态]
+
+## 🔍 关键爻分析
+[仅分析与问事相关的关键爻，不需逐爻]
+
+## 📈 事态发展
+- **当前状况**：[简述]
+- **发展趋势**：[简述]
+- **最终结果**：[简述]
+
+## 💡 行动建议
+- **宜**：[具体建议]
+- **忌**：[需避免的事项]
+- **最佳时机**：[具体时间]
+"""
+
+# 塔罗牌输出框架
+TAROT_FRAMEWORK = """
+## 🃏 牌面展示
+[每张牌：牌名 + 正/逆位，一行一张]
+
+## 🎯 核心主题
+[一句话概括这次占卜的核心信息]
+
+## 🔮 逐张解读
+### [位置1名称]：[牌名]（正/逆位）
+[该牌在此位置对问题的含义，2-3句话]
+
+### [位置2名称]：[牌名]（正/逆位）
+[该牌在此位置对问题的含义，2-3句话]
+
+[...其他位置...]
+
+## 📖 综合分析
+[牌面之间的关联，整体故事线]
+
+## 💡 行动建议
+- **应该做**：[具体建议]
+- **避免做**：[需注意的事项]
+
+## ✨ 寄语
+[温暖鼓励的结束语，1-2句话]
+"""
+
+# 紫微斗数输出框架
+ZIWEI_FRAMEWORK = """
+## 🌟 命盘概览
+- **命宫主星**：[主星名称]
+- **身宫主星**：[主星名称]
+- **命盘格局**：[格局名称，简述]
+
+## 🎯 核心特质
+[基于命宫主星的核心性格和人生主题，3-4句话]
+
+## 📊 十二宫重点
+| 宫位 | 主星 | 关键信息 |
+|------|------|----------|
+| 命宫 | [星] | [一句话] |
+| 财帛 | [星] | [一句话] |
+| 官禄 | [星] | [一句话] |
+| 夫妻 | [星] | [一句话] |
+
+## 💼 事业发展
+- **适合领域**：[2-3个方向]
+- **发展建议**：[简述]
+
+## 💕 感情婚姻
+- **感情特点**：[简述]
+- **配偶特征**：[简述]
+
+## 📅 大限运势
+- **当前大限**：[年龄段，运势特点]
+- **下步大限**：[年龄段，运势变化]
+
+## 💡 开运指南
+[2-3条具体可行的建议]
+"""
+
+# 小六壬输出框架
+XIAOLIU_FRAMEWORK = """
+## 🎯 卦象速断
+**天宫**：[六神] | **地宫**：[六神] | **人宫**：[六神]
+
+## ⚡ 核心结论
+[一句话直断吉凶]
+
+**成功概率**：[XX%]
+**应期**：[近期X天/X周内]
+
+## 📊 三宫解析
+- **天宫[六神]**：[对事情的影响]
+- **地宫[六神]**：[对事情的影响]  
+- **人宫[六神]**：[最终结果指向]
+
+## 🔄 五行关系
+[三宫五行生克关系及对问事的影响]
+
+## 💡 行动指南
+- **宜**：[具体建议]
+- **忌**：[需避免]
+- **吉时**：[有利时辰/日期]
+"""
+
+# 周公解梦输出框架
+DREAM_FRAMEWORK = """
+## 🌙 梦境要素
+[列出梦境中的关键元素：场景、人物、物品]
+
+## 🎯 核心寓意
+[一句话概括梦境的核心信息]
+
+## 📖 传统解析
+[周公解梦典籍中的象征意义]
+
+## 🧠 心理分析
+[从心理学角度分析梦境反映的内在状态]
+
+## 🔮 现实指引
+- **预示**：[可能预示的事情]
+- **提醒**：[需要注意的方面]
+
+## 💡 建议
+[1-2条具体的行动或心态调整建议]
+"""
+
+# 姓名测算输出框架
+NAME_FRAMEWORK = """
+## 📝 姓名信息
+**姓名**：[姓名] | **笔画**：[X-X-X]
+
+## 📊 五格数理
+| 格局 | 数理 | 吉凶 | 含义 |
+|------|------|------|------|
+| 天格 | [X] | [吉/凶] | [一句话] |
+| 人格 | [X] | [吉/凶] | [一句话] |
+| 地格 | [X] | [吉/凶] | [一句话] |
+| 外格 | [X] | [吉/凶] | [一句话] |
+| 总格 | [X] | [吉/凶] | [一句话] |
+
+## 🎯 三才配置
+**[天-人-地]**：[五行配置评价]
+
+## 📈 综合评分
+**[XX分/100分]**
+
+## 💡 名字特点
+[字义寓意、音韵评价，2-3句话]
+
+## 📌 使用建议
+[基于姓名特点的建议]
+"""
+
+# 梅花易数输出框架
+MEIHUA_FRAMEWORK = """
+## 🌸 卦象信息
+- **本卦**：[上卦][下卦] = [卦名]
+- **互卦**：[卦名]
+- **变卦**：[卦名]
+- **体卦**：[X卦，五行] | **用卦**：[X卦，五行]
+
+## 🎯 核心断语
+[一句话直断吉凶]
+
+**成功概率**：[XX%]
+
+## 📊 体用生克
+[体用五行关系分析，对问事的影响]
+
+## 🔮 事态分析
+- **现状**（本卦）：[简述]
+- **过程**（互卦）：[简述]
+- **结果**（变卦）：[简述]
+
+## ⏰ 应期推断
+[根据五行旺衰推算的时间]
+
+## 💡 行动建议
+- **有利方位**：[X方]
+- **有利时机**：[具体时间]
+- **注意事项**：[简述]
+"""
+
+# 奇门遁甲输出框架
+QIMEN_FRAMEWORK = """
+## ⚡ 盘局信息
+- **节气**：[节气] | **阴阳遁**：[阴/阳遁]
+- **值符**：[天干] | **值使**：[八门]
+
+## 🎯 核心断语
+[一句话直断吉凶]
+
+**成功概率**：[XX%]
+
+## 📊 用神宫位
+- **用神落宫**：[第X宫]
+- **天盘**：[干] | **地盘**：[干]
+- **八门**：[门] | **九星**：[星] | **八神**：[神]
+
+## 🔍 格局分析
+[识别吉格凶格，分析对问事的影响]
+
+## ⏰ 时机建议
+- **最佳时机**：[具体时间]
+- **有利方位**：[X方]
+
+## 💡 策略建议
+[基于盘局的具体行动建议]
+"""
+
+# 合婚分析输出框架
+HEHUN_FRAMEWORK = """
+## 👫 双方信息
+| 项目 | 男方 | 女方 |
+|------|------|------|
+| 八字 | [四柱] | [四柱] |
+| 日主 | [X] | [X] |
+| 用神 | [X] | [X] |
+
+## 🎯 综合契合度
+**[XX分/100分]**
+
+## 📊 配合分析
+| 维度 | 评分 | 说明 |
+|------|------|------|
+| 五行配合 | [X分] | [简述] |
+| 日柱配合 | [X分] | [简述] |
+| 神煞配合 | [X分] | [简述] |
+
+## 💕 相处特点
+- **优势**：[双方相处的优点]
+- **注意**：[可能的摩擦点]
+
+## 💍 婚期建议
+[推荐的结婚年份/月份]
+
+## 💡 经营建议
+[2-3条具体的相处建议]
+"""
+
+# 抽签解读输出框架
+CHOUQIAN_FRAMEWORK = """
+## 🎋 签文信息
+**第[X]签** | **签名**：[签名]
+
+**签诗**：
+[签诗原文]
+
+## 🎯 签意速断
+**[上上/上/中/下/下下]签**
+
+[一句话概括签意]
+
+## 📖 签诗解读
+[签诗白话翻译和典故解释]
+
+## 🔮 对所问事项的指引
+[针对用户问题的具体解读]
+
+## 💡 宜忌提示
+- **宜**：[适合做的事]
+- **忌**：[需避免的事]
+
+## ✨ 开运建议
+[1-2条具体可行的建议]
+"""
+
+# 诸葛神算输出框架
+ZHUGE_FRAMEWORK = """
+## 🎋 签文信息
+**第[X]签**
+
+**签诗**：[签诗原文]
+
+## 🎯 核心指引
+[一句话概括签意]
+
+## 📖 签诗解读
+[签诗典故和含义解释]
+
+## 🔮 问事分析
+**成功概率**：[XX%]
+**应期**：[时间预测]
+
+[针对用户问题的具体解读]
+
+## 💡 诸葛锦囊
+[基于签意的策略建议]
+"""
+
+
+# ==================== 工具配置 ====================
+
+TOOL_FRAMEWORKS: Dict[str, str] = {
+    "bazi_analysis": BAZI_FRAMEWORK,
+    "birthday_divination": BAZI_FRAMEWORK,
+    "liuyao_analysis": LIUYAO_FRAMEWORK,
+    "tarot_reading": TAROT_FRAMEWORK,
+    "tarot_divination": TAROT_FRAMEWORK,
+    "ziwei_divination": ZIWEI_FRAMEWORK,
+    "ziwei": ZIWEI_FRAMEWORK,
+    "xiaoliu_analysis": XIAOLIU_FRAMEWORK,
+    "xiaoliu_divination": XIAOLIU_FRAMEWORK,
+    "dream_divination": DREAM_FRAMEWORK,
+    "name_divination": NAME_FRAMEWORK,
+    "name_analysis": NAME_FRAMEWORK,
+    "plum_flower_divination": MEIHUA_FRAMEWORK,
+    "plum_flower": MEIHUA_FRAMEWORK,
+    "qimen_divination": QIMEN_FRAMEWORK,
+    "qimen_analysis": QIMEN_FRAMEWORK,
+    "hehun_divination": HEHUN_FRAMEWORK,
+    "hehun_analysis": HEHUN_FRAMEWORK,
+    "chouqian_analysis": CHOUQIAN_FRAMEWORK,
+    "zhuge_divination": ZHUGE_FRAMEWORK,
 }
 
 
 class OutputLengthController:
-    """输出长度控制器"""
+    """输出控制器"""
     
     def __init__(self):
-        self._mode_configs = MODE_CONFIGS.copy()
-        self._tool_overrides = TOOL_OUTPUT_OVERRIDES.copy()
+        self._tool_frameworks = TOOL_FRAMEWORKS.copy()
     
-    def get_config(self, mode: OutputMode, tool_name: str = None) -> OutputConfig:
-        """
-        获取输出配置
-        如果指定了工具名，会应用工具特定的覆盖配置
-        """
-        base_config = self._mode_configs.get(mode, MODE_CONFIGS[OutputMode.STANDARD])
-        
-        # 创建新配置以避免修改原配置
-        config = OutputConfig(
-            mode=base_config.mode,
-            min_chars=base_config.min_chars,
-            max_chars=base_config.max_chars,
-            max_tokens=base_config.max_tokens,
-            require_sections=base_config.require_sections.copy(),
-            forbid_sections=base_config.forbid_sections.copy()
-        )
-        
-        # 应用工具特定覆盖
-        if tool_name and tool_name in self._tool_overrides:
-            tool_config = self._tool_overrides[tool_name]
-            if mode in tool_config:
-                overrides = tool_config[mode]
-                for key, value in overrides.items():
-                    if hasattr(config, key):
-                        setattr(config, key, value)
-        
-        return config
+    def get_framework(self, tool_name: str) -> str:
+        """获取工具的输出框架"""
+        return self._tool_frameworks.get(tool_name, "")
     
-    def build_length_constraint_prompt(self, config: OutputConfig) -> str:
-        """构建长度约束提示词"""
-        constraints = []
+    def build_output_prompt(self, tool_name: str) -> str:
+        """构建输出要求提示词"""
+        framework = self.get_framework(tool_name)
         
-        # 字数约束
-        constraints.append(
-            f"【输出要求】请将回复控制在 {config.min_chars}-{config.max_chars} 字之间。"
-        )
-        
-        # 必须包含的部分
-        if config.require_sections:
-            sections_str = "、".join(config.require_sections)
-            constraints.append(f"必须包含以下部分：{sections_str}。")
-        
-        # 禁止包含的部分
-        if config.forbid_sections:
-            sections_str = "、".join(config.forbid_sections)
-            constraints.append(f"请勿包含以下内容：{sections_str}。")
-        
-        # 模式特定指导
-        if config.mode == OutputMode.QUICK:
-            constraints.append("请直奔主题，给出核心结论和最重要的建议即可。")
-        elif config.mode == OutputMode.DETAILED:
-            constraints.append("请进行深入全面的分析，提供详尽的解读和具体可行的建议。")
-        
-        return "\n".join(constraints)
+        if framework:
+            return f"""【输出框架】
+请严格按照以下框架结构输出分析报告：
+{framework}
+
+【输出要求】
+1. 严格按照上述框架结构输出，不要遗漏任何部分
+2. 每个部分内容精炼专业，不要废话
+3. 需要量化的地方必须给出具体数值（评分、概率、时间等）
+4. 使用Markdown格式，层次清晰"""
+        else:
+            return """【输出要求】
+1. 结构清晰，分点论述
+2. 内容专业精炼，不要废话
+3. 需要量化的地方必须给出具体数值
+4. 使用Markdown格式"""
     
-    def enhance_prompt(self, original_prompt: str, mode: OutputMode,
-                       tool_name: str = None) -> str:
-        """
-        增强原始提示词，添加输出长度控制
-        """
-        config = self.get_config(mode, tool_name)
-        constraint_prompt = self.build_length_constraint_prompt(config)
-        
-        # 在原始提示词末尾添加约束
-        enhanced = f"{original_prompt}\n\n{constraint_prompt}"
-        
-        return enhanced
+    def enhance_prompt(self, original_prompt: str, tool_name: str = None) -> str:
+        """增强原始提示词，添加输出框架"""
+        output_prompt = self.build_output_prompt(tool_name)
+        return f"{original_prompt}\n\n{output_prompt}"
     
-    def get_max_tokens(self, mode: OutputMode, tool_name: str = None) -> int:
-        """获取最大token数（用于API调用）"""
-        config = self.get_config(mode, tool_name)
-        return config.max_tokens
+    def get_max_tokens(self, tool_name: str = None) -> int:
+        """获取最大token数"""
+        return 16000
     
     def parse_mode(self, mode_str: str) -> OutputMode:
         """解析模式字符串"""
-        mode_map = {
-            "quick": OutputMode.QUICK,
-            "fast": OutputMode.QUICK,
-            "简洁": OutputMode.QUICK,
-            "standard": OutputMode.STANDARD,
-            "normal": OutputMode.STANDARD,
-            "标准": OutputMode.STANDARD,
-            "detailed": OutputMode.DETAILED,
-            "full": OutputMode.DETAILED,
-            "详细": OutputMode.DETAILED
-        }
-        return mode_map.get(mode_str.lower(), OutputMode.STANDARD)
+        return OutputMode.DETAILED
     
-    def register_tool_override(self, tool_name: str, mode: OutputMode,
-                               overrides: Dict[str, Any]):
-        """注册工具特定配置覆盖"""
-        if tool_name not in self._tool_overrides:
-            self._tool_overrides[tool_name] = {}
-        self._tool_overrides[tool_name][mode] = overrides
+    def get_config(self, mode: OutputMode = None, tool_name: str = None) -> OutputConfig:
+        """获取输出配置"""
+        return OutputConfig(
+            mode=OutputMode.DETAILED,
+            max_tokens=16000,
+            output_framework=self.get_framework(tool_name) if tool_name else ""
+        )
 
 
 # 全局单例
 output_controller = OutputLengthController()
 
 
-def enhance_prompt_with_length_control(prompt: str, mode: str = "standard",
+def enhance_prompt_with_length_control(prompt: str, mode: str = "detailed",
                                         tool_name: str = None) -> str:
     """便捷函数：增强提示词"""
-    output_mode = output_controller.parse_mode(mode)
-    return output_controller.enhance_prompt(prompt, output_mode, tool_name)
+    return output_controller.enhance_prompt(prompt, tool_name)
 
 
-def get_output_max_tokens(mode: str = "standard", tool_name: str = None) -> int:
+def get_output_max_tokens(mode: str = "detailed", tool_name: str = None) -> int:
     """便捷函数：获取最大token数"""
-    output_mode = output_controller.parse_mode(mode)
-    return output_controller.get_max_tokens(output_mode, tool_name)
+    return 16000
+
+
+def get_tool_framework(tool_name: str) -> str:
+    """便捷函数：获取工具输出框架"""
+    return output_controller.get_framework(tool_name)

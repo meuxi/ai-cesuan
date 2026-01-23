@@ -254,7 +254,7 @@ async def ai_jieqian(request: Request, body: AIJieqianRequest):
     try:
         openai_stream = await api_client.chat.completions.create(
             model=api_model,
-            max_tokens=1500,
+            max_tokens=32000,  # 用户体验优先：无限制输出
             temperature=0.8,
             stream=True,
             messages=[

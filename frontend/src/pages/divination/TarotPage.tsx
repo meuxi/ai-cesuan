@@ -145,7 +145,7 @@ export default function TarotPage() {
         divinationType="tarot"
       >
         <div className="w-full max-w-3xl mx-auto">
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* 加载中 */}
             {loading78 && (
               <div className="text-center py-8">
@@ -156,7 +156,7 @@ export default function TarotPage() {
 
             {/* 问题输入 */}
             {!loading78 && phase === 'input' && (
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 <div>
                   <textarea
                     value={prompt}
@@ -164,7 +164,7 @@ export default function TarotPage() {
                     placeholder={t('tarot.questionPlaceholder')}
                     maxLength={100}
                     rows={3}
-                    className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none"
+                    className="w-full px-3 py-2.5 text-base sm:text-sm border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
                     {t('tarot.questionTip')}
@@ -173,16 +173,16 @@ export default function TarotPage() {
 
                 {/* 牌阵选择 */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium flex items-center gap-2 text-foreground">
+                  <label className="text-xs sm:text-sm font-medium flex items-center gap-2 text-foreground">
                     <Layers className="w-4 h-4" />
                     {t('tarot.selectSpread')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                     {spreads.map(spread => (
                       <button
                         key={spread.code}
                         onClick={() => setSelectedSpread(spread)}
-                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${selectedSpread?.code === spread.code
+                        className={`px-2 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${selectedSpread?.code === spread.code
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-secondary text-secondary-foreground hover:bg-accent'
                           }`}
@@ -194,17 +194,17 @@ export default function TarotPage() {
                 </div>
 
                 {/* 牌组选择 */}
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2 text-sm text-foreground">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                  <label className="flex items-center gap-2 text-xs sm:text-sm text-foreground">
                     <input
                       type="checkbox"
                       checked={useMajorOnly}
                       onChange={(e) => setUseMajorOnly(e.target.checked)}
-                      className="rounded border-input"
+                      className="rounded border-input w-4 h-4"
                     />
                     {t('tarot.majorOnly')}
                   </label>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">
                     {t('tarot.currentDeck')}: {availableCards.length}{t('tarot.cards')}
                   </span>
                 </div>
@@ -248,10 +248,10 @@ export default function TarotPage() {
                 </div>
 
                 {/* 牌阵展示 */}
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex gap-4 sm:gap-6 justify-center flex-wrap">
+                <div className="flex flex-col items-center gap-3 sm:gap-4">
+                  <div className="flex gap-2 sm:gap-4 md:gap-6 justify-center flex-wrap px-1">
                     {drawnCards.map((item, index) => (
-                      <div key={index} className="flex flex-col items-center gap-2">
+                      <div key={index} className="flex flex-col items-center gap-1.5 sm:gap-2">
                         <TarotCard
                           cardCode={item.card.code}
                           cardName={item.card.name}
@@ -261,7 +261,7 @@ export default function TarotPage() {
                           delay={index * 0.2}
                           size="lg"
                         />
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground text-center max-w-[80px] sm:max-w-none truncate">
                           {selectedSpread.positions[index]?.name || `${t('tarot.position')}${index + 1}`}
                         </span>
                       </div>

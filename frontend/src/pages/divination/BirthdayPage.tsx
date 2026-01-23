@@ -114,7 +114,7 @@ export default function BirthdayPage() {
               type="datetime-local"
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
-              className="px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="w-full max-w-xs px-3 py-2.5 text-base sm:text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
           <div>

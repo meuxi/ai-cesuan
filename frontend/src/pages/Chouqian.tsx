@@ -46,7 +46,7 @@ const ShengbeiImage = ({ isAnimating, result }: { isAnimating: boolean; result?:
             <div className="flex justify-center items-center h-full">
                 <img
                     src="/images/qian/shengbei/shengbeidonghua.gif"
-                    alt="正在掷杯"
+                    alt="掷杯中"
                     className="max-h-[108px] sm:max-h-[126px] w-auto object-contain"
                 />
             </div>
@@ -461,7 +461,7 @@ export default function Chouqian() {
                                     <div className="flex justify-center items-center min-h-[250px]">
                                         <img
                                             src="/images/qian/qiantong/qiuqian.gif"
-                                            alt="求签"
+                                            alt={t('chouqian.signAlt')}
                                             style={{ width: '200px', height: '200px' }}
                                         />
                                     </div>
@@ -789,7 +789,7 @@ export default function Chouqian() {
                                     <div className="flex justify-center mb-6">
                                         <img
                                             src={result.image}
-                                            alt={`${result.type_name}第${result.number}签`}
+                                            alt={`${result.type_name}${t('chouqian.signNumber')}${result.number}${t('chouqian.signSuffix')}`}
                                             className="max-w-full h-auto max-h-[500px] object-contain"
                                             onError={(e) => {
                                                 e.currentTarget.style.display = 'none';

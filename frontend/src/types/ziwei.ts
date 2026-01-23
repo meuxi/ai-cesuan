@@ -13,6 +13,7 @@ export interface ZiweiInput {
     minute?: number;
     gender: 'male' | 'female';
     language?: string;  // 'zh-CN' | 'zh-TW' | 'en-US' | 'ja-JP'
+    algorithm?: 'default' | 'zhongzhou';  // 派别：全书派/中州派
 }
 
 // ==================== 基础类型 ====================

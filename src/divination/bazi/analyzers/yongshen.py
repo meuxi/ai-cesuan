@@ -271,6 +271,145 @@ class YongShenAnalyzer:
                     break
             
             explanation = f'{pattern_type}，真化需顺其势'
+        
+        elif '曲直' in pattern_type:
+            # 曲直格（木局）
+            yong_shen.extend(['木', '水'])
+            xi_shen.append('火')  # 木生火泄秀
+            ji_shen.append('金')  # 金克木
+            explanation = '曲直格成立，喜木水生扶，忌金克'
+            
+        elif '炎上' in pattern_type:
+            # 炎上格（火局）
+            yong_shen.extend(['火', '木'])
+            xi_shen.append('土')  # 火生土泄秀
+            ji_shen.append('水')  # 水克火
+            explanation = '炎上格成立，喜火木生扶，忌水克'
+            
+        elif '稼穡' in pattern_type:
+            # 稼穡格（土局）
+            yong_shen.extend(['土', '火'])
+            xi_shen.append('金')  # 土生金泄秀
+            ji_shen.append('木')  # 木克土
+            explanation = '稼穡格成立，喜土火生扶，忌木克'
+            
+        elif '从革' in pattern_type:
+            # 从革格（金局）
+            yong_shen.extend(['金', '土'])
+            xi_shen.append('水')  # 金生水泄秀
+            ji_shen.append('火')  # 火克金
+            explanation = '从革格成立，喜金土生扶，忌火克'
+            
+        elif '润下' in pattern_type:
+            # 润下格（水局）
+            yong_shen.extend(['水', '金'])
+            xi_shen.append('木')  # 水生木泄秀
+            ji_shen.append('土')  # 土克水
+            explanation = '润下格成立，喜水金生扶，忌土克'
+        
+        elif '建禄' in pattern_type:
+            # 建禄格
+            # 身旺，喜泄耗
+            yong_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤
+            yong_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星
+            xi_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])  # 官杀
+            ji_shen.append(day_master_element)  # 比劫
+            ji_shen.append(ELEMENT_GENERATED_BY[day_master_element])  # 印星
+            explanation = '建禄格，日主有根，喜食伤生财，官杀制身'
+            
+        elif '羊刃' in pattern_type:
+            # 羊刃格
+            # 身强，喜官杀制刃
+            yong_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])  # 官杀制刃
+            yong_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星
+            xi_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤
+            ji_shen.append(day_master_element)  # 比劫
+            ji_shen.append(ELEMENT_GENERATED_BY[day_master_element])  # 印星
+            explanation = '羊刃格，身强刃旺，喜官杀制刃，财星泄刃'
+        
+        elif '正官' in pattern_type:
+            # 正官格
+            official = ELEMENT_CONTROLLED_BY[day_master_element]
+            yong_shen.append(official)  # 正官为用
+            xi_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星生官
+            ji_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤克官
+            explanation = f'正官格，喜官星{official}当权，财星生官，忌食伤克官'
+            
+        elif '七杀' in pattern_type:
+            # 七杀格
+            killer = ELEMENT_CONTROLLED_BY[day_master_element]
+            yong_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤制杀
+            xi_shen.append(killer)  # 七杀为用
+            xi_shen.append(ELEMENT_GENERATED_BY[day_master_element])  # 印星化杀
+            ji_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星生杀
+            explanation = f'七杀格，喜食伤制杀，印星化杀，忌财星生杀'
+            
+        elif '正财' in pattern_type:
+            # 正财格
+            wealth = ELEMENT_CONTROLS[day_master_element]
+            yong_shen.append(wealth)  # 正财为用
+            xi_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤生财
+            ji_shen.append(day_master_element)  # 比劫夺财
+            explanation = f'正财格，喜财星{wealth}，食伤生财，忌比劫夺财'
+            
+        elif '偏财' in pattern_type:
+            # 偏财格
+            wealth = ELEMENT_CONTROLS[day_master_element]
+            yong_shen.append(wealth)  # 偏财为用
+            xi_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤生财
+            ji_shen.append(day_master_element)  # 比劫夺财
+            explanation = f'偏财格，喜财星{wealth}，食伤生财，忌比劫夺财'
+            
+        elif '正印' in pattern_type:
+            # 正印格
+            seal = ELEMENT_GENERATED_BY[day_master_element]
+            yong_shen.append(seal)  # 正印为用
+            yong_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])  # 官杀生印
+            ji_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星克印
+            explanation = f'正印格，喜印星{seal}，官杀生印，忌财星坏印'
+            
+        elif '偏印' in pattern_type:
+            # 偏印格
+            seal = ELEMENT_GENERATED_BY[day_master_element]
+            yong_shen.append(seal)  # 偏印为用
+            xi_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])  # 官杀生印
+            xi_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星制偏印
+            ji_shen.append(ELEMENT_GENERATES[day_master_element])  # 食伤被偏印所夺
+            explanation = f'偏印格，喜印星{seal}，财星制偏印护食伤'
+            
+        elif '食神' in pattern_type:
+            # 食神格
+            output = ELEMENT_GENERATES[day_master_element]
+            yong_shen.append(output)  # 食神为用
+            xi_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星食伤生
+            ji_shen.append(ELEMENT_GENERATED_BY[day_master_element])  # 印星夺食
+            explanation = f'食神格，喜食神{output}生财，忌偏印夺食'
+            
+        elif '伤官' in pattern_type:
+            # 伤官格
+            output = ELEMENT_GENERATES[day_master_element]
+            yong_shen.append(output)  # 伤官为用
+            xi_shen.append(ELEMENT_CONTROLS[day_master_element])  # 财星
+            ji_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])  # 官星被伤官所克
+            explanation = f'伤官格，喜伤官{output}生财，忌官星'
+        
+        elif '五行俱全' in pattern_type:
+            # 五行俱全格
+            # 取五行平衡为要
+            yong_shen.append(day_master_element)
+            explanation = '五行俱全格，命中平衡，喜用需视具体强弱而定'
+            
+        elif '两神成象' in pattern_type:
+            # 两神成象格
+            # 顺势而行
+            explanation = '两神成象格，专精特化，顺势而行'
+            
+        elif '天元一气' in pattern_type:
+            # 天元一气格
+            yong_shen.append(day_master_element)
+            yong_shen.append(ELEMENT_GENERATED_BY[day_master_element])
+            ji_shen.append(ELEMENT_CONTROLLED_BY[day_master_element])
+            explanation = '天元一气格，天干纯一，顺势而行'
             
         else:
             # 其他格局走普通分析

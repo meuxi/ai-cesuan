@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DivinationCardHeader } from '@/components/DivinationCardHeader'
 import { InlineResult } from '@/components/InlineResult'
 import { useDivination } from '@/hooks/useDivination'
@@ -40,6 +41,7 @@ interface DaliurenResult {
 }
 
 export default function DaliurenPage() {
+    const { t } = useTranslation()
     const [year, setYear] = useState(new Date().getFullYear())
     const [month, setMonth] = useState(new Date().getMonth() + 1)
     const [day, setDay] = useState(new Date().getDate())
@@ -89,8 +91,8 @@ export default function DaliurenPage() {
 
     return (
         <DivinationCardHeader
-            title="大六壬"
-            description="三式之首，以天地盘推演吉凶成败"
+            title={t('daliuren.title')}
+            description={t('daliuren.description')}
             icon={Compass}
             divinationType="daliuren"
         >
@@ -271,7 +273,7 @@ export default function DaliurenPage() {
                     result={result}
                     loading={resultLoading}
                     streaming={streaming}
-                    title="大六壬"
+                    title={t('daliuren.aiAnalysis')}
                 />
             </div>
         </DivinationCardHeader>

@@ -37,6 +37,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="p-2 hover:bg-accent rounded-lg transition-colors"
+                        title="打开菜单"
+                        aria-label="打开菜单"
                     >
                         <Menu className="w-5 h-5 text-muted-foreground" />
                     </button>
@@ -44,8 +46,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 p-4 md:p-8 lg:p-12">
-                    <div className="max-w-4xl mx-auto">
+                <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8">
+                    <div className="max-w-4xl mx-auto w-full">
                         {children}
                     </div>
                 </main>

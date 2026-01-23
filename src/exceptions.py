@@ -98,6 +98,41 @@ class EmptyPromptError(DivinationException):
     status_code = status.HTTP_400_BAD_REQUEST
 
 
+class TimeoutError(DivinationException):
+    """API超时错误"""
+    code = "API_TIMEOUT"
+    message = "AI服务响应超时，请稍后重试"
+    status_code = status.HTTP_504_GATEWAY_TIMEOUT
+
+
+class AuthenticationError(DivinationException):
+    """认证失败"""
+    code = "AUTHENTICATION_ERROR"
+    message = "认证失败，请检查API密钥"
+    status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class DataValidationError(DivinationException):
+    """数据验证失败"""
+    code = "DATA_VALIDATION_ERROR"
+    message = "数据验证失败"
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class ServiceUnavailableError(DivinationException):
+    """服务不可用"""
+    code = "SERVICE_UNAVAILABLE"
+    message = "服务暂时不可用，请稍后重试"
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+
+class QuotaExceededError(DivinationException):
+    """配额超限"""
+    code = "QUOTA_EXCEEDED"
+    message = "今日使用次数已达上限"
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+
+
 # 错误码映射表（供前端使用）
 ERROR_CODES = {
     "DIVINATION_ERROR": "占卜服务异常",
@@ -107,6 +142,11 @@ ERROR_CODES = {
     "RATE_LIMIT_EXCEEDED": "请求过于频繁，请稍后再试",
     "API_CONFIG_ERROR": "API配置错误，请检查设置",
     "API_CALL_ERROR": "AI服务调用失败",
+    "API_TIMEOUT": "AI服务响应超时",
+    "AUTHENTICATION_ERROR": "认证失败",
+    "DATA_VALIDATION_ERROR": "数据验证失败",
+    "SERVICE_UNAVAILABLE": "服务暂时不可用",
+    "QUOTA_EXCEEDED": "今日使用次数已达上限",
     "ZHIPU_CONCURRENCY_ERROR": "智谱AI并发请求过多，请稍后再试",
     "BIRTHDAY_FORMAT_ERROR": "生日格式错误",
     "NAME_LENGTH_ERROR": "姓名长度错误",

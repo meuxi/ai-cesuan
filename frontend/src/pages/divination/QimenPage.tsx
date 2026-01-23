@@ -89,8 +89,8 @@ export default function QimenPage() {
 
   return (
     <DivinationCardHeader
-      title="奇门遁甲"
-      description="三式之一，以时空变化推演吉凶祸福"
+      title={t('qimen.title')}
+      description={t('qimen.description')}
       icon={Sparkles}
       divinationType="qimen"
     >
@@ -163,10 +163,10 @@ export default function QimenPage() {
                 value={panType}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPanType(e.target.value)}
               >
-                <option value="时盘">时盘</option>
-                <option value="日盘">日盘</option>
-                <option value="月盘">月盘</option>
-                <option value="年盘">年盘</option>
+                <option value="时盘">{t('qimen.hourlyChart')}</option>
+                <option value="日盘">{t('qimen.dailyChart')}</option>
+                <option value="月盘">{t('qimen.monthlyChart')}</option>
+                <option value="年盘">{t('qimen.yearlyChart')}</option>
               </select>
             </div>
             <div>
@@ -176,8 +176,8 @@ export default function QimenPage() {
                 value={panStyle}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPanStyle(e.target.value)}
               >
-                <option value="转盘">转盘</option>
-                <option value="飞盘">飞盘</option>
+                <option value="转盘">{t('qimen.rotating')}</option>
+                <option value="飞盘">{t('qimen.flying')}</option>
               </select>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function QimenPage() {
           result={result}
           loading={resultLoading}
           streaming={streaming}
-          title="奇门遁甲"
+          title={t('qimen.aiAnalysis')}
         />
       </div>
     </DivinationCardHeader>

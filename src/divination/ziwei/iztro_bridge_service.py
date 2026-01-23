@@ -324,6 +324,7 @@ class HybridIztroService:
     """
     混合紫微斗数服务
     优先使用Node.js桥接（更准确），失败时回退到iztro-py
+    支持派别配置和运限计算（参考py-iztro）
     """
     
     def __init__(self):
@@ -339,6 +340,34 @@ class HybridIztroService:
             logger.warning(f"iztro桥接服务初始化失败，将使用iztro-py: {e}")
             self._use_bridge = False
     
+    def _get_fallback_service(self):
+        """获取回退服务"""
+        if self._fallback_service is None:
+            from .iztro_service import iztro_service
+            self._fallback_service = iztro_service
+        return self._fallback_service
+    
+    def config(self, config) -> None:
+        """
+        设置全局配置（四化、亮度、派别等）
+        参考 py-iztro 的 astro.config() 方法
+        
+        Args:
+            config: ZiweiConfig 配置对象
+        """
+        service = self._get_fallback_service()
+        service.config(config)
+    
+    def get_config(self):
+        """获取当前配置"""
+        service = self._get_fallback_service()
+        return service.get_config()
+    
+    def reset_config(self) -> None:
+        """重置为默认配置"""
+        service = self._get_fallback_service()
+        service.reset_config()
+    
     def calculate(
         self,
         year: int,
@@ -347,11 +376,15 @@ class HybridIztroService:
         hour: int,
         minute: int = 0,
         gender: str = "male",
-        language: str = "zh-CN"
+        language: str = "zh-CN",
+        algorithm: Optional[str] = None  # 新增：派别参数
     ) -> Dict[str, Any]:
         """
         计算紫微斗数命盘
         优先使用Node.js桥接，失败时回退到iztro-py
+        
+        Args:
+            algorithm: 派别 ('default'=全书派, 'zhongzhou'=中州派)
         """
         # 尝试使用桥接服务
         if self._use_bridge and self._bridge_service:
@@ -360,15 +393,51 @@ class HybridIztroService:
                     year, month, day, hour, minute, gender, language
                 )
                 result["_source"] = "iztro-node"
+                if algorithm:
+                    result["config"] = {"algorithm": algorithm}
                 return result
             except Exception as e:
                 logger.warning(f"桥接服务调用失败，回退到iztro-py: {e}")
         
         # 回退到iztro-py
-        from .iztro_service import iztro_service
-        result = iztro_service.calculate(year, month, day, hour, minute, gender, language)
+        service = self._get_fallback_service()
+        result = service.calculate(
+            year, month, day, hour, minute, gender, language,
+            algorithm=algorithm
+        )
         result["_source"] = "iztro-py"
         return result
+    
+    def horoscope(
+        self,
+        birth_date: str,
+        birth_time_index: int,
+        gender: str,
+        target_date: Optional[str] = None,
+        target_time_index: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        计算运限信息（大限/小限/流年/流月/流日/流时）
+        参考 py-iztro 的 astrolabe.horoscope() 方法
+        
+        Args:
+            birth_date: 出生日期 YYYY-MM-DD
+            birth_time_index: 出生时辰索引 0-12
+            gender: 性别 'male'/'female'
+            target_date: 目标日期（默认当天）
+            target_time_index: 目标时辰索引（默认当前时辰）
+        
+        Returns:
+            完整运限数据
+        """
+        service = self._get_fallback_service()
+        return service.horoscope(
+            birth_date=birth_date,
+            birth_time_index=birth_time_index,
+            gender=gender,
+            target_date=target_date,
+            target_time_index=target_time_index
+        )
 
 
 # 全局单例

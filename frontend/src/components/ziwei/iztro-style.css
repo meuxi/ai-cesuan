@@ -473,3 +473,204 @@
   white-space: nowrap;
   font-size: var(--iztro-star-font-size-small);
 }
+
+/* ===== 中宫样式（参考 react-iztro IzpalaceCenter） ===== */
+.iztro-center-palace {
+  grid-area: ct;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.iztro-center-palace-centralize {
+  text-align: center;
+}
+
+.iztro-center-palace ul.basic-info {
+  margin: 10px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 20px;
+}
+
+.iztro-center-palace ul.basic-info li {
+  list-style: none;
+}
+
+.iztro-center-palace .center-title {
+  padding: 5px 0;
+  margin: 0;
+  font-size: var(--iztro-star-font-size-big);
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px dashed var(--iztro-color-border);
+}
+
+/* 运限日期切换按钮 */
+.horo-buttons {
+  margin: 10px;
+  font-size: var(--iztro-star-font-size-small);
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.horo-buttons .center-button {
+  display: block;
+  text-align: center;
+  padding: 5px;
+  border: 1px solid var(--iztro-color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  color: var(--iztro-color-text);
+  user-select: none;
+}
+
+.horo-buttons .center-button:not(.disabled):hover {
+  color: var(--iztro-color-major);
+  background-color: var(--iztro-color-border);
+}
+
+.horo-buttons .center-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.horo-buttons .center-horo-hour {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: var(--iztro-color-major);
+}
+
+/* 中宫命盘箭头线 */
+#palace-line {
+  stroke: var(--iztro-color-awesome);
+  opacity: 0.6;
+  transition: all 0.25s ease-in-out;
+}
+
+#palace-line.decadal {
+  stroke: var(--iztro-color-decadal);
+}
+
+#palace-line.yearly {
+  stroke: var(--iztro-color-yearly);
+}
+
+#palace-line.monthly {
+  stroke: var(--iztro-color-monthly);
+}
+
+#palace-line.daily {
+  stroke: var(--iztro-color-daily);
+}
+
+#palace-line.hourly {
+  stroke: var(--iztro-color-hourly);
+}
+
+/* 流时显示 */
+.solar-horoscope {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.solar-horoscope-centralize {
+  justify-content: center;
+}
+
+.solar-horoscope .today {
+  display: inline-block;
+  font-size: var(--iztro-star-font-size-small);
+  cursor: pointer;
+  border: 1px solid var(--iztro-color-border);
+  border-radius: 4px;
+  padding: 0 5px;
+  transition: all 0.25s ease-in-out;
+}
+
+.solar-horoscope .today:hover {
+  color: var(--iztro-color-major);
+  background-color: var(--iztro-color-border);
+}
+
+/* ===== 增强：宫位星曜悬停效果 ===== */
+.iztro-star:hover {
+  transform: scale(1.05);
+  cursor: default;
+}
+
+.iztro-star-major:hover {
+  color: var(--iztro-color-awesome);
+}
+
+/* ===== 增强：小限颜色 ===== */
+.iztro-palace-fate .iztro-palace-minor-limit-active {
+  background-color: #ec4899;  /* pink-500 */
+}
+
+.iztro-palace-dynamic-name .iztro-palace-dynamic-name-minor-limit {
+  color: #ec4899;
+}
+
+/* ===== 增强：自化标记（宫干飞出飞入本宫） ===== */
+.self-mutagen-mutagen-0 {
+  border-left: 3px solid var(--iztro-color-awesome);
+  padding-left: 2px;
+}
+
+.self-mutagen-mutagen-1 {
+  border-left: 3px solid var(--iztro-color-quan);
+  padding-left: 2px;
+}
+
+.self-mutagen-mutagen-2 {
+  border-left: 3px solid var(--iztro-color-nice);
+  padding-left: 2px;
+}
+
+.self-mutagen-mutagen-3 {
+  border-left: 3px solid var(--iztro-color-focus);
+  padding-left: 2px;
+}
+
+/* ===== 增强：响应式适配 ===== */
+@media (max-width: 640px) {
+  .iztro-astrolabe-theme-default {
+    --iztro-star-font-size-big: 11px;
+    --iztro-star-font-size-small: 10px;
+  }
+  
+  .iztro-palace {
+    padding: 2px;
+  }
+  
+  .iztro-palace-footer {
+    font-size: 9px;
+  }
+  
+  .iztro-palace-scope-age {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .iztro-astrolabe-theme-default {
+    --iztro-star-font-size-big: 10px;
+    --iztro-star-font-size-small: 9px;
+  }
+  
+  .iztro-palace-adj {
+    display: none;
+  }
+  
+  .iztro-palace-lft24,
+  .iztro-palace-rgt24 {
+    display: none;
+  }
+}

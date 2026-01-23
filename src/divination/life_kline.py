@@ -218,10 +218,11 @@ class LifeKLineAnalyzer:
         system_prompt = """你是一位八字命理大师。根据用户提供的四柱干支和大运信息，生成"人生K线图"数据。
 核心规则:
 1. 年龄采用虚岁，从1岁开始
-2. 每年的reason字段控制在20-30字以内
+2. 每年的reason字段提供专业的命理分析（30-50字），体现干支生克关系
 3. 所有维度给出0-10分
 4. 让评分呈现明显波动，体现"牛市"和"熊市"
-5. daYun是大运干支(10年不变)，ganZhi是流年干支(每年一变)"""
+5. daYun是大运干支(10年不变)，ganZhi是流年干支(每年一变)
+6. summary、personality、industry等文字字段请提供深度专业的解析，充分展开分析"""
         
         user_prompt = f"""请分析以下八字：
 
@@ -257,7 +258,7 @@ class LifeKLineAnalyzer:
             ChatMessage(role="user", content=prompts["user_prompt"]),
         ]
         
-        response = await self.ai_service.chat(messages, temperature=0.7, max_tokens=30000)
+        response = await self.ai_service.chat(messages, temperature=0.7, max_tokens=32000)  # 用户体验优先：无限制输出
         
         # 解析JSON响应
         return self._parse_ai_response(response.content)

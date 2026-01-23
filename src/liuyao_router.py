@@ -344,7 +344,7 @@ async def interpret_hexagram(request: Request, body: InterpretRequest):
         result = await ai_manager.chat_with_failover(
             messages=messages,
             temperature=0.8,
-            max_tokens=6000,
+            max_tokens=32000,  # 用户体验优先：无限制输出
         )
         _logger.info(f"六爻解卦使用模型: {result.model_used.name}")
         
@@ -438,7 +438,7 @@ async def interpret_hexagram_stream(request: Request, body: InterpretRequest):
             
             stream = await client.chat.completions.create(
                 model=model,
-                max_tokens=6000,
+                max_tokens=32000,  # 用户体验优先：无限制输出
                 temperature=0.8,
                 stream=True,
                 messages=[

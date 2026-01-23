@@ -174,7 +174,7 @@ class AnthropicProvider(AIProvider):
         payload = {
             "model": model,
             "messages": user_messages,
-            "max_tokens": max_tokens or 4096,
+            "max_tokens": max_tokens or 32000,  # 用户体验优先：无限制输出
             "temperature": temperature,
         }
         
@@ -308,10 +308,10 @@ class DeepSeekProvider(OpenAIProvider):
         max_tokens: Optional[int] = None,
         **kwargs
     ) -> ChatResponse:
-        # DeepSeek 限制 max_tokens 范围
+        # DeepSeek max_tokens - 用户体验优先：提升到最大值
         if max_tokens is None:
-            max_tokens = 2048
-        max_tokens = max(1, min(max_tokens, 8192))
+            max_tokens = 32000
+        max_tokens = max(1, min(max_tokens, 32000))
         
         return await super().chat(
             messages=messages,

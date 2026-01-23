@@ -11,6 +11,22 @@ const API_BASE = import.meta.env.VITE_API_BASE || ''
 const IS_TAURI = import.meta.env.VITE_IS_TAURI || ''
 const md = new MarkdownIt()
 
+// 占卜请求参数类型
+interface DivinationParams {
+  prompt?: string
+  question?: string
+  userName?: string
+  name?: string
+  birthday?: string
+  gender?: string
+  num1?: number
+  num2?: number
+  cards?: Array<{ name: string; isReversed: boolean }>
+  spread?: string
+  master?: { id: string; name: string }
+  [key: string]: unknown  // 允许其他动态属性
+}
+
 export function useDivination(promptType: string) {
   const { jwt, customOpenAISettings } = useGlobalState()
   const [result, setResult] = useState('')
@@ -19,7 +35,7 @@ export function useDivination(promptType: string) {
   const [streaming, setStreaming] = useState(false)
   const [showDrawer, setShowDrawer] = useState(false)
 
-  const onSubmit = async (params: any) => {
+  const onSubmit = async (params: DivinationParams) => {
     try {
       setLoading(true)
       setResultLoading(true)
@@ -136,13 +152,14 @@ export function useDivination(promptType: string) {
           throw new Error(`占卜失败: ${err.message}`)
         },
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error)
-      const userFriendlyMsg = error.message?.includes('rate_limit')
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      const userFriendlyMsg = errorMessage.includes('rate_limit')
         ? '请求过于频繁，请稍后再试（约1分钟）'
-        : error.message?.includes('API')
+        : errorMessage.includes('API')
           ? 'API配置错误，请检查设置'
-          : error.message || '占卜失败，请检查网络后重试'
+          : errorMessage || '占卜失败，请检查网络后重试'
       setResult(userFriendlyMsg)
       toast.error(userFriendlyMsg)
       setStreaming(false)

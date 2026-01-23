@@ -17,11 +17,12 @@ _logger = logging.getLogger(__name__)
 # ========== AI风格提示词 ==========
 
 STYLE_PROMPTS = {
-    'concise': """风格要求：【精准直断模式】
-- 直断吉凶，一针见血，300字以内
-- 只给出核心结论和关键依据
+    'concise': """风格要求：【精准专业分析模式】
+- 直断吉凶，一针见血，专业深入
+- 给出核心结论和关键依据，充分展开分析
 - 必须给出明确的成功概率（如：成功率75%）
-- 必须给出具体应期（如：农历X月、XX日前后）""",
+- 必须给出具体应期（如：农历X月、XX日前后）
+- 不受字数限制，确保分析完整专业""",
     'detailed': """风格要求：【超级专业详尽分析模式 - 必须完整执行以下所有步骤】
 
 📊 **分析深度要求**：
@@ -574,7 +575,7 @@ def build_interpretation_prompt(hexagram_data: Dict, question: str, style: str,
 ---
 
 ## 🔚 结语
-[以易学大师口吻给出最终寄语，鼓励或提醒求卦者，100字以内]
+[以易学大师口吻给出最终寄语，鼓励或提醒求卦者，充分表达智慧与关怀]
 """
     
     return prompt
@@ -668,7 +669,7 @@ class OpenAIAIService(BaseAIService):
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
-                max_tokens=12000,
+                max_tokens=32000,  # 用户体验优先：无限制输出
                 temperature=0.75,
                 messages=[
                     {

@@ -67,6 +67,46 @@ YANGREN_BRANCHES = {
     '己': '巳', '庚': '酉', '辛': '申', '壬': '子', '癸': '亥'
 }
 
+# 地支藏干
+BRANCH_HIDDEN_STEMS = {
+    '子': ['癸'],
+    '丑': ['己', '癸', '辛'],
+    '寅': ['甲', '丙', '戊'],
+    '卯': ['乙'],
+    '辰': ['戊', '乙', '癸'],
+    '巳': ['丙', '戊', '庚'],
+    '午': ['丁', '己'],
+    '未': ['己', '丁', '乙'],
+    '申': ['庚', '壬', '戊'],
+    '酉': ['辛'],
+    '戌': ['戊', '辛', '丁'],
+    '亥': ['壬', '甲']
+}
+
+# 十神映射
+TEN_GODS = {
+    '甲': {'甲': '比肩', '乙': '劫财', '丙': '食神', '丁': '伤官', '戊': '偏财', 
+           '己': '正财', '庚': '七杀', '辛': '正官', '壬': '偏印', '癸': '正印'},
+    '乙': {'甲': '劫财', '乙': '比肩', '丙': '伤官', '丁': '食神', '戊': '正财', 
+           '己': '偏财', '庚': '正官', '辛': '七杀', '壬': '正印', '癸': '偏印'},
+    '丙': {'甲': '偏印', '乙': '正印', '丙': '比肩', '丁': '劫财', '戊': '食神', 
+           '己': '伤官', '庚': '偏财', '辛': '正财', '壬': '七杀', '癸': '正官'},
+    '丁': {'甲': '正印', '乙': '偏印', '丙': '劫财', '丁': '比肩', '戊': '伤官', 
+           '己': '食神', '庚': '正财', '辛': '偏财', '壬': '正官', '癸': '七杀'},
+    '戊': {'甲': '七杀', '乙': '正官', '丙': '偏印', '丁': '正印', '戊': '比肩', 
+           '己': '劫财', '庚': '食神', '辛': '伤官', '壬': '偏财', '癸': '正财'},
+    '己': {'甲': '正官', '乙': '七杀', '丙': '正印', '丁': '偏印', '戊': '劫财', 
+           '己': '比肩', '庚': '伤官', '辛': '食神', '壬': '正财', '癸': '偏财'},
+    '庚': {'甲': '偏财', '乙': '正财', '丙': '七杀', '丁': '正官', '戊': '偏印', 
+           '己': '正印', '庚': '比肩', '辛': '劫财', '壬': '食神', '癸': '伤官'},
+    '辛': {'甲': '正财', '乙': '偏财', '丙': '正官', '丁': '七杀', '戊': '正印', 
+           '己': '偏印', '庚': '劫财', '辛': '比肩', '壬': '伤官', '癸': '食神'},
+    '壬': {'甲': '食神', '乙': '伤官', '丙': '偏财', '丁': '正财', '戊': '七杀', 
+           '己': '正官', '庚': '偏印', '辛': '正印', '壬': '比肩', '癸': '劫财'},
+    '癸': {'甲': '伤官', '乙': '食神', '丙': '正财', '丁': '偏财', '戊': '正官', 
+           '己': '七杀', '庚': '正印', '辛': '偏印', '壬': '劫财', '癸': '比肩'}
+}
+
 
 @dataclass
 class PatternResult:
@@ -134,7 +174,12 @@ class PatternAnalyzer:
         if traditional:
             patterns.append({**traditional, 'priority': 7})
         
-        # 5. 根据日主强弱判断正格
+        # 5. 检查特殊格局（两神成象格、五行俱全格、天元一气格等）
+        special = cls._check_special_patterns(bazi, all_stems, all_branches)
+        if special:
+            patterns.append({**special, 'priority': 6})
+        
+        # 6. 根据日主强弱判断正格
         strength_pattern = cls._get_strength_pattern(strength_score)
         patterns.append({**strength_pattern, 'priority': 5})
         
@@ -302,6 +347,190 @@ class PatternAnalyzer:
             }
         
         return None
+    
+    @classmethod
+    def _check_special_patterns(cls, bazi: Dict, all_stems: List[str], 
+                                 all_branches: List[str]) -> Optional[Dict]:
+        """检查特殊格局（两神成象格、五行俱全格等）"""
+        day_stem = bazi['day']['stem']
+        day_element = STEM_ELEMENT.get(day_stem)
+        
+        # 1. 五行俱全格 - 所有五行都有
+        element_counts = cls._count_elements(all_stems, all_branches)
+        if all(count > 0 for count in element_counts.values()):
+            return {
+                'type': '五行俱全格',
+                'strength': 8,
+                'description': '五行俱全，各元素皆备，命理平衡',
+                'characteristics': ['完整无缺', '多才多艺', '适应力强']
+            }
+        
+        # 2. 两神成象格 - 只有两种五行，且力量均衡
+        non_zero_elements = {k: v for k, v in element_counts.items() if v > 0}
+        if len(non_zero_elements) == 2:
+            values = list(non_zero_elements.values())
+            if min(values) >= 2:  # 两种五行各有至少2个
+                elements = list(non_zero_elements.keys())
+                return {
+                    'type': '两神成象格',
+                    'subtype': f'{elements[0]}{elements[1]}成象',
+                    'strength': 8,
+                    'description': f'{elements[0]}{elements[1]}两神成象，专精特化',
+                    'characteristics': ['专注集中', '特化发展', '能量纯粹']
+                }
+        
+        # 3. 天元一气格 - 四柱天干相同
+        if len(set(all_stems)) == 1:
+            return {
+                'type': '天元一气格',
+                'strength': 9,
+                'description': '天元一气，天干纯一，格局清贵',
+                'characteristics': ['纯粹无杂', '高度集中', '意志坚定']
+            }
+        
+        # 4. 地支一气格 - 四柱地支五行相同
+        branch_elements = [BRANCH_ELEMENT.get(b) for b in all_branches]
+        if len(set(branch_elements)) == 1:
+            return {
+                'type': '地支一气格',
+                'strength': 8,
+                'description': '地支一气，地支五行统一',
+                'characteristics': ['根基稳固', '统一协调', '专注发展']
+            }
+        
+        # 5. 金神格 - 日干庚辛 + 时支巳酉丑
+        if day_stem in ['庚', '辛'] and bazi['hour']['branch'] in ['巳', '酉', '丑']:
+            metal_count = element_counts.get('金', 0)
+            if metal_count >= 3:
+                return {
+                    'type': '金神格',
+                    'strength': 8,
+                    'description': '金神入命，锐利精明',
+                    'characteristics': ['锐利果敢', '策略精明', '决断力强']
+                }
+        
+        # 6. 正印格 - 月支藏干中有正印
+        month_hidden = BRANCH_HIDDEN_STEMS.get(bazi['month']['branch'], [])
+        if month_hidden:
+            for stem in month_hidden:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god == '正印':
+                    return {
+                        'type': '正印格',
+                        'strength': 7,
+                        'description': '正印透出，学识渊博',
+                        'characteristics': ['学识丰富', '仁慈宽厚', '善于学习']
+                    }
+                elif ten_god == '偏印':
+                    return {
+                        'type': '偏印格',
+                        'strength': 7,
+                        'description': '偏印当令，聪明灵活',
+                        'characteristics': ['机智灵活', '独立思考', '艺术天赋']
+                    }
+        
+        # 7. 伤官格
+        if month_hidden:
+            for stem in month_hidden:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god == '伤官':
+                    return {
+                        'type': '伤官格',
+                        'strength': 7,
+                        'description': '伤官当令，才华横溢',
+                        'characteristics': ['才华出众', '创意丰富', '表达能力强']
+                    }
+                elif ten_god == '食神':
+                    return {
+                        'type': '食神格',
+                        'strength': 7,
+                        'description': '食神当令，福禄双全',
+                        'characteristics': ['心态平和', '口福不断', '生活安逸']
+                    }
+        
+        # 8. 财格
+        if month_hidden:
+            for stem in month_hidden:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god == '正财':
+                    return {
+                        'type': '正财格',
+                        'strength': 7,
+                        'description': '正财当令，勤劳致富',
+                        'characteristics': ['勤俭持家', '理财有方', '稳健务实']
+                    }
+                elif ten_god == '偏财':
+                    return {
+                        'type': '偏财格',
+                        'strength': 7,
+                        'description': '偏财当令，财运亨通',
+                        'characteristics': ['交际广泛', '善于投资', '横财运好']
+                    }
+        
+        # 9. 官杀格
+        if month_hidden:
+            for stem in month_hidden:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god == '正官':
+                    return {
+                        'type': '正官格',
+                        'strength': 7,
+                        'description': '正官当令，仕途亨通',
+                        'characteristics': ['正直守信', '组织能力强', '适合公职']
+                    }
+                elif ten_god == '七杀':
+                    return {
+                        'type': '七杀格',
+                        'strength': 7,
+                        'description': '七杀当令，威武不屈',
+                        'characteristics': ['意志坚强', '决断果敢', '适合军警']
+                    }
+        
+        return None
+    
+    @classmethod
+    def _count_elements(cls, stems: List[str], branches: List[str]) -> Dict[str, float]:
+        """统计五行分布"""
+        element_counts = {'木': 0, '火': 0, '土': 0, '金': 0, '水': 0}
+        
+        for stem in stems:
+            elem = STEM_ELEMENT.get(stem)
+            if elem:
+                element_counts[elem] += 1
+        
+        for branch in branches:
+            elem = BRANCH_ELEMENT.get(branch)
+            if elem:
+                element_counts[elem] += 0.5
+        
+        return element_counts
+    
+    @classmethod
+    def _count_ten_gods(cls, day_stem: str, all_stems: List[str], 
+                        all_branches: List[str]) -> Dict[str, int]:
+        """统计十神分布"""
+        ten_god_counts = {
+            '比肩': 0, '劫财': 0, '食神': 0, '伤官': 0,
+            '正财': 0, '偏财': 0, '正官': 0, '七杀': 0,
+            '正印': 0, '偏印': 0
+        }
+        
+        # 统计天干
+        for stem in all_stems:
+            if stem != day_stem:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god and ten_god in ten_god_counts:
+                    ten_god_counts[ten_god] += 1
+        
+        # 统计藏干
+        for branch in all_branches:
+            hidden_stems = BRANCH_HIDDEN_STEMS.get(branch, [])
+            for stem in hidden_stems:
+                ten_god = TEN_GODS.get(day_stem, {}).get(stem)
+                if ten_god and ten_god in ten_god_counts:
+                    ten_god_counts[ten_god] += 0.5
+        
+        return ten_god_counts
     
     @classmethod
     def _get_strength_pattern(cls, strength_score: float) -> Dict:

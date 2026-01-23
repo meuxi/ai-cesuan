@@ -7,31 +7,31 @@ export default function MarketPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       {/* Hero Section */}
       <Hero />
 
       {/* Quote Section */}
-      <div className="text-center py-16 my-16 bg-secondary rounded-2xl">
-        <div className="max-w-2xl mx-auto px-4">
-          <blockquote className="text-2xl md:text-3xl text-foreground italic font-serif">
+      <div className="text-center py-8 sm:py-16 my-8 sm:my-16 bg-secondary rounded-xl sm:rounded-2xl mx-0">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4">
+          <blockquote className="text-lg sm:text-2xl md:text-3xl text-foreground italic font-serif leading-relaxed">
             "除非你意识到你的潜意识，否则潜意识将主导你的人生，而你将其称为命运。"
           </blockquote>
-          <cite className="block text-base text-muted-foreground mt-6 not-italic">
+          <cite className="block text-sm sm:text-base text-muted-foreground mt-4 sm:mt-6 not-italic">
             — 卡尔·荣格
           </cite>
         </div>
       </div>
 
       {/* Section Divider */}
-      <div className="flex items-center mb-8">
+      <div className="flex items-center mb-6 sm:mb-8">
         <div className="flex-1 h-px bg-border"></div>
-        <h2 className="text-xl font-semibold mx-4 text-foreground">选择占卜方式</h2>
+        <h2 className="text-base sm:text-xl font-semibold mx-3 sm:mx-4 text-foreground whitespace-nowrap">选择占卜方式</h2>
         <div className="flex-1 h-px bg-border"></div>
       </div>
 
       {/* Divination Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {DIVINATION_OPTIONS.map((option) => {
           const Icon = option.icon
           return (

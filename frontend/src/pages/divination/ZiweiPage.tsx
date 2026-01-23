@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Solar } from 'lunar-javascript'
 import { logger } from '@/utils/logger'
 import SEOHead, { SEO_CONFIG } from '@/components/SEOHead'
@@ -26,8 +27,10 @@ import { ZiweiHoroscopePanelEnhanced, type ZiweiHoroscopePanelRef } from '@/comp
 import type { ZiweiResult } from '@/types/ziwei'
 
 export default function ZiweiPage() {
+    const { t } = useTranslation()
     const [birthday, setBirthday] = useLocalStorage('ziwei_birthday', '2000-08-17T12:00')
     const [gender, setGender] = useLocalStorage('ziwei_gender', 'male')
+    const [algorithm, setAlgorithm] = useLocalStorage('ziwei_algorithm', 'default')  // 派别选择
     const [lunarInfo, setLunarInfo] = useState('')
     const [ziweiData, setZiweiData] = useState<ZiweiResult | null>(null)
     const [panLoading, setPanLoading] = useState(false)
@@ -74,7 +77,7 @@ export default function ZiweiPage() {
         try {
             setPanLoading(true)
 
-            // 使用后端专业服务计算
+            // 使用后端专业服务计算（支持派别选择）
             const ziweiResult = await ziweiServiceProfessional.calculate({
                 year: date.getFullYear(),
                 month: date.getMonth() + 1,
@@ -82,7 +85,8 @@ export default function ZiweiPage() {
                 hour: date.getHours(),
                 minute: date.getMinutes(),
                 gender: gender as 'male' | 'female',
-                language: 'zh-CN'
+                language: 'zh-CN',
+                algorithm: algorithm as 'default' | 'zhongzhou'  // 派别参数
             })
 
             setZiweiData(ziweiResult)
@@ -102,7 +106,7 @@ export default function ZiweiPage() {
                 }
             })
 
-            toast.success('紫微排盘完成！')
+            toast.success(t('ziwei.paipanSuccess'))
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : '排盘失败，请重试'
             toast.error(message)
@@ -132,51 +136,51 @@ export default function ZiweiPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-center text-lg font-semibold">
-                            紫微斗数命盘
+                            {t('ziwei.chartTitle')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {/* 基本信息 */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                            <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">五行局</div>
-                                <div className="font-semibold text-foreground">{ziweiData.basicInfo.fiveElement}</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-6">
+                            <div className="bg-secondary/50 rounded-lg p-2.5 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.fiveElementJu')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-foreground">{ziweiData.basicInfo.fiveElement}</div>
                             </div>
-                            <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">命宫</div>
-                                <div className="font-semibold text-foreground">
+                            <div className="bg-secondary/50 rounded-lg p-2.5 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.mingPalace')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-foreground">
                                     {ziweiData.palaces.find(p => p.name === '命宮')?.earthlyBranch || '-'}
                                 </div>
                             </div>
-                            <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">身宫</div>
-                                <div className="font-semibold text-foreground">
+                            <div className="bg-secondary/50 rounded-lg p-2.5 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.shenPalace')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-foreground">
                                     {ziweiData.palaces.find(p => p.isBodyPalace)?.earthlyBranch || '-'}
                                 </div>
                             </div>
-                            <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">时支</div>
-                                <div className="font-semibold text-foreground">{ziweiData.basicInfo.fourPillars.hour.branch}时</div>
+                            <div className="bg-secondary/50 rounded-lg p-2.5 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.hourBranch')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-foreground">{ziweiData.basicInfo.fourPillars.hour.branch}时</div>
                             </div>
                         </div>
 
                         {/* 四柱信息 */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                            <div className="bg-primary/10 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">年柱</div>
-                                <div className="font-semibold text-primary">{ziweiData.basicInfo.fourPillars.year.stem}{ziweiData.basicInfo.fourPillars.year.branch}</div>
+                        <div className="grid grid-cols-4 gap-1.5 sm:gap-3 mb-4 sm:mb-6">
+                            <div className="bg-primary/10 rounded-lg p-2 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.yearPillar')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-primary">{ziweiData.basicInfo.fourPillars.year.stem}{ziweiData.basicInfo.fourPillars.year.branch}</div>
                             </div>
-                            <div className="bg-primary/10 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">月柱</div>
-                                <div className="font-semibold text-primary">{ziweiData.basicInfo.fourPillars.month.stem}{ziweiData.basicInfo.fourPillars.month.branch}</div>
+                            <div className="bg-primary/10 rounded-lg p-2 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.monthPillar')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-primary">{ziweiData.basicInfo.fourPillars.month.stem}{ziweiData.basicInfo.fourPillars.month.branch}</div>
                             </div>
-                            <div className="bg-primary/10 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">日柱</div>
-                                <div className="font-semibold text-primary">{ziweiData.basicInfo.fourPillars.day.stem}{ziweiData.basicInfo.fourPillars.day.branch}</div>
+                            <div className="bg-primary/10 rounded-lg p-2 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.dayPillar')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-primary">{ziweiData.basicInfo.fourPillars.day.stem}{ziweiData.basicInfo.fourPillars.day.branch}</div>
                             </div>
-                            <div className="bg-primary/10 rounded-lg p-3 text-center">
-                                <div className="text-xs text-muted-foreground mb-1">时柱</div>
-                                <div className="font-semibold text-primary">{ziweiData.basicInfo.fourPillars.hour.stem}{ziweiData.basicInfo.fourPillars.hour.branch}</div>
+                            <div className="bg-primary/10 rounded-lg p-2 sm:p-3 text-center">
+                                <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t('ziwei.hourPillar')}</div>
+                                <div className="font-semibold text-sm sm:text-base text-primary">{ziweiData.basicInfo.fourPillars.hour.stem}{ziweiData.basicInfo.fourPillars.hour.branch}</div>
                             </div>
                         </div>
 
@@ -195,7 +199,7 @@ export default function ZiweiPage() {
                         <div className="mt-6">
                             <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
                                 <span className="w-1 h-4 bg-primary rounded-full"></span>
-                                运限分析
+                                {t('ziwei.horoscopeAnalysis')}
                             </h3>
                             <ZiweiHoroscopePanelEnhanced
                                 ref={horoscopePanelRef}
@@ -206,14 +210,14 @@ export default function ZiweiPage() {
                         </div>
 
                         {/* 详细信息标签页 */}
-                        <Tabs defaultValue="stars" className="mt-6">
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="stars">星曜详情</TabsTrigger>
-                                <TabsTrigger value="decades">大限信息</TabsTrigger>
-                                <TabsTrigger value="mutagen">四化分析</TabsTrigger>
+                        <Tabs defaultValue="stars" className="mt-4 sm:mt-6">
+                            <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+                                <TabsTrigger value="stars" className="px-1 sm:px-3">{t('ziwei.starsDetail')}</TabsTrigger>
+                                <TabsTrigger value="decades" className="px-1 sm:px-3">{t('ziwei.decadeInfo')}</TabsTrigger>
+                                <TabsTrigger value="mutagen" className="px-1 sm:px-3">{t('ziwei.mutagenAnalysis')}</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="stars" className="mt-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <TabsContent value="stars" className="mt-3 sm:mt-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                                     {ziweiData.palaces.map((palace, index) => (
                                         <Card key={index} className="p-3">
                                             <div className="font-medium text-sm mb-2">
@@ -246,8 +250,8 @@ export default function ZiweiPage() {
                                     ))}
                                 </div>
                             </TabsContent>
-                            <TabsContent value="decades" className="mt-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <TabsContent value="decades" className="mt-3 sm:mt-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                                     {ziweiData.decades.map((decade, index) => (
                                         <Card key={index} className="p-3">
                                             <div className="font-medium text-sm mb-2">
@@ -264,7 +268,7 @@ export default function ZiweiPage() {
                                 {ziweiData.mutagenInfo ? (
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <Card className="p-3">
-                                            <div className="text-sm font-medium mb-2">本命四化</div>
+                                            <div className="text-sm font-medium mb-2">{t('ziwei.natalMutagen')}</div>
                                             <div className="space-y-1 text-xs">
                                                 <div>化禄: {ziweiData.mutagenInfo.natal.lu || '-'}</div>
                                                 <div>化权: {ziweiData.mutagenInfo.natal.quan || '-'}</div>
@@ -274,7 +278,7 @@ export default function ZiweiPage() {
                                         </Card>
                                     </div>
                                 ) : (
-                                    <div className="text-center text-muted-foreground">暂无四化信息</div>
+                                    <div className="text-center text-muted-foreground">{t('ziwei.noMutagenInfo')}</div>
                                 )}
                             </TabsContent>
                         </Tabs>
@@ -286,16 +290,16 @@ export default function ZiweiPage() {
 
     return (
         <DivinationCardHeader
-            title="紫微斗数"
-            description="传统命理学精髓，十二宫位详解命运"
+            title={t('ziwei.title')}
+            description={t('ziwei.description')}
             icon={Compass}
             divinationType="ziwei"
         >
             <div className="max-w-4xl mx-auto w-full">
-                <div className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label className="block mb-2 text-sm font-medium text-foreground">出生时间</Label>
+                <div className="space-y-4 sm:space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                        <div className="sm:col-span-2 md:col-span-1">
+                            <Label className="block mb-2 text-sm font-medium text-foreground">{t('ziwei.birthTime')}</Label>
                             <input
                                 type="datetime-local"
                                 value={birthday}
@@ -303,24 +307,35 @@ export default function ZiweiPage() {
                                     setBirthday(e.target.value)
                                     computeLunar(e.target.value)
                                 }}
-                                className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                className="w-full px-3 py-2.5 text-base sm:text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                             />
                         </div>
                         <div>
-                            <Label className="block mb-2 text-sm font-medium text-foreground">性别</Label>
+                            <Label className="block mb-2 text-sm font-medium text-foreground">{t('ziwei.genderLabel')}</Label>
                             <select
                                 value={gender}
                                 onChange={(e) => setGender(e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                className="w-full px-3 py-2.5 text-base sm:text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                             >
-                                <option value="male">男 (乾造)</option>
-                                <option value="female">女 (坤造)</option>
+                                <option value="male">{t('ziwei.genderMale')}</option>
+                                <option value="female">{t('ziwei.genderFemale')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <Label className="block mb-2 text-sm font-medium text-foreground">{t('ziwei.algorithmLabel')}</Label>
+                            <select
+                                value={algorithm}
+                                onChange={(e) => setAlgorithm(e.target.value)}
+                                className="w-full px-3 py-2.5 text-base sm:text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
+                                <option value="default">{t('ziwei.algorithmDefault')}</option>
+                                <option value="zhongzhou">{t('ziwei.algorithmZhongzhou')}</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <Label className="text-sm font-medium text-foreground">农历</Label>
+                        <Label className="text-sm font-medium text-foreground">{t('ziwei.lunarLabel')}</Label>
                         <p className="text-sm mt-2 text-muted-foreground">{lunarInfo}</p>
                     </div>
                 </div>
@@ -334,9 +349,9 @@ export default function ZiweiPage() {
                             className="w-full h-12"
                         >
                             {panLoading ? (
-                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />正在排盘...</>
+                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('ziwei.paipaning')}</>
                             ) : (
-                                <><Calculator className="w-4 h-4 mr-2" />开始排盘</>
+                                <><Calculator className="w-4 h-4 mr-2" />{t('ziwei.startPaipan')}</>
                             )}
                         </Button>
                     </div>
@@ -355,7 +370,7 @@ export default function ZiweiPage() {
                                     className="w-full h-12"
                                 >
                                     <Sparkles className="w-4 h-4 mr-2" />
-                                    开始 AI 分析
+                                    {t('ziwei.startAIAnalysis')}
                                 </Button>
                             </div>
                         )}
@@ -367,7 +382,7 @@ export default function ZiweiPage() {
                     result={result}
                     loading={resultLoading}
                     streaming={streaming}
-                    title="紫微斗数解读"
+                    title={t('ziwei.aiAnalysis')}
                 />
             </div>
         </DivinationCardHeader>

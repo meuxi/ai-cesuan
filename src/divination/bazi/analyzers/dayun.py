@@ -431,3 +431,322 @@ def get_liunian_info(day_master: str, birth_year: int, target_year: int) -> Dict
         day_master, birth_year, target_year, target_year
     )
     return liunian_list[0].__dict__ if liunian_list else None
+
+
+class EnhancedDayunAnalyzer:
+    """增强版大运分析器 - 结合大运流年"""
+    
+    # 地支藏干
+    ZHI_CANGGAN = {
+        '子': ['癸'], '丑': ['己', '癸', '辛'], '寅': ['甲', '丙', '戊'],
+        '卯': ['乙'], '辰': ['戊', '乙', '癸'], '巳': ['丙', '庚', '戊'],
+        '午': ['丁', '己'], '未': ['己', '丁', '乙'], '申': ['庚', '壬', '戊'],
+        '酉': ['辛'], '戌': ['戊', '辛', '丁'], '亥': ['壬', '甲']
+    }
+    
+    # 地支相冲
+    ZHI_CHONG = {
+        '子': '午', '午': '子', '丑': '未', '未': '丑',
+        '寅': '申', '申': '寅', '卯': '酉', '酉': '卯',
+        '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳'
+    }
+    
+    # 地支三合
+    ZHI_SANHE = {
+        '子': ('申', '辰', '水'), '丑': ('巳', '酉', '金'), 
+        '寅': ('午', '戌', '火'), '卯': ('亥', '未', '木'),
+        '辰': ('申', '子', '水'), '巳': ('丑', '酉', '金'),
+        '午': ('寅', '戌', '火'), '未': ('亥', '卯', '木'),
+        '申': ('子', '辰', '水'), '酉': ('丑', '巳', '金'),
+        '戌': ('寅', '午', '火'), '亥': ('卯', '未', '木')
+    }
+    
+    # 运势评分
+    SHISHEN_SCORE = {
+        '比肩': 60, '劫财': 40, '食神': 80, '伤官': 55,
+        '偏财': 75, '正财': 80, '七杀': 50, '正官': 85,
+        '偏印': 65, '正印': 85
+    }
+    
+    @classmethod
+    def analyze_combined_fortune(
+        cls,
+        dayun: DayunInfo,
+        liunian: LiunianInfo,
+        day_master: str,
+        day_branch: str,
+        yong_shen: List[str] = None
+    ) -> Dict[str, any]:
+        """
+        分析大运流年组合运势
+        
+        Args:
+            dayun: 大运信息
+            liunian: 流年信息
+            day_master: 日主
+            day_branch: 日支
+            yong_shen: 用神列表
+        """
+        result = {
+            'overall_score': 0,
+            'career': {'score': 0, 'description': ''},
+            'wealth': {'score': 0, 'description': ''},
+            'relationship': {'score': 0, 'description': ''},
+            'health': {'score': 0, 'description': ''},
+            'highlights': [],
+            'warnings': [],
+            'suggestions': []
+        }
+        
+        # 基础分数
+        dayun_score = cls.SHISHEN_SCORE.get(dayun.ten_god, 60)
+        liunian_score = cls.SHISHEN_SCORE.get(liunian.ten_god, 60)
+        base_score = (dayun_score + liunian_score) / 2
+        
+        # 用神加分
+        if yong_shen:
+            dayun_wuxing = GAN_WUXING.get(dayun.gan, '')
+            liunian_wuxing = GAN_WUXING.get(liunian.gan, '')
+            
+            if dayun_wuxing in yong_shen:
+                base_score += 10
+                result['highlights'].append(f'大运{dayun.gan}({dayun_wuxing})为用神，运势加持')
+            
+            if liunian_wuxing in yong_shen:
+                base_score += 5
+                result['highlights'].append(f'流年{liunian.gan}({liunian_wuxing})为用神，有利')
+        
+        # 检查大运流年组合
+        
+        # 1. 天干组合分析
+        gan_combo = cls._analyze_gan_combination(dayun.gan, liunian.gan, day_master)
+        base_score += gan_combo['score_adj']
+        if gan_combo['description']:
+            if gan_combo['score_adj'] > 0:
+                result['highlights'].append(gan_combo['description'])
+            else:
+                result['warnings'].append(gan_combo['description'])
+        
+        # 2. 地支组合分析
+        zhi_combo = cls._analyze_zhi_combination(
+            dayun.zhi, liunian.zhi, day_branch
+        )
+        base_score += zhi_combo['score_adj']
+        if zhi_combo['description']:
+            if zhi_combo['score_adj'] > 0:
+                result['highlights'].append(zhi_combo['description'])
+            else:
+                result['warnings'].append(zhi_combo['description'])
+        
+        # 3. 十神组合分析
+        shishen_combo = cls._analyze_shishen_combination(
+            dayun.ten_god, liunian.ten_god
+        )
+        result['career']['score'] = shishen_combo['career']
+        result['career']['description'] = shishen_combo['career_desc']
+        result['wealth']['score'] = shishen_combo['wealth']
+        result['wealth']['description'] = shishen_combo['wealth_desc']
+        result['relationship']['score'] = shishen_combo['relationship']
+        result['relationship']['description'] = shishen_combo['relationship_desc']
+        result['health']['score'] = shishen_combo['health']
+        result['health']['description'] = shishen_combo['health_desc']
+        
+        # 计算总分
+        result['overall_score'] = min(100, max(0, round(base_score)))
+        
+        # 生成建议
+        result['suggestions'] = cls._generate_fortune_suggestions(
+            dayun.ten_god, liunian.ten_god, result['overall_score']
+        )
+        
+        return result
+    
+    @classmethod
+    def _analyze_gan_combination(
+        cls, dayun_gan: str, liunian_gan: str, day_master: str
+    ) -> Dict:
+        """分析天干组合"""
+        result = {'score_adj': 0, 'description': ''}
+        
+        # 天干五合
+        gan_he = {
+            ('甲', '己'): '土', ('乙', '庚'): '金', ('丙', '辛'): '水',
+            ('丁', '壬'): '木', ('戊', '癸'): '火'
+        }
+        
+        combo = (dayun_gan, liunian_gan)
+        reverse_combo = (liunian_gan, dayun_gan)
+        
+        if combo in gan_he or reverse_combo in gan_he:
+            element = gan_he.get(combo) or gan_he.get(reverse_combo)
+            result['score_adj'] = 10
+            result['description'] = f'大运{dayun_gan}与流年{liunian_gan}相合化{element}，运势和谐'
+        
+        # 天干相冲（甲庚、乙辛、丙壬、丁癸）
+        gan_chong = [('甲', '庚'), ('乙', '辛'), ('丙', '壬'), ('丁', '癸')]
+        if combo in gan_chong or reverse_combo in gan_chong:
+            result['score_adj'] = -10
+            result['description'] = f'大运{dayun_gan}与流年{liunian_gan}相冲，变动较大'
+        
+        return result
+    
+    @classmethod
+    def _analyze_zhi_combination(
+        cls, dayun_zhi: str, liunian_zhi: str, day_branch: str
+    ) -> Dict:
+        """分析地支组合"""
+        result = {'score_adj': 0, 'description': ''}
+        
+        # 地支相冲
+        if cls.ZHI_CHONG.get(dayun_zhi) == liunian_zhi:
+            result['score_adj'] = -15
+            result['description'] = f'大运{dayun_zhi}与流年{liunian_zhi}相冲，易有动荡'
+        
+        # 流年冲日支
+        if cls.ZHI_CHONG.get(liunian_zhi) == day_branch:
+            result['score_adj'] -= 10
+            result['description'] = f'流年{liunian_zhi}冲日支{day_branch}，注意健康和感情'
+        
+        # 检查三合
+        sanhe_info = cls.ZHI_SANHE.get(dayun_zhi)
+        if sanhe_info and liunian_zhi in sanhe_info[:2]:
+            result['score_adj'] = 8
+            result['description'] = f'大运{dayun_zhi}与流年{liunian_zhi}形成{sanhe_info[2]}局半合，有助力'
+        
+        return result
+    
+    @classmethod
+    def _analyze_shishen_combination(
+        cls, dayun_shishen: str, liunian_shishen: str
+    ) -> Dict:
+        """分析十神组合"""
+        result = {
+            'career': 60, 'career_desc': '事业平稳',
+            'wealth': 60, 'wealth_desc': '财运平稳',
+            'relationship': 60, 'relationship_desc': '感情平稳',
+            'health': 70, 'health_desc': '健康尚可'
+        }
+        
+        # 事业评分
+        career_good = ['正官', '正印', '偏印', '食神']
+        if dayun_shishen in career_good or liunian_shishen in career_good:
+            result['career'] = 80
+            result['career_desc'] = '事业运上升，有贵人相助'
+        if dayun_shishen == '正官' and liunian_shishen in ['正印', '正财']:
+            result['career'] = 90
+            result['career_desc'] = '事业大吉，升职有望'
+        if dayun_shishen == '七杀' and liunian_shishen == '伤官':
+            result['career'] = 50
+            result['career_desc'] = '事业压力大，需谨慎处理人际关系'
+        
+        # 财运评分
+        wealth_good = ['正财', '偏财', '食神']
+        if dayun_shishen in wealth_good or liunian_shishen in wealth_good:
+            result['wealth'] = 80
+            result['wealth_desc'] = '财运亨通，收入增加'
+        if dayun_shishen == '劫财' or liunian_shishen == '劫财':
+            result['wealth'] = 50
+            result['wealth_desc'] = '财运波动，防破财'
+        if dayun_shishen == '偏财' and liunian_shishen == '食神':
+            result['wealth'] = 90
+            result['wealth_desc'] = '财运大旺，有意外收获'
+        
+        # 感情评分
+        if dayun_shishen in ['正财', '正官'] or liunian_shishen in ['正财', '正官']:
+            result['relationship'] = 75
+            result['relationship_desc'] = '感情稳定，有桃花运'
+        if dayun_shishen == '伤官' or liunian_shishen == '伤官':
+            result['relationship'] = 55
+            result['relationship_desc'] = '感情易有波折，需多沟通'
+        
+        # 健康评分
+        if dayun_shishen == '七杀' and liunian_shishen == '七杀':
+            result['health'] = 50
+            result['health_desc'] = '注意身体健康，防意外'
+        if dayun_shishen == '食神' or liunian_shishen == '正印':
+            result['health'] = 85
+            result['health_desc'] = '身体康健，精力充沛'
+        
+        return result
+    
+    @classmethod
+    def _generate_fortune_suggestions(
+        cls, dayun_shishen: str, liunian_shishen: str, score: int
+    ) -> List[str]:
+        """生成运势建议"""
+        suggestions = []
+        
+        # 根据十神组合给建议
+        if dayun_shishen in ['正官', '七杀'] or liunian_shishen in ['正官', '七杀']:
+            suggestions.append('事业上可积极进取，把握升迁机会')
+        
+        if dayun_shishen in ['正财', '偏财'] or liunian_shishen in ['正财', '偏财']:
+            suggestions.append('财运较好，可适当投资理财')
+        
+        if dayun_shishen == '劫财' or liunian_shishen == '劫财':
+            suggestions.append('注意理财，避免大额投资和借贷')
+        
+        if dayun_shishen == '伤官' or liunian_shishen == '伤官':
+            suggestions.append('说话谨慎，避免口舌是非')
+        
+        if dayun_shishen in ['正印', '偏印'] or liunian_shishen in ['正印', '偏印']:
+            suggestions.append('适合学习进修，考取证书')
+        
+        if dayun_shishen == '食神' or liunian_shishen == '食神':
+            suggestions.append('发挥才华，创意工作有利')
+        
+        # 根据总分给建议
+        if score >= 80:
+            suggestions.append('整体运势向好，可大胆开拓')
+        elif score >= 60:
+            suggestions.append('运势平稳，稳中求进为宜')
+        else:
+            suggestions.append('运势有波折，宜守不宜攻')
+        
+        return suggestions
+    
+    @classmethod
+    def analyze_yearly_fortune(
+        cls,
+        dayun_list: List[DayunInfo],
+        day_master: str,
+        day_branch: str,
+        birth_year: int,
+        target_year: int,
+        yong_shen: List[str] = None
+    ) -> Dict:
+        """
+        分析指定年份的综合运势
+        """
+        # 获取当前大运
+        current_age = target_year - birth_year + 1
+        current_dayun = None
+        for dayun in dayun_list:
+            if dayun.start_age <= current_age <= dayun.end_age:
+                current_dayun = dayun
+                break
+        
+        if not current_dayun:
+            return {'error': '无法确定当前大运'}
+        
+        # 获取流年信息
+        liunian_list = DayunCalculator.calculate_liunian(
+            day_master, birth_year, target_year, target_year
+        )
+        if not liunian_list:
+            return {'error': '无法计算流年信息'}
+        
+        liunian = liunian_list[0]
+        
+        # 综合分析
+        combined_analysis = cls.analyze_combined_fortune(
+            current_dayun, liunian, day_master, day_branch, yong_shen
+        )
+        
+        return {
+            'year': target_year,
+            'age': current_age,
+            'dayun': current_dayun.__dict__,
+            'liunian': liunian.__dict__,
+            'analysis': combined_analysis
+        }

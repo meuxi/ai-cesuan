@@ -25,30 +25,33 @@ const getNavGroups = (t: (key: string) => string): NavGroup[] => [
         title: t('nav.baziGroup'),
         items: [
             { href: '/divination/birthday', label: t('nav.birthday'), icon: Calculator },
-            { href: '/divination/hehun', label: t('nav.hehun'), icon: Heart },
-            { href: '/divination/daily', label: t('nav.daily'), icon: Calendar },
-        ]
-    },
-    {
-        title: t('nav.ziweiGroup'),
-        items: [
             { href: '/divination/ziwei', label: t('nav.ziwei'), icon: Compass },
+            { href: '/divination/hehun', label: t('nav.hehun'), icon: Heart },
+            { href: '/divination/life-kline', label: t('nav.lifeKline'), icon: TrendingUp },
         ]
     },
     {
         title: t('nav.zhouyiGroup'),
         items: [
-            { href: '/divination/plum_flower', label: t('nav.plumFlower'), icon: Flower2 },
-            { href: '/divination/monthly', label: t('nav.monthly'), icon: TrendingUp },
             { href: '/divination/liuyao', label: t('nav.liuyao'), icon: Zap },
+            { href: '/divination/plum_flower', label: t('nav.plumFlower'), icon: Flower2 },
             { href: '/divination/xiaoliu', label: t('nav.xiaoliu'), icon: Clock },
+            { href: '/divination/qimen', label: t('nav.qimen'), icon: Compass },
+            { href: '/divination/daliuren', label: t('nav.daliuren'), icon: Zap },
         ]
     },
     {
-        title: t('nav.dreamGroup'),
+        title: t('nav.westernGroup'),
         items: [
-            { href: '/divination/dream', label: t('nav.dream'), icon: Moon },
             { href: '/divination/tarot', label: t('nav.tarot'), icon: Star },
+            { href: '/divination/zodiac', label: t('nav.zodiac'), icon: Sun },
+        ]
+    },
+    {
+        title: t('nav.fortuneGroup'),
+        items: [
+            { href: '/divination/daily', label: t('nav.daily'), icon: Calendar },
+            { href: '/divination/monthly', label: t('nav.monthly'), icon: TrendingUp },
         ]
     },
     {
@@ -66,9 +69,9 @@ const getNavGroups = (t: (key: string) => string): NavGroup[] => [
         ]
     },
     {
-        title: t('nav.zodiacGroup'),
+        title: t('nav.toolsGroup'),
         items: [
-            { href: '/divination/zodiac', label: t('nav.zodiac'), icon: Sun },
+            { href: '/divination/dream', label: t('nav.dream'), icon: Moon },
             { href: '/divination/fate', label: t('nav.fate'), icon: Users },
         ]
     },
@@ -77,9 +80,6 @@ const getNavGroups = (t: (key: string) => string): NavGroup[] => [
         items: [
             { href: '/divination/chouqian', label: t('nav.chouqian'), icon: Sparkles },
             { href: '/divination/zhuge', label: t('nav.zhuge'), icon: BookOpen },
-            { href: '/divination/qimen', label: t('nav.qimen'), icon: Compass },
-            { href: '/divination/daliuren', label: t('nav.daliuren'), icon: Zap },
-            { href: '/divination/life-kline', label: t('nav.lifeKline'), icon: TrendingUp },
         ]
     },
 ]
@@ -122,18 +122,21 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             {/* Mobile Overlay */}
             {mobileOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
                     onClick={onMobileClose}
+                    aria-hidden="true"
                 />
             )}
 
             {/* Sidebar */}
             <aside
                 className={`
-          fixed top-0 left-0 h-full w-[220px] bg-sidebar dark:bg-sidebar
+          fixed top-0 left-0 h-full 
+          w-[85vw] max-w-[320px] sm:w-[280px] lg:w-[220px]
+          bg-sidebar dark:bg-sidebar
           border-r border-sidebar-border
           flex flex-col z-50
-          transition-transform duration-300
+          transition-transform duration-300 ease-out
           lg:translate-x-0
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -149,6 +152,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                     <button
                         onClick={onMobileClose}
                         className="lg:hidden p-1 hover:bg-sidebar-accent rounded"
+                        title="关闭菜单"
+                        aria-label="关闭菜单"
                     >
                         <X className="w-5 h-5 text-muted-foreground" />
                     </button>

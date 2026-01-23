@@ -17,7 +17,7 @@ const LiuYaoPage: React.FC = () => {
     });
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto w-full">
             <DivinationCardHeader
                 title="六爻占卦"
                 description="诚心问卦，铜钱起卦或数理起卦，AI智能解读"

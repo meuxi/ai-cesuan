@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { DivinationCardHeader } from '@/components/DivinationCardHeader'
 import { InlineResult } from '@/components/InlineResult'
@@ -66,6 +67,7 @@ interface PersonInput {
 const currentYear = new Date().getFullYear()
 
 export default function HehunPage() {
+    const { t } = useTranslation()
     const [male, setMale] = useLocalStorage<PersonInput>('hehun_male', {
         name: '男方',
         year: 1995,
@@ -218,8 +220,8 @@ export default function HehunPage() {
 
     return (
         <DivinationCardHeader
-            title="八字合婚"
-            description="根据男女双方完整八字，分析婚姻配对吉凶"
+            title={t('hehun.title')}
+            description={t('hehun.description')}
             icon={Heart}
             divinationType="hehun"
         >
@@ -314,7 +316,7 @@ export default function HehunPage() {
                     </div>
                 )}
 
-                <InlineResult result={result} loading={resultLoading} streaming={streaming} title="合婚详解" />
+                <InlineResult result={result} loading={resultLoading} streaming={streaming} title={t('hehun.aiAnalysis')} />
             </div>
         </DivinationCardHeader>
     )

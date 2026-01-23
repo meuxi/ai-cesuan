@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { DivinationCardHeader } from '@/components/DivinationCardHeader'
 import { InlineResult } from '@/components/InlineResult'
@@ -26,6 +27,7 @@ interface ZhugeResult {
 }
 
 export default function ZhugePage() {
+    const { t } = useTranslation()
     const [inputText, setInputText] = useState('')
     const [zhugeData, setZhugeData] = useState<ZhugeResult | null>(null)
     const [calcLoading, setCalcLoading] = useState(false)
@@ -126,8 +128,8 @@ export default function ZhugePage() {
 
     return (
         <DivinationCardHeader
-            title="诸葛神算"
-            description="三字测吉凶，诸葛亮神机妙算"
+            title={t('zhuge.title')}
+            description={t('zhuge.description')}
             icon={BookOpen}
             divinationType="zhuge"
         >
@@ -257,7 +259,7 @@ export default function ZhugePage() {
                     result={result}
                     loading={resultLoading}
                     streaming={streaming}
-                    title="诸葛神签解读"
+                    title={t('zhuge.aiAnalysis')}
                 />
             </div>
         </DivinationCardHeader>
