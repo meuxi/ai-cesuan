@@ -4,7 +4,7 @@ import re
 import time
 from typing import Optional
 from urllib.parse import urlparse
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from openai import AsyncOpenAI
 
 import logging
@@ -125,7 +125,7 @@ async def divination(
         user: Optional[User] = Depends(get_user)
 ):
     """
-    AI占卜接口 - 流式返回占卜结果
+    AI占卜接口 - 返回AI生成的占卜结果
     
     Args:
         request: FastAPI请求对象，用于获取客户端IP和自定义API配置
@@ -133,7 +133,8 @@ async def divination(
         user: 可选的已登录用户信息
     
     Returns:
-        StreamingResponse: SSE流式响应，逐步返回AI生成的占卜结果
+        - 自定义API模式: StreamingResponse (SSE流式响应)
+        - 预设模式: JSONResponse (完整JSON，前端模拟打字机效果)
     
     Raises:
         HTTPException 403: prompt包含停止词或缺少API配置
@@ -338,16 +339,23 @@ async def divination(
             # 消费用户配额
             quota_manager.consume_quota(user_id, input_tokens + output_tokens, cost)
             
-            # 非流式响应，模拟流式输出
-            async def simulate_stream():
-                content = result.response.content
-                # 按字符分块输出，模拟流式效果
-                chunk_size = 2
-                for i in range(0, len(content), chunk_size):
-                    chunk = content[i:i+chunk_size]
-                    yield f"data: {json.dumps(chunk)}\n\n"
+            # 直接返回 JSON 响应（前端会模拟打字机效果）
+            content = result.response.content
+            if not content:
+                _logger.warning("AI返回内容为空")
+                return JSONResponse(
+                    content={"success": False, "error": "AI返回内容为空，请重试"},
+                    status_code=200
+                )
             
-            return StreamingResponse(simulate_stream(), media_type='text/event-stream')
+            return JSONResponse(
+                content={
+                    "success": True,
+                    "content": content,
+                    "model": result.model_used.name,
+                    "latency_ms": int(latency * 1000)
+                }
+            )
             
         except Exception as e:
             _logger.error(f"AI failover error: {e}")
