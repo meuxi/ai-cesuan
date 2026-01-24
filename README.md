@@ -51,17 +51,17 @@
 ### 方式一：Vercel 一键部署（推荐）⭐
 
 最简单快捷的部署方式，无需服务器，完全免费。
+1. 点击下方按钮开始部署：
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmeuxi%2Fai-cesuan.git&env=api_key,api_base,dashscope_api_key,deepseek_api_key,enable_rate_limit,zhipu_api_key,siliconflow_api_key&project-name=my-ai-divination&repository-name=my-ai-divination)
 
-1. Fork 本仓库到你的 GitHub 账号
+2.在部署时配置环境变量：
+api_key：必填，你的 OpenAI API Key
+api_base：可选，API 地址（默认为 OpenAI 官方地址）
+其他可选参数：model、github_client_id、github_client_secret 等
 
-2. 在 [Vercel](https://vercel.com) 导入项目
+3.部署完成后，Vercel 会自动分配一个访问域名
 
-3. 配置环境变量（参考 `.env.example`）：
-   - `api_key`：必填，OpenAI API Key（或其他兼容 API）
-   - `api_base`：可选，API 地址
-   - 其他可选配置见下方说明
-
-4. 部署完成后，Vercel 会自动分配访问域名
+4.也可以绑定自己的域名
 
 ### 方式二：Docker 部署
 
