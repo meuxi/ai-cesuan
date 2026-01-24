@@ -50,6 +50,18 @@ interface CompatibilityData {
     advice: string[]
 }
 
+interface ZodiacInfoData {
+    name: string
+    english: string
+    date_range: string
+    element: string
+    quality: string
+    ruler: string
+    traits?: string[]
+    strengths?: string[]
+    weaknesses?: string[]
+}
+
 type TabType = 'fortune' | 'compatibility' | 'info'
 
 export default function ZodiacPage() {
@@ -59,7 +71,7 @@ export default function ZodiacPage() {
     const [selectedZodiac2, setSelectedZodiac2] = useState<string>('狮子座')
     const [fortune, setFortune] = useState<FortuneData | null>(null)
     const [compatibility, setCompatibility] = useState<CompatibilityData | null>(null)
-    const [zodiacInfo, setZodiacInfo] = useState<any>(null)
+    const [zodiacInfo, setZodiacInfo] = useState<ZodiacInfoData | null>(null)
     const [loading, setLoading] = useState(false)
 
     const fetchDailyFortune = async (zodiac: string) => {

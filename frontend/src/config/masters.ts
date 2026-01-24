@@ -288,7 +288,7 @@ export function getMasterGamePrompt(master: Master, gameType: string): MasterGam
 }
 
 // 构建完整提示词
-export function buildMasterPrompt(master: Master, gameType: string, divinationData: any): string {
+export function buildMasterPrompt(master: Master, gameType: string, divinationData: unknown): string {
     let prompt = master.prompt
 
     const gamePrompt = getMasterGamePrompt(master, gameType)

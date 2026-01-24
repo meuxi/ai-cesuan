@@ -1,3 +1,4 @@
+"""基础数据模型"""
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
@@ -18,7 +19,9 @@ class SettingsInfo(BaseModel):
 
 class OauthBody(BaseModel):
     login_type: str
-    code: Optional[str]
+    code: Optional[str] = None
+    state: Optional[str] = None  # OAuth state 参数（CSRF 防护）
+    redirect_url: Optional[str] = None  # 回调 URL（用于验证 state）
 
 
 class User(BaseModel):

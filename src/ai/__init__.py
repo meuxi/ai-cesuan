@@ -15,6 +15,7 @@ from .provider import (
 from .models import AIModel, AIModelConfig
 from .failover import AIProviderManager, AllModelsFailedError
 from .token_counter import estimate_tokens, estimate_cost
+from .manager import get_ai_manager, reset_ai_manager
 
 __all__ = [
     "AIProvider",
@@ -29,4 +30,6 @@ __all__ = [
     "AllModelsFailedError",
     "estimate_tokens",
     "estimate_cost",
+    "get_ai_manager",
+    "reset_ai_manager",
 ]

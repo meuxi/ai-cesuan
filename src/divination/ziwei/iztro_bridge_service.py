@@ -7,13 +7,111 @@ import subprocess
 import json
 import logging
 import os
+import shutil
+import re
 from typing import Dict, Any, Optional
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Node.js脚本路径
+# Node.js脚本路径（项目内部的固定脚本）
 BRIDGE_SCRIPT_PATH = Path(__file__).parent.parent.parent.parent / "scripts" / "iztro_bridge.js"
+
+# 允许的 Node.js 可执行文件名称
+ALLOWED_NODE_NAMES = {"node", "node.exe", "nodejs", "nodejs.exe"}
+
+# 脚本文件名验证正则（只允许字母、数字、下划线、连字符、点号）
+SAFE_SCRIPT_NAME_PATTERN = re.compile(r'^[a-zA-Z0-9_\-\.]+\.js$')
+
+
+def _validate_node_path(node_path: str) -> str:
+    """
+    验证并解析 Node.js 可执行文件路径
+    
+    安全措施：
+    1. 只接受 "node" 或绝对路径
+    2. 验证文件名是否为已知的 Node.js 可执行文件名
+    3. 验证文件存在且可执行
+    
+    Args:
+        node_path: 用户提供的 Node.js 路径
+        
+    Returns:
+        验证后的绝对路径
+        
+    Raises:
+        ValueError: 路径验证失败
+    """
+    # 如果是简单的 "node"，使用 shutil.which 查找系统 PATH
+    if node_path in ("node", "nodejs"):
+        resolved = shutil.which(node_path)
+        if not resolved:
+            raise ValueError(f"系统 PATH 中未找到 {node_path}")
+        node_path = resolved
+    
+    # 转换为绝对路径
+    abs_path = Path(node_path).resolve()
+    
+    # 验证文件名是否为允许的 Node.js 名称
+    if abs_path.name.lower() not in ALLOWED_NODE_NAMES:
+        raise ValueError(
+            f"不允许的 Node.js 可执行文件名: {abs_path.name}，"
+            f"允许的名称: {', '.join(ALLOWED_NODE_NAMES)}"
+        )
+    
+    # 验证文件存在
+    if not abs_path.exists():
+        raise ValueError(f"Node.js 可执行文件不存在: {abs_path}")
+    
+    # 验证是文件（非目录）
+    if not abs_path.is_file():
+        raise ValueError(f"路径不是文件: {abs_path}")
+    
+    return str(abs_path)
+
+
+def _validate_script_path(script_path: Path) -> str:
+    """
+    验证桥接脚本路径
+    
+    安全措施：
+    1. 只允许项目 scripts 目录下的脚本
+    2. 验证文件名格式
+    3. 验证文件存在
+    
+    Args:
+        script_path: 脚本路径
+        
+    Returns:
+        验证后的绝对路径
+        
+    Raises:
+        ValueError: 路径验证失败
+    """
+    # 转换为绝对路径
+    abs_path = script_path.resolve()
+    
+    # 验证文件名格式（防止路径遍历）
+    if not SAFE_SCRIPT_NAME_PATTERN.match(abs_path.name):
+        raise ValueError(f"不安全的脚本文件名: {abs_path.name}")
+    
+    # 验证脚本在项目 scripts 目录下（防止路径遍历攻击）
+    expected_parent = BRIDGE_SCRIPT_PATH.parent.resolve()
+    if abs_path.parent != expected_parent:
+        raise ValueError(
+            f"脚本路径不在预期目录: {abs_path.parent}，"
+            f"期望目录: {expected_parent}"
+        )
+    
+    # 验证文件存在
+    if not abs_path.exists():
+        raise ValueError(f"桥接脚本不存在: {abs_path}")
+    
+    # 验证是文件
+    if not abs_path.is_file():
+        raise ValueError(f"路径不是文件: {abs_path}")
+    
+    return str(abs_path)
 
 
 class IztroBridgeService:
@@ -28,9 +126,16 @@ class IztroBridgeService:
         
         Args:
             node_path: Node.js可执行文件路径，默认使用系统PATH中的node
+            
+        Raises:
+            ValueError: 路径验证失败
         """
-        self.node_path = node_path
-        self.script_path = str(BRIDGE_SCRIPT_PATH)
+        # 安全验证 node_path
+        self.node_path = _validate_node_path(node_path)
+        
+        # 安全验证 script_path（固定使用项目内脚本）
+        self.script_path = _validate_script_path(BRIDGE_SCRIPT_PATH)
+        
         self._check_prerequisites()
     
     def _check_prerequisites(self) -> bool:

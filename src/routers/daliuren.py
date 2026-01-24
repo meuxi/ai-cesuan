@@ -1,7 +1,10 @@
 """大六壬API路由"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from datetime import datetime
+
+from src.common import safe_api_call
+from src.cache import cached_divination
 
 router = APIRouter(prefix="/api/daliuren", tags=["大六壬"])
 
@@ -26,6 +29,8 @@ class DaliurenResponse(BaseModel):
 
 
 @router.post("/paipan", response_model=DaliurenResponse)
+@safe_api_call("大六壬排盘")
+@cached_divination("daliuren", ["year", "month", "day", "hour", "minute"])
 async def daliuren_paipan(request: DaliurenRequest):
     """大六壬排盘
     
@@ -35,21 +40,16 @@ async def daliuren_paipan(request: DaliurenRequest):
     Returns:
         排盘结果
     """
-    try:
-        from src.divination.daliuren import DaliurenPaipan
-        
-        paipan = DaliurenPaipan()
-        result = paipan.paipan(
-            request.year, 
-            request.month, 
-            request.day, 
-            request.hour,
-            request.minute
-        )
-        
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"排盘失败: {str(e)}")
+    from src.divination.daliuren import DaliurenPaipan
+    
+    paipan = DaliurenPaipan()
+    return paipan.paipan(
+        request.year, 
+        request.month, 
+        request.day, 
+        request.hour,
+        request.minute
+    )
 
 
 @router.get("/test")

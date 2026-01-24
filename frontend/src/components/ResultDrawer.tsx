@@ -2,7 +2,7 @@ import { X } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import ResultActions from '@/components/ResultActions'
-import DOMPurify from 'dompurify'
+import { ResultContent } from '@/components/common'
 
 interface ResultDrawerProps {
   show: boolean
@@ -62,6 +62,7 @@ export function ResultDrawer({ show, onClose, result, loading, streaming, title 
           <button
             onClick={onClose}
             className="rounded-md p-2 hover:bg-accent transition-colors"
+            aria-label="关闭"
           >
             <X className="h-5 w-5 text-muted-foreground" />
           </button>
@@ -71,36 +72,26 @@ export function ResultDrawer({ show, onClose, result, loading, streaming, title 
           ref={containerRef}
           className="overflow-y-auto p-6 h-[calc(80vh-4rem)]"
         >
-          {loading ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-muted border-t-foreground"></div>
-              <div className="text-center space-y-1">
-                <p className="text-base font-medium text-foreground">正在占卜中...</p>
-                <p className="text-sm text-muted-foreground">
-                  请稍候，AI 正在为您解读
-                </p>
-              </div>
-            </div>
-          ) : result ? (
-            <>
-              <div id="divination-result" className={streaming ? 'streaming-content' : ''}>
-                <div
-                  className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(result) }}
-                />
-                {streaming && (
-                  <span className="inline-flex w-1 h-5 ml-1 bg-foreground cursor-blink align-middle rounded-sm"></span>
-                )}
-              </div>
-              {!streaming && (
-                <ResultActions
-                  result={result.replace(/<[^>]*>/g, '')}
-                  title={title}
-                  elementId="divination-result"
-                />
-              )}
-            </>
-          ) : null}
+          <ResultContent
+            result={result}
+            loading={loading}
+            streaming={streaming}
+            contentType="html"
+            id="divination-result"
+            loadingConfig={{
+              text: '正在占卜中...',
+              subText: '请稍候，AI 正在为您解读',
+              size: 'lg'
+            }}
+            className={loading ? 'h-full flex items-center justify-center' : ''}
+            actions={
+              <ResultActions
+                result={result.replace(/<[^>]*>/g, '')}
+                title={title}
+                elementId="divination-result"
+              />
+            }
+          />
         </div>
       </div>
     </div>

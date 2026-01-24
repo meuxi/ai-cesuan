@@ -6,6 +6,7 @@
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime
+from functools import lru_cache
 import logging
 import re
 
@@ -169,8 +170,12 @@ CHINESE_TRANSLATIONS = {
 }
 
 
+# 翻译结果缓存（性能优化）
+_translation_cache: dict[str, str] = {}
+
+
 def translate_name(key: str, category: str = '') -> str:
-    """翻译英文key为中文"""
+    """翻译英文key为中文（带缓存）"""
     if not key:
         return key
     
@@ -178,8 +183,13 @@ def translate_name(key: str, category: str = '') -> str:
     if len(key) == 1 and '\u4e00' <= key <= '\u9fff':
         return key
     
+    # 检查缓存
+    if key in _translation_cache:
+        return _translation_cache[key]
+    
     # 先检查本地翻译表
     if key in CHINESE_TRANSLATIONS:
+        _translation_cache[key] = CHINESE_TRANSLATIONS[key]
         return CHINESE_TRANSLATIONS[key]
     
     # 处理带后缀的key (如 xxxStar, xxxPalace, xxxHeavenly, xxxEarthly)
@@ -189,7 +199,9 @@ def translate_name(key: str, category: str = '') -> str:
         clean_key = clean_key.replace(suffix, '')
     
     if clean_key in CHINESE_TRANSLATIONS:
-        return CHINESE_TRANSLATIONS[clean_key]
+        result = CHINESE_TRANSLATIONS[clean_key]
+        _translation_cache[key] = result
+        return result
     
     # 处理驼峰命名的复合key（如 jiHeavenly -> ji -> 己）
     # 提取首部小写部分
@@ -197,7 +209,9 @@ def translate_name(key: str, category: str = '') -> str:
     if match:
         prefix = match.group(1)
         if prefix in CHINESE_TRANSLATIONS:
-            return CHINESE_TRANSLATIONS[prefix]
+            result = CHINESE_TRANSLATIONS[prefix]
+            _translation_cache[key] = result
+            return result
     
     # 尝试 iztro 翻译
     paths = [
@@ -213,22 +227,29 @@ def translate_name(key: str, category: str = '') -> str:
         try:
             result = t(path)
             if result != path and result != key:
+                _translation_cache[key] = result
                 return result
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"翻译路径 '{path}' 失败: {e}")
     
     # 最后尝试记录未翻译的key以便调试
     logger.debug(f"未翻译的key: {key}")
+    _translation_cache[key] = key  # 缓存未翻译的key，避免重复查找
     return key
 
 
 class IztroService:
     """紫微斗数计算服务 - 支持派别配置"""
     
+    # 缓存配置
+    CACHE_MAX_SIZE = 500  # 最大缓存数量
+    
     def __init__(self):
         """初始化服务"""
         self._config: ZiweiConfig = get_config()
-        self._astrolabe_cache: Dict[str, Any] = {}  # 缓存命盘用于运限计算
+        # 使用有限大小的缓存，防止内存无限增长
+        self._astrolabe_cache: Dict[str, Any] = {}
+        self._cache_keys: List[str] = []  # 用于LRU淘汰
     
     def config(self, config: ZiweiConfig) -> None:
         """
@@ -251,6 +272,31 @@ class IztroService:
         reset_config()
         self._config = get_config()
         logger.info("紫微配置已重置为默认")
+    
+    def _set_cache(self, key: str, value: Any) -> None:
+        """设置缓存（带LRU淘汰）"""
+        # 如果key已存在，先移除旧位置
+        if key in self._astrolabe_cache:
+            self._cache_keys.remove(key)
+        
+        # 添加新数据
+        self._astrolabe_cache[key] = value
+        self._cache_keys.append(key)
+        
+        # 淘汰最旧的缓存
+        while len(self._cache_keys) > self.CACHE_MAX_SIZE:
+            oldest_key = self._cache_keys.pop(0)
+            self._astrolabe_cache.pop(oldest_key, None)
+            logger.debug(f"[缓存] 淘汰旧缓存: {oldest_key}")
+    
+    def _get_cache(self, key: str) -> Optional[Any]:
+        """获取缓存（更新访问顺序）"""
+        if key in self._astrolabe_cache:
+            # 更新访问顺序（移到末尾）
+            self._cache_keys.remove(key)
+            self._cache_keys.append(key)
+            return self._astrolabe_cache[key]
+        return None
     
     def calculate(
         self,
@@ -308,13 +354,13 @@ class IztroService:
             if not astrolabe:
                 raise ValueError("创建命盘失败")
             
-            # 缓存命盘用于后续运限计算
+            # 缓存命盘用于后续运限计算（LRU淘汰策略）
             cache_key = f"{date_str}_{time_index}_{gender}"
-            self._astrolabe_cache[cache_key] = {
+            self._set_cache(cache_key, {
                 'astrolabe': astrolabe,
                 'birth_year': year,
                 'gender': gender
-            }
+            })
             
             # 转换为API响应格式
             response = self._convert_to_response(astrolabe, year, month, day, hour, minute, gender, language)
@@ -355,9 +401,9 @@ class IztroService:
             运限数据（大限/小限/流年/流月/流日/流时）
         """
         try:
-            # 检查缓存
+            # 检查缓存（使用LRU方法）
             cache_key = f"{birth_date}_{birth_time_index}_{gender}"
-            cached = self._astrolabe_cache.get(cache_key)
+            cached = self._get_cache(cache_key)
             
             if not cached:
                 # 需要先计算命盘
@@ -365,7 +411,7 @@ class IztroService:
                 year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
                 hour = birth_time_index * 2 if birth_time_index < 12 else 23
                 self.calculate(year, month, day, hour, gender=gender)
-                cached = self._astrolabe_cache.get(cache_key)
+                cached = self._get_cache(cache_key)
             
             if not cached:
                 raise ValueError("无法获取命盘数据")

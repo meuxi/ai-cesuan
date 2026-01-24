@@ -47,9 +47,10 @@ export default function LoginPage() {
       const token = await response.json()
       setJwt(token)
       window.location.href = '/'
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error(err)
-      setError(`登录失败: ${err.message || '未知错误'}`)
+      const message = err instanceof Error ? err.message : '未知错误'
+      setError(`登录失败: ${message}`)
     } finally {
       setLoading(false)
     }
@@ -73,9 +74,10 @@ export default function LoginPage() {
 
       const redirectUrl = await response.json()
       window.location.href = redirectUrl
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error(err)
-      setError(err.message || '登录失败')
+      const message = err instanceof Error ? err.message : '登录失败'
+      setError(message)
     } finally {
       setLoading(false)
     }

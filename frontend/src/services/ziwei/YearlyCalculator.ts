@@ -5,6 +5,18 @@
 
 import { YearlyInfo, EnhancedPalace } from '@/types/ziwei'
 
+// iztro 流年数据接口
+interface HoroscopeYearlyData {
+    heavenlyStem?: string
+    earthlyBranch?: string
+    index?: number
+    palaceIndex?: number
+    name?: string
+    mutagen?: string[]
+    palaceNames?: string[]
+    _fixed?: boolean
+}
+
 // 天干顺序
 const HEAVENLY_STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
 
@@ -119,7 +131,7 @@ export class YearlyCalculator {
     /**
      * 修正流年信息（如果iztro返回错误）
      */
-    static fixYearlyInfo(horoscopeYearly: any, targetYear: number): any {
+    static fixYearlyInfo(horoscopeYearly: HoroscopeYearlyData | null, targetYear: number): HoroscopeYearlyData | null {
         if (!horoscopeYearly) return null
 
         const correct = this.getYearStemBranch(targetYear)

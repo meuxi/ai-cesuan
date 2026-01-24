@@ -11,6 +11,31 @@ import { logger } from '@/utils/logger'
 type Astrolabe = ReturnType<typeof astro.bySolar>
 type Horoscope = ReturnType<Astrolabe['horoscope']>
 
+// iztro 库内部类型补充定义（库本身类型不完整）
+interface IztroHoroscopeScope {
+    heavenlyStem?: string
+    earthlyBranch?: string
+    index?: number
+    palaceIndex?: number
+    name?: string
+    mutagen?: string[]
+    palaceNames?: string[]
+}
+
+interface IztroHoroscopeResult {
+    decadal?: IztroHoroscopeScope & { palaceNames?: string[] }
+    yearly?: IztroHoroscopeScope
+    monthly?: IztroHoroscopeScope
+    daily?: IztroHoroscopeScope
+    hourly?: IztroHoroscopeScope
+}
+
+interface IztroPalace {
+    heavenlyStem?: string
+    earthlyBranch?: string
+    name?: string
+}
+
 // 四化信息
 export interface MutagenInfo {
     lu: string      // 化禄
@@ -127,7 +152,7 @@ export class ZiweiHoroscopeService {
         const match = fiveElement.match(/[二三四五六]/)
         const startAge = match ? (fiveElementMap[match[0]] || 2) : 2
 
-        return this.astrolabe.palaces.map((palace: any, index: number) => {
+        return this.astrolabe.palaces.map((palace: IztroPalace, index: number) => {
             const decadeStartAge = startAge + index * 10
             const decadeEndAge = decadeStartAge + 9
 
@@ -138,7 +163,7 @@ export class ZiweiHoroscopeService {
             let palaceNames: string[] | undefined
             try {
                 const decadeYear = this.birthYear + decadeStartAge
-                const horoscope = this.astrolabe?.horoscope(new Date(decadeYear, 5, 15)) as any
+                const horoscope = this.astrolabe?.horoscope(new Date(decadeYear, 5, 15)) as IztroHoroscopeResult | undefined
                 if (horoscope?.decadal?.palaceNames) {
                     palaceNames = horoscope.decadal.palaceNames
                 }
@@ -168,7 +193,7 @@ export class ZiweiHoroscopeService {
 
         try {
             const yearDate = new Date(year, 5, 15)
-            const horoscope = this.astrolabe.horoscope(yearDate) as any
+            const horoscope = this.astrolabe.horoscope(yearDate) as IztroHoroscopeResult | undefined
 
             if (!horoscope?.yearly) return null
 
@@ -215,7 +240,7 @@ export class ZiweiHoroscopeService {
 
         try {
             const monthDate = new Date(year, month - 1, 15)
-            const horoscope = this.astrolabe.horoscope(monthDate) as any
+            const horoscope = this.astrolabe.horoscope(monthDate) as IztroHoroscopeResult | undefined
 
             if (!horoscope?.monthly) return null
 
@@ -258,7 +283,7 @@ export class ZiweiHoroscopeService {
 
         try {
             const dayDate = new Date(year, month - 1, day)
-            const horoscope = this.astrolabe.horoscope(dayDate) as any
+            const horoscope = this.astrolabe.horoscope(dayDate) as IztroHoroscopeResult | undefined
 
             if (!horoscope?.daily) return null
 
@@ -306,7 +331,7 @@ export class ZiweiHoroscopeService {
 
         try {
             const hourDate = new Date(year, month - 1, day, hour * 2 + 1)
-            const horoscope = this.astrolabe.horoscope(hourDate, hour) as any
+            const horoscope = this.astrolabe.horoscope(hourDate, hour) as IztroHoroscopeResult | undefined
 
             if (!horoscope?.hourly) return null
 
@@ -374,7 +399,7 @@ export class ZiweiHoroscopeService {
     /**
      * 解析四化数组
      */
-    private parseMutagen(mutagenArray: any): MutagenInfo | undefined {
+    private parseMutagen(mutagenArray: string[] | undefined): MutagenInfo | undefined {
         if (!mutagenArray || !Array.isArray(mutagenArray) || mutagenArray.length < 4) {
             return undefined
         }

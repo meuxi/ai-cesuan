@@ -28,7 +28,12 @@ interface LifeKLineChartProps {
     data: KLinePoint[];
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
+interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: KLinePoint }>;
+}
+
+const CustomTooltip = ({ active, payload }: TooltipProps) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload as KLinePoint;
         const isUp = data.close >= data.open;
@@ -76,7 +81,16 @@ const CustomTooltip = ({ active, payload }: any) => {
     return null;
 };
 
-const CandleShape = (props: any) => {
+interface CandleShapeProps {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    payload: KLinePoint;
+    yAxis?: { scale: (value: number) => number };
+}
+
+const CandleShape = (props: CandleShapeProps) => {
     const { x, y, width, height, payload, yAxis } = props;
 
     const isUp = payload.close >= payload.open;

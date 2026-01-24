@@ -12,6 +12,7 @@ import { useDivination } from '@/hooks/useDivination'
 import { toast } from 'sonner'
 import { BookOpen, Sparkles, Calculator, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { logger } from '@/utils/logger'
 
 const API_BASE = import.meta.env.VITE_API_BASE || ''
 
@@ -78,9 +79,10 @@ export default function ZhugePage() {
             }
 
             setZhugeData(zhugeResult)
-        } catch (error: any) {
-            toast.error(error.message || '诸葛神算失败，请重试')
-            console.error('诸葛神算错误:', error)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : '诸葛神算失败，请重试'
+            toast.error(message)
+            logger.error('诸葛神算错误:', error)
         } finally {
             setCalcLoading(false)
         }

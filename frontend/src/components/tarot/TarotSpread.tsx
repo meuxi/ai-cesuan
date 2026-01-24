@@ -3,6 +3,7 @@
  * 支持多种经典牌阵布局
  */
 
+import { memo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { TarotCard } from '../TarotCard'
 import { useTranslation } from 'react-i18next'
@@ -264,6 +265,54 @@ export function TarotSpread({
     )
 }
 
+// 牌阵配置数据
+const SPREADS: { type: SpreadType; name: string; nameEn: string; cards: number; icon: string }[] = [
+    { type: 'single', name: '单牌', nameEn: 'Single', cards: 1, icon: '🎴' },
+    { type: 'three-card', name: '三牌阵', nameEn: 'Three Card', cards: 3, icon: '🃏' },
+    { type: 'cross', name: '十字阵', nameEn: 'Cross', cards: 5, icon: '✚' },
+    { type: 'horseshoe', name: '马蹄阵', nameEn: 'Horseshoe', cards: 7, icon: '🔮' },
+    { type: 'celtic-cross', name: '凯尔特十字', nameEn: 'Celtic Cross', cards: 10, icon: '⚜️' },
+]
+
+// 牌阵按钮组件（使用 memo 优化）
+interface SpreadButtonProps {
+    spread: typeof SPREADS[number]
+    isSelected: boolean
+    isEnglish: boolean
+    onClick: (type: SpreadType) => void
+}
+
+const SpreadButton = memo(function SpreadButton({ 
+    spread, 
+    isSelected, 
+    isEnglish, 
+    onClick 
+}: SpreadButtonProps) {
+    const handleClick = useCallback(() => {
+        onClick(spread.type)
+    }, [spread.type, onClick])
+
+    return (
+        <motion.button
+            onClick={handleClick}
+            className={`
+                px-3 py-2 rounded-lg text-sm font-medium transition-all
+                flex items-center gap-2
+                ${isSelected 
+                    ? 'bg-primary text-primary-foreground shadow-lg' 
+                    : 'bg-card border border-border hover:bg-accent hover:text-accent-foreground'
+                }
+            `}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+        >
+            <span>{spread.icon}</span>
+            <span>{isEnglish ? spread.nameEn : spread.name}</span>
+            <span className="text-xs opacity-60">({spread.cards})</span>
+        </motion.button>
+    )
+})
+
 // 牌阵选择器组件
 interface SpreadSelectorProps {
     value: SpreadType
@@ -271,37 +320,19 @@ interface SpreadSelectorProps {
 }
 
 export function SpreadSelector({ value, onChange }: SpreadSelectorProps) {
-    const { t, i18n } = useTranslation()
-    
-    const spreads: { type: SpreadType; name: string; nameEn: string; cards: number; icon: string }[] = [
-        { type: 'single', name: '单牌', nameEn: 'Single', cards: 1, icon: '🎴' },
-        { type: 'three-card', name: '三牌阵', nameEn: 'Three Card', cards: 3, icon: '🃏' },
-        { type: 'cross', name: '十字阵', nameEn: 'Cross', cards: 5, icon: '✚' },
-        { type: 'horseshoe', name: '马蹄阵', nameEn: 'Horseshoe', cards: 7, icon: '🔮' },
-        { type: 'celtic-cross', name: '凯尔特十字', nameEn: 'Celtic Cross', cards: 10, icon: '⚜️' },
-    ]
+    const { i18n } = useTranslation()
+    const isEnglish = i18n.language === 'en'
 
     return (
         <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            {spreads.map(spread => (
-                <motion.button
+            {SPREADS.map(spread => (
+                <SpreadButton
                     key={spread.type}
-                    onClick={() => onChange(spread.type)}
-                    className={`
-                        px-3 py-2 rounded-lg text-sm font-medium transition-all
-                        flex items-center gap-2
-                        ${value === spread.type 
-                            ? 'bg-primary text-primary-foreground shadow-lg' 
-                            : 'bg-card border border-border hover:bg-accent hover:text-accent-foreground'
-                        }
-                    `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                >
-                    <span>{spread.icon}</span>
-                    <span>{i18n.language === 'en' ? spread.nameEn : spread.name}</span>
-                    <span className="text-xs opacity-60">({spread.cards})</span>
-                </motion.button>
+                    spread={spread}
+                    isSelected={value === spread.type}
+                    isEnglish={isEnglish}
+                    onClick={onChange}
+                />
             ))}
         </div>
     )

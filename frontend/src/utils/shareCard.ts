@@ -5,6 +5,7 @@
  */
 
 import html2canvas from 'html2canvas';
+import { logger } from './logger';
 
 export interface ShareCardOptions {
     /** 卡片容器元素 */
@@ -114,7 +115,7 @@ export async function copyToClipboard(options: ShareCardOptions): Promise<boolea
 
         return false;
     } catch (error) {
-        console.error('复制到剪贴板失败:', error);
+        logger.error('复制到剪贴板失败:', error);
         return false;
     }
 }
@@ -149,7 +150,7 @@ export async function shareCard(
         await downloadShareCard(options, filename);
         return { shared: true, method: 'download' };
     } catch (error) {
-        console.error('分享失败:', error);
+        logger.error('分享失败:', error);
         throw error;
     }
 }

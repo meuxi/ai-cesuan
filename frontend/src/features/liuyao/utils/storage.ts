@@ -1,5 +1,5 @@
-
 import { HistoryRecord } from '../types';
+import { logger } from '@/utils/logger';
 
 const STORAGE_KEY = 'liu_yao_history_v1';
 
@@ -8,7 +8,7 @@ export const getHistory = (): HistoryRecord[] => {
         const raw = localStorage.getItem(STORAGE_KEY);
         return raw ? JSON.parse(raw) : [];
     } catch (e) {
-        console.error("Failed to read history", e);
+        logger.error("Failed to read history", e);
         return [];
     }
 };
@@ -28,7 +28,7 @@ export const saveRecord = (record: HistoryRecord) => {
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch (e) {
-        console.error("Failed to save record", e);
+        logger.error("Failed to save record", e);
     }
 };
 

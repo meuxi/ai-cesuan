@@ -4,6 +4,7 @@
 """
 import json
 import logging
+import asyncio
 from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -21,7 +22,7 @@ from src.liuyao import (
     get_line_name
 )
 from src.liuyao_service import LiuYaoAIService, build_interpretation_prompt
-from src.chatgpt_router import get_ai_manager
+from src.ai import get_ai_manager
 from src.ai.provider import ChatMessage
 from src.config import settings
 from openai import AsyncOpenAI
@@ -297,36 +298,14 @@ async def interpret_hexagram(request: Request, body: InterpretRequest):
     custom_model = request.headers.get("x-api-model")
     
     try:
-        # 自动执行高级分析
+        # 自动执行高级分析（使用线程池避免阻塞事件循环）
         advanced_analysis = None
         try:
-            ganzhi = get_current_ganzhi()
-            analyzer = LiuyaoAdvancedAnalyzer(
-                month_zhi=ganzhi['month_zhi'],
-                day_gan=ganzhi['day_gan'],
-                day_zhi=ganzhi['day_zhi']
+            advanced_analysis = await asyncio.to_thread(
+                _perform_advanced_analysis,
+                body.hexagram_data,
+                body.question or ""
             )
-            
-            # 从卦象数据提取爻信息
-            lines = body.hexagram_data.get('lines', [])
-            yaos = []
-            for line in lines:
-                yao_info = {
-                    'index': line.get('index', 0),
-                    'branch': line.get('branch', ''),
-                    'element': line.get('element', ''),
-                    'liu_qin': line.get('six_relation', ''),
-                    'is_moving': line.get('is_moving', False),
-                }
-                if line.get('is_moving') and line.get('changed_branch'):
-                    from src.divination.liuyao_advanced import DIZHI_WUXING
-                    yao_info['changed_branch'] = line.get('changed_branch')
-                    yao_info['changed_element'] = DIZHI_WUXING.get(line.get('changed_branch', ''), '')
-                yaos.append(yao_info)
-            
-            # 根据问题推断用神五行
-            yong_shen_element = _infer_yong_shen_element(body.question or "")
-            advanced_analysis = analyzer.analyze_hexagram(yaos=yaos, yong_shen_element=yong_shen_element)
             _logger.info("高级分析完成")
         except Exception as e:
             _logger.warning(f"高级分析失败，将使用基础解读: {e}")
@@ -370,33 +349,14 @@ async def interpret_hexagram_stream(request: Request, body: InterpretRequest):
     """
     _logger.info(f"AI流式解卦请求: style={body.style}, question={body.question}")
     
-    # 自动执行高级分析
+    # 自动执行高级分析（使用线程池避免阻塞事件循环）
     advanced_analysis = None
     try:
-        ganzhi = get_current_ganzhi()
-        analyzer = LiuyaoAdvancedAnalyzer(
-            month_zhi=ganzhi['month_zhi'],
-            day_gan=ganzhi['day_gan'],
-            day_zhi=ganzhi['day_zhi']
+        advanced_analysis = await asyncio.to_thread(
+            _perform_advanced_analysis,
+            body.hexagram_data,
+            body.question or ""
         )
-        
-        lines = body.hexagram_data.get('lines', [])
-        yaos = []
-        for line in lines:
-            yao_info = {
-                'index': line.get('index', 0),
-                'branch': line.get('branch', ''),
-                'element': line.get('element', ''),
-                'liu_qin': line.get('six_relation', ''),
-                'is_moving': line.get('is_moving', False),
-            }
-            if line.get('is_moving') and line.get('changed_branch'):
-                yao_info['changed_branch'] = line.get('changed_branch')
-                yao_info['changed_element'] = DIZHI_WUXING.get(line.get('changed_branch', ''), '')
-            yaos.append(yao_info)
-        
-        yong_shen_element = _infer_yong_shen_element(body.question or "")
-        advanced_analysis = analyzer.analyze_hexagram(yaos=yaos, yong_shen_element=yong_shen_element)
     except Exception as e:
         _logger.warning(f"高级分析失败: {e}")
     
@@ -457,6 +417,38 @@ async def interpret_hexagram_stream(request: Request, body: InterpretRequest):
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
     
     return StreamingResponse(generate_stream(), media_type='text/event-stream')
+
+
+def _perform_advanced_analysis(hexagram_data: dict, question: str) -> Optional[dict]:
+    """
+    执行高级分析（CPU密集型任务，在线程池中运行）
+    """
+    ganzhi = get_current_ganzhi()
+    analyzer = LiuyaoAdvancedAnalyzer(
+        month_zhi=ganzhi['month_zhi'],
+        day_gan=ganzhi['day_gan'],
+        day_zhi=ganzhi['day_zhi']
+    )
+    
+    # 从卦象数据提取爻信息
+    lines = hexagram_data.get('lines', [])
+    yaos = []
+    for line in lines:
+        yao_info = {
+            'index': line.get('index', 0),
+            'branch': line.get('branch', ''),
+            'element': line.get('element', ''),
+            'liu_qin': line.get('six_relation', ''),
+            'is_moving': line.get('is_moving', False),
+        }
+        if line.get('is_moving') and line.get('changed_branch'):
+            yao_info['changed_branch'] = line.get('changed_branch')
+            yao_info['changed_element'] = DIZHI_WUXING.get(line.get('changed_branch', ''), '')
+        yaos.append(yao_info)
+    
+    # 根据问题推断用神五行
+    yong_shen_element = _infer_yong_shen_element(question)
+    return analyzer.analyze_hexagram(yaos=yaos, yong_shen_element=yong_shen_element)
 
 
 def _infer_yong_shen_element(question: str) -> str:

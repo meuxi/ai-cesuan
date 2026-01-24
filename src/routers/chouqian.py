@@ -4,12 +4,13 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from typing import List, Dict, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import random
 from openai import AsyncOpenAI
 from ..divination.chouqian.models import ChouqianResult, ChouqianRequest, ShengbeiResult
 from ..divination.chouqian.service import chouqian_service
 from ..config import settings
+from ..common import safe_api_call, get_api_config_from_request, validate_api_config
 
 _logger = logging.getLogger(__name__)
 
@@ -18,9 +19,9 @@ router = APIRouter(prefix="/chouqian", tags=["抽签"])
 
 class ShengbeiRequest(BaseModel):
     """圣杯请求"""
-    qian_type: str
-    qian_number: int
-    current_count: int = 0  # 当前已成功次数
+    qian_type: str = Field(..., min_length=1, max_length=50, description="签类型")
+    qian_number: int = Field(..., ge=1, le=200, description="签号")
+    current_count: int = Field(0, ge=0, le=3, description="当前已成功次数")
 
 
 class ShengbeiResponse(BaseModel):
@@ -49,6 +50,7 @@ async def get_qian_types() -> Dict[str, dict]:
 
 
 @router.post("/draw", response_model=ChouqianResult, summary="抽签")
+@safe_api_call("抽签")
 async def draw_qian(request: ChouqianRequest):
     """
     抽签接口
@@ -57,15 +59,11 @@ async def draw_qian(request: ChouqianRequest):
     - **user_name**: 求签人姓名（可选）
     - **question**: 所问之事（可选）
     """
-    try:
-        return chouqian_service.draw(request.type)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return chouqian_service.draw(request.type)
 
 
 @router.get("/detail/{qian_type}/{number}", response_model=ChouqianResult, summary="获取签文详情")
+@safe_api_call("获取签文详情")
 async def get_qian_detail(qian_type: str, number: int):
     """
     根据签号获取签文详情
@@ -73,27 +71,18 @@ async def get_qian_detail(qian_type: str, number: int):
     - **qian_type**: 签类型（guanyin）
     - **number**: 签号（1-100）
     """
-    try:
-        return chouqian_service.get_by_number(qian_type, number)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return chouqian_service.get_by_number(qian_type, number)
 
 
 @router.get("/list/{qian_type}", response_model=List[ChouqianResult], summary="获取签文列表")
+@safe_api_call("获取签文列表")
 async def get_qian_list(qian_type: str):
     """
     获取所有签文列表
     
     - **qian_type**: 签类型（guanyin）
     """
-    try:
-        return chouqian_service.get_all(qian_type)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return chouqian_service.get_all(qian_type)
 
 
 @router.post("/draw_start", response_model=DrawWithShengbeiResponse, summary="开始抽签(含圣杯流程)")
@@ -174,10 +163,10 @@ async def throw_shengbei(request: ShengbeiRequest):
 
 class AIJieqianRequest(BaseModel):
     """AI解签请求"""
-    qian_type: str
-    qian_number: int
-    user_name: str = ""
-    question: str = ""
+    qian_type: str = Field(..., min_length=1, max_length=50, description="签类型")
+    qian_number: int = Field(..., ge=1, le=200, description="签号")
+    user_name: str = Field("", max_length=50, description="求签人姓名")
+    question: str = Field("", max_length=500, description="所问之事")
 
 
 @router.post("/ai_jieqian", summary="AI解签")
@@ -227,33 +216,23 @@ async def ai_jieqian(request: Request, body: AIJieqianRequest):
 
     user_prompt = f"{qian_info}\n{user_info}\n请为此签进行详细解读。"
     
-    # 获取API配置
-    custom_base_url = request.headers.get("x-api-url")
-    custom_api_key = request.headers.get("x-api-key")
-    custom_api_model = request.headers.get("x-api-model")
-    
-    final_api_key = custom_api_key or settings.api_key
-    final_base_url = custom_base_url or settings.api_base
-    api_model = custom_api_model or settings.model
-    
-    if not final_base_url or not final_api_key:
-        raise HTTPException(status_code=403, detail="请设置 API KEY 和 API BASE URL")
-    
-    # 清理API密钥
-    final_api_key = final_api_key.strip().replace('\xa0', '').replace('\u200b', '')
-    if final_api_key.startswith("Bearer "):
-        final_api_key = final_api_key[7:].strip()
+    # 获取API配置（使用统一工具函数）
+    api_config = get_api_config_from_request(request)
+    try:
+        validate_api_config(api_config)
+    except ValueError as e:
+        raise HTTPException(status_code=403, detail=str(e))
     
     api_client = AsyncOpenAI(
-        api_key=final_api_key,
-        base_url=final_base_url,
+        api_key=api_config["api_key"],
+        base_url=api_config["base_url"],
         timeout=60.0,
         max_retries=0
     )
     
     try:
         openai_stream = await api_client.chat.completions.create(
-            model=api_model,
+            model=api_config["model"],
             max_tokens=32000,  # 用户体验优先：无限制输出
             temperature=0.8,
             stream=True,

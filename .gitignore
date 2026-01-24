@@ -189,3 +189,9 @@ port*.txt
 
 # Runtime data (项目根目录的data文件夹)
 /data/
+
+# Test results
+test-results/
+frontend/test-results/
+playwright-report/
+e2e/report/

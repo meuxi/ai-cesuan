@@ -3,12 +3,17 @@
  * 统一的AI分析结果展示界面
  */
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, Share2, Download, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
-import ReactMarkdown from 'react-markdown'
+import { logger } from '@/utils/logger'
+import { 
+  MarkdownContent, 
+  LoadingSkeleton, 
+  SpinnerLoading 
+} from '@/components/common'
 
 interface ResultDisplayProps {
   /** 结果内容（支持Markdown） */
@@ -49,6 +54,16 @@ export function ResultDisplay({
   const [copied, setCopied] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
   const contentRef = useRef<HTMLDivElement>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 清理定时器，防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
 
   // 自动滚动到最新内容（流式输出时）
   useEffect(() => {
@@ -58,22 +73,31 @@ export function ResultDisplay({
   }, [result, streaming])
 
   // 复制功能
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     if (!result) return
     try {
       await navigator.clipboard.writeText(result)
       setCopied(true)
       onCopy?.()
-      setTimeout(() => setCopied(false), 2000)
+      // 使用 ref 管理定时器，便于清理
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+      timerRef.current = setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy:', err)
+      logger.error('Failed to copy:', err)
     }
-  }
+  }, [result, onCopy])
+
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed(prev => !prev)
+  }, [])
 
   // 如果没有结果且不在加载，不显示
   if (!result && !loading) return null
 
   const defaultTitle = i18n.language === 'en' ? 'AI Analysis' : 'AI 分析结果'
+  const isActive = loading || streaming
 
   return (
     <motion.div
@@ -93,12 +117,12 @@ export function ResultDisplay({
       )}>
         <div className="flex items-center gap-2">
           <motion.div
-            animate={loading || streaming ? { rotate: 360 } : { rotate: 0 }}
-            transition={{ duration: 2, repeat: loading || streaming ? Infinity : 0, ease: 'linear' }}
+            animate={isActive ? { rotate: 360 } : { rotate: 0 }}
+            transition={{ duration: 2, repeat: isActive ? Infinity : 0, ease: 'linear' }}
           >
             <Sparkles className={cn(
               'w-5 h-5',
-              loading || streaming ? 'text-primary' : 'text-muted-foreground'
+              isActive ? 'text-primary' : 'text-muted-foreground'
             )} />
           </motion.div>
           <h3 className="font-semibold text-foreground">
@@ -159,8 +183,9 @@ export function ResultDisplay({
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={toggleCollapse}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              aria-label={isCollapsed ? '展开' : '收起'}
             >
               {isCollapsed ? (
                 <ChevronDown className="w-4 h-4" />
@@ -183,28 +208,15 @@ export function ResultDisplay({
           >
             <div
               ref={contentRef}
-              className={cn(
-                'p-4 overflow-y-auto',
-                'prose prose-sm dark:prose-invert max-w-none',
-                'prose-headings:text-foreground prose-p:text-foreground/90',
-                'prose-strong:text-foreground prose-a:text-primary'
-              )}
+              className="p-4 overflow-y-auto"
               style={{ maxHeight: '500px' }}
             >
               {loading && !result ? (
-                <LoadingSkeleton />
+                <LoadingSkeleton lines={5} />
               ) : (
-                <ReactMarkdown>
-                  {result || ''}
-                </ReactMarkdown>
-              )}
-              
-              {/* 流式输出光标 */}
-              {streaming && (
-                <motion.span
-                  className="inline-block w-2 h-5 bg-primary ml-1"
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
+                <MarkdownContent
+                  content={result || ''}
+                  streaming={streaming}
                 />
               )}
             </div>
@@ -212,21 +224,6 @@ export function ResultDisplay({
         )}
       </AnimatePresence>
     </motion.div>
-  )
-}
-
-// 加载骨架
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      {[100, 85, 95, 75, 90].map((width, i) => (
-        <div 
-          key={i}
-          className="h-4 bg-muted rounded"
-          style={{ width: `${width}%` }}
-        />
-      ))}
-    </div>
   )
 }
 
@@ -247,26 +244,12 @@ export function InlineResultDisplay({ result, loading, streaming }: InlineResult
       className="mt-4 p-4 rounded-lg bg-secondary/50 border border-border"
     >
       {loading && !result ? (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          >
-            <Sparkles className="w-4 h-4" />
-          </motion.div>
-          <span className="text-sm">正在分析...</span>
-        </div>
+        <SpinnerLoading text="正在分析..." />
       ) : (
-        <div className="prose prose-sm dark:prose-invert max-w-none">
-          <ReactMarkdown>{result || ''}</ReactMarkdown>
-          {streaming && (
-            <motion.span
-              className="inline-block w-1.5 h-4 bg-primary ml-0.5"
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            />
-          )}
-        </div>
+        <MarkdownContent
+          content={result || ''}
+          streaming={streaming}
+        />
       )}
     </motion.div>
   )

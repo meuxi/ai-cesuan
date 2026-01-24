@@ -11,27 +11,29 @@ from fastapi.staticfiles import StaticFiles
 # ========== 容错修复1：处理 src 模块导入失败 ==========
 try:
     from src.limiter import get_real_ipaddr
-    from src.chatgpt_router import router as chatgpt_router
-    from src.user_router import router as user_router
-    from src.liuyao_router import router as liuyao_router
-    from src.bazi_router import router as bazi_router
-    from src.routers.chouqian import router as chouqian_router
-    from src.routers.zhuge import router as zhuge_router
-    from src.routers.qimen import router as qimen_router
-    from src.routers.daliuren import router as daliuren_router
-    from src.routers.fortune import router as fortune_router
-    from src.routers.zodiac import router as zodiac_router
-    from src.routers.tarot import router as tarot_router
-    # 新增模块路由
-    from src.routers.prompts import router as prompts_router
-    from src.routers.life_kline import router as life_kline_router
-    from src.routers.analytics import router as analytics_router
-    from src.routers.rag import router as rag_router
-    from src.routers.logs import router as logs_router
-    from src.routers.ziwei import router as ziwei_router
-    from src.routers.hehun import router as hehun_router
-    from src.routers.plum_flower import router as plum_flower_router
-    from src.routers.monitoring_router import router as monitoring_router
+    # 从统一入口导入所有路由
+    from src.routers import (
+        chatgpt_router,
+        user_router,
+        liuyao_router,
+        bazi_router,
+        chouqian_router,
+        zhuge_router,
+        qimen_router,
+        daliuren_router,
+        fortune_router,
+        zodiac_router,
+        tarot_router,
+        prompts_router,
+        life_kline_router,
+        analytics_router,
+        rag_router,
+        logs_router,
+        ziwei_router,
+        hehun_router,
+        plum_flower_router,
+        monitoring_router,
+    )
 except ImportError as e:
     raise ImportError(f"Failed to import src modules: {e}. Check src module files exist.") from e
 
@@ -115,28 +117,72 @@ app.add_middleware(
 )
 
 # ========== 路由注册 ==========
-app.include_router(chatgpt_router, prefix="/api")
-app.include_router(user_router, prefix="/api")
-app.include_router(liuyao_router, prefix="/api/liuyao", tags=["六爻"])
-app.include_router(bazi_router)
-app.include_router(chouqian_router, prefix="/api")
-app.include_router(zhuge_router, prefix="/api")
-app.include_router(qimen_router)
-app.include_router(daliuren_router)
-app.include_router(fortune_router, prefix="/api")
-app.include_router(zodiac_router)
-app.include_router(tarot_router, prefix="/api")
-# 新增功能模块路由
-app.include_router(prompts_router, prefix="/api")
-app.include_router(life_kline_router, prefix="/api")
-app.include_router(analytics_router, prefix="/api")
-app.include_router(rag_router, prefix="/api")
-app.include_router(logs_router, prefix="/api")
-app.include_router(ziwei_router, prefix="/api")
-app.include_router(hehun_router, prefix="/api")
-app.include_router(plum_flower_router)
-app.include_router(monitoring_router)
-_logger.info("API路由已注册（含六爻、八字、抽签、诸葛神算、奇门遁甲、大六壬、运势、星座、塔罗牌、提示词模板、人生K线图、用量统计、RAG知识库、操作日志、紫微斗数、合婚、梅花易数、系统监控模块）")
+# 
+# API 版本说明：
+# - /api/v1/xxx - 新版本 API（推荐使用）
+# - /api/xxx - 旧版本兼容路径（将逐步废弃）
+#
+# 注意：部分路由器自带前缀，注册时需避免重复
+
+# ========== API v1 路由（推荐） ==========
+# 
+# 注意：部分路由器自带 /api/ 前缀，这些路由器使用 /v1 前缀而非 /api/v1
+# 以避免路径变成 /api/v1/api/xxx 的重复问题
+#
+# 核心功能
+app.include_router(chatgpt_router, prefix="/api/v1", tags=["AI对话"])
+app.include_router(user_router, prefix="/api/v1", tags=["用户"])
+
+# 占卜模块 - 不带 /api 前缀的路由器
+app.include_router(liuyao_router, prefix="/api/v1/liuyao", tags=["六爻"])
+app.include_router(ziwei_router, prefix="/api/v1", tags=["紫微斗数"])  # 自带 /ziwei
+app.include_router(tarot_router, prefix="/api/v1", tags=["塔罗牌"])  # 自带 /tarot
+app.include_router(chouqian_router, prefix="/api/v1", tags=["抽签"])  # 自带 /chouqian
+app.include_router(zhuge_router, prefix="/api/v1", tags=["诸葛神算"])  # 自带 /zhuge
+app.include_router(hehun_router, prefix="/api/v1", tags=["合婚"])  # 自带 /hehun
+
+# 占卜模块 - 自带 /api/ 前缀的路由器，使用 /v1 前缀避免重复
+app.include_router(bazi_router, prefix="/v1")  # 自带 /api/bazi -> /v1/api/bazi
+app.include_router(qimen_router, prefix="/v1")  # 自带 /api/qimen -> /v1/api/qimen
+app.include_router(daliuren_router, prefix="/v1")  # 自带 /api/daliuren -> /v1/api/daliuren
+app.include_router(plum_flower_router, prefix="/v1")  # 自带 /api/plum-flower -> /v1/api/plum-flower
+app.include_router(zodiac_router, prefix="/v1")  # 自带 /api/zodiac -> /v1/api/zodiac
+
+# 运势相关
+app.include_router(fortune_router, prefix="/api/v1", tags=["运势"])  # 自带 /fortune
+app.include_router(life_kline_router, prefix="/api/v1", tags=["人生K线图"])  # 自带 /life-kline
+
+# 系统功能
+app.include_router(prompts_router, prefix="/api/v1", tags=["提示词模板"])  # 自带 /prompts
+app.include_router(analytics_router, prefix="/api/v1", tags=["用量统计"])  # 自带 /analytics
+app.include_router(rag_router, prefix="/api/v1", tags=["RAG知识库"])  # 自带 /rag
+app.include_router(logs_router, prefix="/api/v1", tags=["操作日志"])  # 自带 /logs
+app.include_router(monitoring_router, prefix="/v1")  # 自带 /api/monitor -> /v1/api/monitor
+
+# ========== 旧版本兼容层（保持向后兼容） ==========
+# 这些路由保持原有路径，确保现有前端不受影响
+app.include_router(chatgpt_router, prefix="/api", include_in_schema=False)
+app.include_router(user_router, prefix="/api", include_in_schema=False)
+app.include_router(liuyao_router, prefix="/api/liuyao", include_in_schema=False)
+app.include_router(bazi_router, include_in_schema=False)  # 自带 /api/bazi
+app.include_router(chouqian_router, prefix="/api", include_in_schema=False)
+app.include_router(zhuge_router, prefix="/api", include_in_schema=False)
+app.include_router(qimen_router, include_in_schema=False)  # 自带 /api/qimen
+app.include_router(daliuren_router, include_in_schema=False)  # 自带 /api/daliuren
+app.include_router(fortune_router, prefix="/api", include_in_schema=False)
+app.include_router(zodiac_router, include_in_schema=False)  # 自带 /api/zodiac
+app.include_router(tarot_router, prefix="/api", include_in_schema=False)
+app.include_router(prompts_router, prefix="/api", include_in_schema=False)
+app.include_router(life_kline_router, prefix="/api", include_in_schema=False)
+app.include_router(analytics_router, prefix="/api", include_in_schema=False)
+app.include_router(rag_router, prefix="/api", include_in_schema=False)
+app.include_router(logs_router, prefix="/api", include_in_schema=False)
+app.include_router(ziwei_router, prefix="/api", include_in_schema=False)
+app.include_router(hehun_router, prefix="/api", include_in_schema=False)
+app.include_router(plum_flower_router, include_in_schema=False)  # 自带 /api/plum-flower
+app.include_router(monitoring_router, include_in_schema=False)  # 自带 /api/monitor
+
+_logger.info("API路由已注册：v1版本路径 + 旧版本兼容层")
 
 # ========== 静态前端文件服务修复3：绝对路径 + 容错 ==========
 frontend_dist_path = Path(__file__).parent / "dist"  # 基于当前文件的绝对路径

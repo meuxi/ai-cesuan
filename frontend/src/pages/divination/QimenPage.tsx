@@ -67,8 +67,9 @@ export default function QimenPage() {
 
       const data = await response.json()
       setQimenData(data)
-    } catch (error: any) {
-      toast.error(error.message || '排盘失败，请重试')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '排盘失败，请重试'
+      toast.error(message)
     } finally {
       setPaipanLoading(false)
     }

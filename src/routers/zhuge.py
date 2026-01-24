@@ -1,7 +1,9 @@
 """诸葛神算API路由 - 使用AI计算笔画和解签"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
+
+from src.common import safe_api_call
 
 router = APIRouter(prefix="/zhuge", tags=["诸葛神算"])
 
@@ -59,6 +61,7 @@ def calculate_qian_number(b1: int, b2: int, b3: int) -> int:
 
 
 @router.post("/divine", response_model=ZhugeResponse, summary="诸葛神算占卜")
+@safe_api_call("诸葛神算占卜")
 async def divine(request: ZhugeRequest):
     """
     诸葛神算占卜接口 - 完整移植自zgss.asp
@@ -76,39 +79,36 @@ async def divine(request: ZhugeRequest):
     
     注意：笔画计算和解签内容由前端调用AI服务完成
     """
-    try:
-        # 提取三个汉字
-        chars = list(request.text.replace(" ", ""))[:3]
-        if len(chars) < 3:
-            return ZhugeResponse(
-                success=False,
-                error="请输入三个汉字"
-            )
-        
-        # 检查是否提供了笔画数
-        if request.bihua1 is None or request.bihua2 is None or request.bihua3 is None:
-            return ZhugeResponse(
-                success=False,
-                input_chars=chars,
-                error="请先通过AI获取汉字笔画数，然后提供bihua1/bihua2/bihua3参数"
-            )
-        
-        # 计算签号
-        qian_number = calculate_qian_number(request.bihua1, request.bihua2, request.bihua3)
-        qian_id = str(qian_number).zfill(3)
-        
+    # 提取三个汉字
+    chars = list(request.text.replace(" ", ""))[:3]
+    if len(chars) < 3:
         return ZhugeResponse(
-            success=True,
-            input_chars=chars,
-            bihua_list=[request.bihua1, request.bihua2, request.bihua3],
-            qian_number=qian_number,
-            qian_id=qian_id,
-            title=f"第{qian_number}签",
-            content="请结合AI生成详细解签内容",
-            ai_interpretation=""  # 由前端调用AI服务填充
+            success=False,
+            error="请输入三个汉字"
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    
+    # 检查是否提供了笔画数
+    if request.bihua1 is None or request.bihua2 is None or request.bihua3 is None:
+        return ZhugeResponse(
+            success=False,
+            input_chars=chars,
+            error="请先通过AI获取汉字笔画数，然后提供bihua1/bihua2/bihua3参数"
+        )
+    
+    # 计算签号
+    qian_number = calculate_qian_number(request.bihua1, request.bihua2, request.bihua3)
+    qian_id = str(qian_number).zfill(3)
+    
+    return ZhugeResponse(
+        success=True,
+        input_chars=chars,
+        bihua_list=[request.bihua1, request.bihua2, request.bihua3],
+        qian_number=qian_number,
+        qian_id=qian_id,
+        title=f"第{qian_number}签",
+        content="请结合AI生成详细解签内容",
+        ai_interpretation=""  # 由前端调用AI服务填充
+    )
 
 
 @router.get("/info", summary="诸葛神算说明")

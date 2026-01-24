@@ -2,6 +2,7 @@ import json
 import os
 import re
 import time
+import asyncio
 from typing import Optional
 from urllib.parse import urlparse
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -26,7 +27,7 @@ from src.exceptions import (
     APICallError,
     ZhipuConcurrencyError,
 )
-from src.ai import AIProviderManager, AIModelConfig, AIModel
+from src.ai import AIProviderManager, AIModelConfig, AIModel, get_ai_manager
 from src.ai.models import PRESET_ROUTES, ModelStatus
 from src.ai.provider import ChatMessage
 from src.ai.degradation import degradation_manager, check_should_proceed
@@ -35,87 +36,64 @@ from src.quota import quota_manager
 from src.monitoring import cost_monitor
 from src.prompts.output_control import enhance_prompt_with_length_control, get_output_max_tokens
 from src.i18n import Translator
+from src.common.sse_response import SSEMessage, SSEErrorCode, SSE_HEADERS
+
+
+# 预编译敏感字段集合（避免每次调用重新创建）
+_SENSITIVE_KEYS_LOWER = {
+    "api_key", "apikey", "api-key", "key", "secret", "password",
+    "token", "access_token", "refresh_token", "jwt",
+    "birthday", "bazi_data", "ziwei_data", "lunar_birthday",
+    "expire_at", "cards",
+}
+
+
+def _sanitize_log_data(data: dict, sensitive_keys: set[str] = None) -> dict:
+    """
+    脱敏日志数据，隐藏敏感字段
+    
+    Args:
+        data: 原始数据字典
+        sensitive_keys: 需要脱敏的字段名集合
+        
+    Returns:
+        脱敏后的数据字典
+    """
+    # 性能优化：非 DEBUG 级别时跳过脱敏处理，返回简化占位符
+    if not _logger.isEnabledFor(logging.DEBUG):
+        return {"_type": type(data).__name__, "_sanitized": True}
+    
+    if not isinstance(data, dict):
+        return data
+    
+    # 使用预编译的敏感字段集合
+    keys_to_check = sensitive_keys or _SENSITIVE_KEYS_LOWER
+    
+    result = {}
+    for k, v in data.items():
+        if k.lower() in keys_to_check:
+            # 脱敏处理：只显示前4位和后4位（如果长度足够）
+            if isinstance(v, str) and len(v) > 8:
+                result[k] = f"{v[:4]}***{v[-4:]}"
+            elif v is not None:
+                result[k] = "***"
+            else:
+                result[k] = None
+        elif isinstance(v, dict):
+            result[k] = _sanitize_log_data(v, keys_to_check)
+        elif isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict):
+            result[k] = f"[{len(v)} items]"  # 只显示数量
+        else:
+            result[k] = v
+    
+    return result
 
 client = AsyncOpenAI(api_key=settings.api_key, base_url=settings.api_base)
 router = APIRouter()
 _logger = logging.getLogger(__name__)
 
-# 初始化AI故障转移管理器（使用配置的API密钥）
-def _init_ai_manager() -> AIProviderManager:
-    """初始化AI管理器，使用环境变量配置的API密钥"""
-    config = AIModelConfig()
-    
-    # 1. DashScope (阿里云百炼) - 优先使用
-    if settings.dashscope_api_key:
-        config.add_model(AIModel(
-            name="DashScope-Qwen",
-            provider="openai",  # OpenAI兼容格式
-            api_key=settings.dashscope_api_key,
-            base_url=settings.dashscope_api_base,
-            is_primary=True,
-            status=ModelStatus.ACTIVE,
-            parameters={"model": settings.dashscope_model}
-        ))
-        _logger.info(f"[AI] 已配置DashScope: {settings.dashscope_model}")
-    
-    # 2. DeepSeek - 备用
-    if settings.deepseek_api_key:
-        config.add_model(AIModel(
-            name="DeepSeek",
-            provider="openai",
-            api_key=settings.deepseek_api_key,
-            base_url=settings.deepseek_api_base,
-            status=ModelStatus.ACTIVE,
-            parameters={"model": settings.deepseek_model}
-        ))
-        _logger.info(f"[AI] 已配置DeepSeek: {settings.deepseek_model}")
-    
-    # 3. 智谱AI - 备用
-    if settings.zhipu_api_key:
-        config.add_model(AIModel(
-            name="Zhipu-GLM",
-            provider="openai",
-            api_key=settings.zhipu_api_key,
-            base_url=settings.zhipu_api_base,
-            status=ModelStatus.ACTIVE,
-            parameters={"model": settings.zhipu_model}
-        ))
-        _logger.info(f"[AI] 已配置智谱AI: {settings.zhipu_model}")
-    
-    # 4. 硅基流动 SiliconFlow - 备用
-    if settings.siliconflow_api_key:
-        config.add_model(AIModel(
-            name="SiliconFlow",
-            provider="openai",
-            api_key=settings.siliconflow_api_key,
-            base_url=settings.siliconflow_api_base,
-            status=ModelStatus.ACTIVE,
-            parameters={"model": settings.siliconflow_model}
-        ))
-        _logger.info(f"[AI] 已配置SiliconFlow: {settings.siliconflow_model}")
-    
-    # 5. OpenAI - 最后备用（兼容所有OpenAI格式的API）
-    if settings.api_key and settings.api_key != "sk-test-1234567890":
-        config.add_model(AIModel(
-            name="OpenAI",
-            provider="openai",
-            api_key=settings.api_key,
-            base_url=settings.api_base,
-            status=ModelStatus.ACTIVE,
-            parameters={"model": settings.model}
-        ))
-        _logger.info(f"[AI] 已配置OpenAI: {settings.model}")
-    
-    return AIProviderManager(config)
-
-_ai_manager: Optional[AIProviderManager] = None
-
-def get_ai_manager() -> AIProviderManager:
-    """获取全局AI管理器（懒加载）"""
-    global _ai_manager
-    if _ai_manager is None:
-        _ai_manager = _init_ai_manager()
-    return _ai_manager
+# AI管理器已移至 src/ai/manager.py，通过 get_ai_manager 统一访问
+# 保持向后兼容性：get_ai_manager 已从 src.ai 导入
 
 
 @router.post("/divination")
@@ -174,11 +152,14 @@ async def divination(
                 f"{settings.project_name}:{user.login_type}:{user.user_name}", time_window_seconds, max_reqs
             )
 
-    _logger.info(
-        f"Request from {real_ip}, "
-        f"user={json.dumps(user.model_dump(), ensure_ascii=False) if user else None}, "
-        f"body={json.dumps(divination_body.model_dump(), ensure_ascii=False)}"
-    )
+    # 性能优化：简化请求日志，减少 JSON 序列化开销
+    _logger.info(f"Request: ip={real_ip}, type={divination_body.prompt_type}, len={len(divination_body.prompt)}")
+    
+    # 详细日志仅在 DEBUG 级别记录
+    if _logger.isEnabledFor(logging.DEBUG):
+        sanitized_user = _sanitize_log_data(user.model_dump()) if user else None
+        sanitized_body = _sanitize_log_data(divination_body.model_dump())
+        _logger.debug(f"Request detail: user={sanitized_user}, body={sanitized_body}")
     if any(w in divination_body.prompt.lower() for w in settings.stop_words):
         raise StopWordDetectedError(message="输入包含禁止词汇，请重新输入")
     
@@ -219,9 +200,16 @@ async def divination(
         # 安全检查1：验证HTTPS协议（生产环境强制）
         is_production = os.getenv("VERCEL") == "1" or os.getenv("ENVIRONMENT") == "production"
         if is_production:
-            # 检查请求是否通过HTTPS
-            forwarded_proto = request.headers.get("x-forwarded-proto", "http")
-            if forwarded_proto != "https":
+            # 多重检查请求是否通过HTTPS（防止头部伪造）
+            forwarded_proto = request.headers.get("x-forwarded-proto", "").lower()
+            # 额外检查：Cloudflare、AWS等CDN的协议头
+            cf_visitor = request.headers.get("cf-visitor", "")
+            is_https = (
+                forwarded_proto == "https" or
+                '"scheme":"https"' in cf_visitor or
+                request.url.scheme == "https"
+            )
+            if not is_https:
                 _logger.warning(f"拒绝非HTTPS请求传输自定义API密钥: {get_real_ipaddr(request)}")
                 raise APIConfigError(message="安全错误：自定义API密钥仅支持HTTPS传输")
         
@@ -291,8 +279,8 @@ async def divination(
             else:
                 raise APICallError(message="AI服务暂时不可用，请稍后重试")
     else:
-        # 使用预设的免费模型线路（AI故障转移）
-        _logger.info("使用预设AI模型线路（故障转移模式）")
+        # 使用预设的免费模型线路（AI故障转移 + 流式输出）
+        _logger.debug("使用预设AI模型线路（故障转移流式模式）")
         ai_manager = get_ai_manager()
         
         messages = [
@@ -300,71 +288,115 @@ async def divination(
             ChatMessage(role="user", content=prompt)
         ]
         
-        try:
-            result = await ai_manager.chat_with_failover(
-                messages=messages,
-                temperature=0.9,
-                max_tokens=max_tokens,
-            )
-            _logger.info(f"使用模型: {result.model_used.name}, 尝试次数: {result.attempts}")
+        # 内存保护：最大输出长度限制（约 250KB）
+        MAX_OUTPUT_LENGTH = 250000
+        
+        async def get_preset_stream_generator():
+            """预设模型的流式生成器 - 使用统一的SSE响应格式"""
+            # 优化：只统计输出长度，避免累积完整内容占用大量内存
+            output_length = 0
+            chunk_count = 0
             
-            # 记录成本监控
-            latency = time.time() - request_start_time
-            input_tokens = estimate_tokens(system_prompt + prompt) or 0
-            output_tokens = estimate_tokens(result.response.content) or 0
-            total_tokens = input_tokens + output_tokens
-            
-            # 安全计算成本（避免空值）
-            if hasattr(result, 'cost') and result.cost is not None:
-                cost = result.cost
-            elif total_tokens > 0:
-                cost = estimate_cost(total_tokens, 0.002)
-            else:
-                cost = 0.0
-            cost_monitor.record_call(
-                model=result.model_used.name,
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                cost=cost,
-                latency=latency,
-                success=True,
-                tool_name=divination_body.prompt_type,
-                user_id=user_id
-            )
-            
-            # 消费用户配额
-            quota_manager.consume_quota(user_id, input_tokens + output_tokens, cost)
-            
-            # 直接返回 JSON 响应（前端会模拟打字机效果）
-            content = result.response.content
-            if not content:
-                _logger.warning("AI返回内容为空")
-                return JSONResponse(
-                    content={"success": False, "error": "AI返回内容为空，请重试"},
-                    status_code=200
-                )
-            
-            return JSONResponse(
-                content={
-                    "success": True,
-                    "content": content,
-                    "model": result.model_used.name,
-                    "latency_ms": int(latency * 1000)
-                }
-            )
-            
-        except Exception as e:
-            _logger.error(f"AI failover error: {e}")
-            raise APICallError(message="AI服务暂时不可用，请稍后重试")
+            try:
+                # 性能优化：禁用预检健康检查，减少 1-5 秒首字节延迟
+                # 直接尝试主模型，失败后再故障转移到备用模型
+                async for chunk in ai_manager.chat_stream_with_failover(
+                    messages=messages,
+                    temperature=0.9,
+                    max_tokens=max_tokens,
+                    pre_check=False,  # 禁用预检，避免额外的 API 调用
+                ):
+                    # 累计长度统计
+                    chunk_len = len(chunk) if chunk else 0
+                    output_length += chunk_len
+                    chunk_count += 1
+                    
+                    # 内存保护：超出最大长度限制时停止
+                    if output_length > MAX_OUTPUT_LENGTH:
+                        _logger.warning(f"[流式响应] 输出超出限制 ({output_length}/{MAX_OUTPUT_LENGTH})，提前终止")
+                        yield SSEMessage.data("\n\n[内容过长，已截断]")
+                        break
+                    
+                    yield SSEMessage.data(chunk)
+                
+                # 发送结束标记
+                yield SSEMessage.done()
+                
+                # 性能优化：使用后台任务记录监控，完全不阻塞响应
+                async def _record_metrics():
+                    try:
+                        latency = time.time() - request_start_time
+                        # 简化 token 估算，避免同步计算开销
+                        input_tokens = len(system_prompt + prompt) // 4  # 粗略估算
+                        output_tokens = output_length // 4
+                        total_tokens = input_tokens + output_tokens
+                        cost = estimate_cost(total_tokens, 0.002) if total_tokens > 0 else 0.0
+                        
+                        cost_monitor.record_call(
+                            model="preset-stream",
+                            input_tokens=input_tokens,
+                            output_tokens=output_tokens,
+                            cost=cost,
+                            latency=latency,
+                            success=True,
+                            tool_name=divination_body.prompt_type,
+                            user_id=user_id
+                        )
+                        quota_manager.consume_quota(user_id, total_tokens, cost)
+                    except Exception as e:
+                        _logger.warning(f"监控记录失败: {e}")
+                
+                # 创建后台任务，不等待完成
+                asyncio.create_task(_record_metrics())
+                    
+            except asyncio.CancelledError:
+                _logger.info("客户端断开连接，流式传输已取消")
+                return
+            except TimeoutError as e:
+                _logger.error(f"Preset streaming timeout: {e}")
+                yield SSEMessage.error(str(e), SSEErrorCode.TIMEOUT_ERROR)
+                yield SSEMessage.done()
+            except Exception as e:
+                _logger.error(f"Preset streaming error: {e}")
+                yield SSEMessage.error(str(e), SSEErrorCode.STREAM_ERROR)
+                yield SSEMessage.done()
+        
+        # 返回流式响应（使用统一响应头）
+        return StreamingResponse(
+            get_preset_stream_generator(),
+            media_type='text/event-stream',
+            headers=SSE_HEADERS
+        )
 
     async def get_openai_generator():
+        """SSE 流式生成器 - 边收边发，实时输出（使用统一的SSE响应格式）"""
         try:
             async for event in openai_stream:
+                # 检查是否结束（finish_reason 不为空表示生成完成）
+                if event.choices and event.choices[0].finish_reason:
+                    _logger.debug(f"Stream finished: {event.choices[0].finish_reason}")
+                    yield SSEMessage.done()
+                    break
+                
+                # 提取并发送内容
                 if event.choices and event.choices[0].delta and event.choices[0].delta.content:
                     current_response = event.choices[0].delta.content
-                    yield f"data: {json.dumps(current_response)}\n\n"
+                    yield SSEMessage.data(current_response)
+                    
+        except asyncio.CancelledError:
+            # 客户端主动断开连接（如用户取消请求）
+            _logger.info("客户端断开连接，流式传输已取消")
+            return
+            
         except Exception as e:
             _logger.error(f"Streaming error: {e}")
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            # 发送结构化错误信息（统一格式）
+            yield SSEMessage.error(str(e), SSEErrorCode.STREAM_ERROR)
+            yield SSEMessage.done()
 
-    return StreamingResponse(get_openai_generator(), media_type='text/event-stream')
+    # 创建带完整响应头的 SSE 响应（使用统一响应头）
+    return StreamingResponse(
+        get_openai_generator(),
+        media_type='text/event-stream',
+        headers=SSE_HEADERS
+    )

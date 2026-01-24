@@ -11,6 +11,7 @@ import { getDivinationOption } from '@/config/constants'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Sparkles } from 'lucide-react'
+import { logger } from '@/utils/logger'
 
 const CONFIG = getDivinationOption('new_name')!
 
@@ -37,7 +38,7 @@ export default function NewNamePage() {
       )
       setLunarBirthday(solar.getLunar().toFullString())
     } catch (error) {
-      console.error(error)
+      logger.error('农历转换失败:', error)
       setLunarBirthday('转换失败')
     }
   }

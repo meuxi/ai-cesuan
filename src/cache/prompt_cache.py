@@ -1,10 +1,15 @@
 """
 提示词多级缓存系统
 层级：内存(L1) → Redis(L2) → 文件(L3)
+
+优化策略：
+- TTL 随机抖动：防止缓存雪崩
+- 空值缓存：防止缓存穿透
 """
 import json
 import hashlib
 import logging
+import random
 from typing import Optional, Dict, Any, List
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -17,26 +22,49 @@ logger = logging.getLogger(__name__)
 # 检测是否在Vercel环境（只读文件系统）
 IS_VERCEL = os.getenv("VERCEL") == "1"
 
+# 空值缓存标记（用于防止缓存穿透）
+CACHE_NULL_VALUE = "__CACHE_NULL__"
+# 空值缓存 TTL（较短，避免长时间缓存无效查询）
+NULL_VALUE_TTL_SECONDS = 60
+
 
 class PromptCacheConfig:
     """缓存配置"""
     # L1 内存缓存配置
     L1_MAX_SIZE = 100
     L1_TTL_SECONDS = 3600  # 1小时
+    L1_TTL_JITTER = 0.1    # TTL 抖动比例 (±10%)
     
     # L2 Redis缓存配置
     L2_TTL_SECONDS = 86400  # 24小时
+    L2_TTL_JITTER = 0.1    # TTL 抖动比例 (±10%)
     L2_PREFIX = "prompt:cache:"
     
     # L3 文件缓存配置
     L3_CACHE_DIR = "data/prompt_cache"
     L3_TTL_SECONDS = 604800  # 7天
+    L3_TTL_JITTER = 0.05   # TTL 抖动比例 (±5%)
     
     # 高频工具列表（常驻内存）
     HIGH_FREQ_TOOLS = [
         "bazi_analysis", "tarot_reading", "xiaoliu_analysis",
         "life_kline_analysis", "dream_divination", "liuyao_analysis"
     ]
+    
+    @classmethod
+    def get_ttl_with_jitter(cls, base_ttl: int, jitter_ratio: float) -> int:
+        """
+        获取带随机抖动的 TTL，防止缓存雪崩
+        
+        Args:
+            base_ttl: 基础 TTL（秒）
+            jitter_ratio: 抖动比例（如 0.1 表示 ±10%）
+        
+        Returns:
+            带随机抖动的 TTL
+        """
+        jitter = int(base_ttl * jitter_ratio)
+        return base_ttl + random.randint(-jitter, jitter)
 
 
 class MultiLevelPromptCache:
@@ -158,8 +186,8 @@ class MultiLevelPromptCache:
         self._update_stats("l2_misses")
         return None
     
-    def _l2_set(self, key: str, value: str):
-        """设置L2 Redis缓存"""
+    def _l2_set(self, key: str, value: str, ttl: int = None):
+        """设置L2 Redis缓存（带 TTL 抖动防止雪崩）"""
         redis_client = self._get_redis_client()
         if redis_client is None:
             return
@@ -167,9 +195,14 @@ class MultiLevelPromptCache:
         try:
             redis_key = f"{PromptCacheConfig.L2_PREFIX}{key}"
             if hasattr(redis_client, 'redis_client') and redis_client.redis_client:
+                # 使用带抖动的 TTL，防止缓存雪崩
+                actual_ttl = ttl or PromptCacheConfig.get_ttl_with_jitter(
+                    PromptCacheConfig.L2_TTL_SECONDS,
+                    PromptCacheConfig.L2_TTL_JITTER
+                )
                 redis_client.redis_client.setex(
                     redis_key,
-                    PromptCacheConfig.L2_TTL_SECONDS,
+                    actual_ttl,
                     value
                 )
         except Exception as e:
@@ -228,6 +261,8 @@ class MultiLevelPromptCache:
         多级缓存获取
         查询顺序: L1 → L2 → L3
         命中低级缓存时会回填高级缓存
+        
+        注意：返回 None 表示缓存未命中，返回空字符串表示缓存的空值
         """
         key = self.generate_cache_key(template_id, variables)
         self._update_stats("total_gets")
@@ -235,22 +270,43 @@ class MultiLevelPromptCache:
         # L1查询
         value = self._l1_get(key)
         if value is not None:
+            # 检查是否为空值标记（防止缓存穿透）
+            if value == CACHE_NULL_VALUE:
+                return ""  # 返回空字符串表示缓存的空值
             return value
         
         # L2查询
         value = self._l2_get(key)
         if value is not None:
+            if value == CACHE_NULL_VALUE:
+                self._l1_set(key, CACHE_NULL_VALUE)  # 回填L1
+                return ""
             self._l1_set(key, value)  # 回填L1
             return value
         
         # L3查询
         value = self._l3_get(key)
         if value is not None:
+            if value == CACHE_NULL_VALUE:
+                self._l1_set(key, CACHE_NULL_VALUE)
+                self._l2_set(key, CACHE_NULL_VALUE, ttl=NULL_VALUE_TTL_SECONDS)
+                return ""
             self._l1_set(key, value)  # 回填L1
             self._l2_set(key, value)  # 回填L2
             return value
         
         return None
+    
+    def set_null(self, template_id: str, variables: Dict[str, Any]):
+        """
+        缓存空值（防止缓存穿透）
+        
+        当查询结果确实为空时调用，避免重复查询数据库/API
+        空值缓存使用较短的 TTL
+        """
+        key = self.generate_cache_key(template_id, variables)
+        self._l1_set(key, CACHE_NULL_VALUE)
+        self._l2_set(key, CACHE_NULL_VALUE, ttl=NULL_VALUE_TTL_SECONDS)
     
     def set(self, template_id: str, variables: Dict[str, Any], content: str,
             levels: List[int] = None):

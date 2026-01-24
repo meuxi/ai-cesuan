@@ -2,8 +2,14 @@ import { ABOUT } from '@/config/constants'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import MarkdownIt from 'markdown-it'
+import DOMPurify from 'dompurify'
 
 const md = new MarkdownIt()
+
+// 安全渲染 Markdown：先渲染再 sanitize，防止 XSS
+const safeRenderMarkdown = (content: string): string => {
+  return DOMPurify.sanitize(md.render(content))
+}
 
 export default function AboutPage() {
   const navigate = useNavigate()
@@ -42,7 +48,7 @@ export default function AboutPage() {
             prose-li:text-muted-foreground
             prose-strong:text-foreground
             prose-ul:my-4 prose-li:my-1"
-          dangerouslySetInnerHTML={{ __html: md.render(ABOUT) }}
+          dangerouslySetInnerHTML={{ __html: safeRenderMarkdown(ABOUT) }}
         />
       </div>
     </div>

@@ -209,6 +209,8 @@ export function TarotCard({
                                 src={finalImageUrl}
                                 alt={cardName || 'Tarot Card'}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                                 onError={() => setImageError(true)}
                             />
                             {/* 图片光泽效果 */}

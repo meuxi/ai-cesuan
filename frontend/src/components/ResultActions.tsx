@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from './ui/button'
 import { Copy, Share2, Download, Check } from 'lucide-react'
 import { toast } from 'sonner'
@@ -15,6 +15,16 @@ interface ResultActionsProps {
 export default function ResultActions({ result, title, elementId = 'divination-result' }: ResultActionsProps) {
   const [copied, setCopied] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 清理定时器，防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
 
   // 复制结果（带网站信息）
   const handleCopy = async () => {
@@ -23,7 +33,11 @@ export default function ResultActions({ result, title, elementId = 'divination-r
       await navigator.clipboard.writeText(textWithSiteInfo)
       setCopied(true)
       toast.success('已复制到剪贴板')
-      setTimeout(() => setCopied(false), 2000)
+      // 使用 ref 管理定时器，便于清理
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+      timerRef.current = setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       toast.error('复制失败，请手动复制')
     }
@@ -46,8 +60,8 @@ export default function ResultActions({ result, title, elementId = 'divination-r
         await navigator.clipboard.writeText(`${shareData.text}\n${SITE_CONFIG.url}`)
         toast.success('链接已复制，可以分享给朋友')
       }
-    } catch (error: any) {
-      if (error.name !== 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name !== 'AbortError') {
         toast.error('分享失败')
       }
     }

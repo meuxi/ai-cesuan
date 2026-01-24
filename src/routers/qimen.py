@@ -4,6 +4,9 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
+from src.common import safe_api_call
+from src.cache import cached_divination
+
 router = APIRouter(prefix="/api/qimen", tags=["奇门遁甲"])
 
 # 导入用神模块
@@ -39,6 +42,8 @@ class QimenResponse(BaseModel):
 
 
 @router.post("/paipan", response_model=QimenResponse)
+@safe_api_call("奇门排盘")
+@cached_divination("qimen", ["year", "month", "day", "hour", "minute", "pan_type", "pan_style"])
 async def qimen_paipan(request: QimenRequest):
     """奇门遁甲排盘
     
@@ -58,39 +63,23 @@ async def qimen_paipan(request: QimenRequest):
     Returns:
         排盘结果
     """
-    # 验证盘类型
-    valid_pan_types = ['时盘', '日盘', '月盘', '年盘']
-    if request.pan_type not in valid_pan_types:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"无效的盘类型，应为：{', '.join(valid_pan_types)}"
-        )
+    from src.divination.qimen import QimenPaipan
+    from src.divination.common.validators import validate_pan_type, validate_pan_style
     
-    # 验证盘式
-    valid_pan_styles = ['转盘', '飞盘']
-    if request.pan_style not in valid_pan_styles:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"无效的盘式，应为：{', '.join(valid_pan_styles)}"
-        )
+    # 使用统一验证函数
+    validate_pan_type(request.pan_type)
+    validate_pan_style(request.pan_style)
     
-    try:
-        from src.divination.qimen import QimenPaipan
-        
-        paipan = QimenPaipan()
-        result = paipan.paipan(
-            request.year, 
-            request.month, 
-            request.day, 
-            request.hour,
-            request.minute,
-            request.pan_type,
-            request.pan_style
-        )
-        
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"排盘失败: {str(e)}")
+    paipan = QimenPaipan()
+    return paipan.paipan(
+        request.year, 
+        request.month, 
+        request.day, 
+        request.hour,
+        request.minute,
+        request.pan_type,
+        request.pan_style
+    )
 
 
 @router.get("/test")
@@ -152,65 +141,56 @@ async def get_shilei_options():
 
 
 @router.post("/yongshen/analyze")
+@safe_api_call("用神分析")
 async def analyze_yongshen_api(request: YongShenRequest):
     """
     分析用神状态
     
     根据事类选取用神，分析其落宫状态、旺相休囚死、与日干关系等
     """
+    from src.exceptions import ServiceUnavailableError
+    from src.divination.common.validators import validate_wuxing
+    
     if not YONGSHEN_AVAILABLE:
-        raise HTTPException(status_code=503, detail="用神模块不可用")
+        raise ServiceUnavailableError("用神模块不可用")
     
-    valid_wuxing = ['木', '火', '土', '金', '水']
-    if request.rigan_wuxing not in valid_wuxing:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"无效的日干五行，应为：{', '.join(valid_wuxing)}"
-        )
+    validate_wuxing(request.rigan_wuxing)
     
-    try:
-        result = analyze_yongshen(
-            shi_lei=request.shi_lei,
-            yongshen_gong=request.yongshen_gong,
-            rigan_gong=request.rigan_gong,
-            shigan_gong=request.shigan_gong,
-            month=request.month,
-            rigan_wuxing=request.rigan_wuxing,
-            kongwang=request.kongwang,
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"用神分析失败: {str(e)}")
+    return analyze_yongshen(
+        shi_lei=request.shi_lei,
+        yongshen_gong=request.yongshen_gong,
+        rigan_gong=request.rigan_gong,
+        shigan_gong=request.shigan_gong,
+        month=request.month,
+        rigan_wuxing=request.rigan_wuxing,
+        kongwang=request.kongwang,
+    )
 
 
 @router.post("/yongshen/zhuke")
+@safe_api_call("主客分析")
 async def analyze_zhuke_api(request: ZhuKeRequest):
     """
     主客分析
     
     用于合作、诉讼等涉及双方的事类，分析我方与对方的强弱对比
     """
+    from src.exceptions import ServiceUnavailableError
+    from src.divination.common.validators import validate_wuxing
+    
     if not YONGSHEN_AVAILABLE:
-        raise HTTPException(status_code=503, detail="用神模块不可用")
+        raise ServiceUnavailableError("用神模块不可用")
     
-    valid_wuxing = ['木', '火', '土', '金', '水']
-    if request.rigan_wuxing not in valid_wuxing or request.shigan_wuxing not in valid_wuxing:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"无效的五行，应为：{', '.join(valid_wuxing)}"
-        )
+    validate_wuxing(request.rigan_wuxing)
+    validate_wuxing(request.shigan_wuxing)
     
-    try:
-        result = qimen_yongshen.analyze_zhuke(
-            rigan_gong=request.rigan_gong,
-            shigan_gong=request.shigan_gong,
-            month=request.month,
-            rigan_wuxing=request.rigan_wuxing,
-            shigan_wuxing=request.shigan_wuxing,
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"主客分析失败: {str(e)}")
+    return qimen_yongshen.analyze_zhuke(
+        rigan_gong=request.rigan_gong,
+        shigan_gong=request.shigan_gong,
+        month=request.month,
+        rigan_wuxing=request.rigan_wuxing,
+        shigan_wuxing=request.shigan_wuxing,
+    )
 
 
 @router.get("/yongshen/fangwei")

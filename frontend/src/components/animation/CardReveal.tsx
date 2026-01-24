@@ -2,7 +2,7 @@
  * 卡片翻转揭示动画组件
  * 用于塔罗牌、抽签等场景
  */
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 
 interface CardRevealProps {
@@ -38,20 +38,36 @@ export function CardReveal({
   duration = 0.6
 }: CardRevealProps) {
   const [isFlipped, setIsFlipped] = useState(isRevealed)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleClick = () => {
+  // 清理定时器，防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
+
+  const handleClick = useCallback(() => {
     if (clickable && !isFlipped) {
       setIsFlipped(true)
-      setTimeout(() => {
+      // 使用 ref 管理定时器
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+      }
+      timerRef.current = setTimeout(() => {
         onReveal?.()
       }, duration * 1000)
     }
-  }
+  }, [clickable, isFlipped, duration, onReveal])
 
   // 同步外部状态
-  if (isRevealed !== isFlipped) {
-    setIsFlipped(isRevealed)
-  }
+  useEffect(() => {
+    if (isRevealed !== isFlipped) {
+      setIsFlipped(isRevealed)
+    }
+  }, [isRevealed, isFlipped])
 
   return (
     <div

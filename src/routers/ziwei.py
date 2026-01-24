@@ -13,6 +13,8 @@ from src.divination.ziwei.iztro_bridge_service import hybrid_iztro_service
 from src.divination.ziwei.ziwei_config import (
     ZiweiConfig, AlgorithmType, YearDivideType, AgeDivideType
 )
+from src.common import safe_api_call
+from src.cache import cached_divination
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ziwei", tags=["紫微斗数"])
@@ -67,6 +69,8 @@ class ZiweiHoroscopeRequest(BaseModel):
 
 
 @router.post("/paipan")
+@safe_api_call("紫微排盘")
+@cached_divination("ziwei", ["year", "month", "day", "hour", "minute", "gender", "algorithm"])
 async def paipan(req: ZiweiPaipanRequest):
     """紫微斗数排盘（使用iztro-py后端计算）
     
@@ -76,21 +80,16 @@ async def paipan(req: ZiweiPaipanRequest):
     Returns:
         完整的紫微命盘数据
     """
-    try:
-        result = hybrid_iztro_service.calculate(
-            year=req.year,
-            month=req.month,
-            day=req.day,
-            hour=req.hour,
-            minute=req.minute or 0,
-            gender=req.gender,
-            language=req.language or "zh-CN",
-            algorithm=req.algorithm
-        )
-        return result
-    except Exception as e:
-        logger.error(f"紫微排盘失败: {e}")
-        raise HTTPException(status_code=500, detail=f"紫微排盘失败: {str(e)}")
+    return hybrid_iztro_service.calculate(
+        year=req.year,
+        month=req.month,
+        day=req.day,
+        hour=req.hour,
+        minute=req.minute or 0,
+        gender=req.gender,
+        language=req.language or "zh-CN",
+        algorithm=req.algorithm
+    )
 
 
 @router.post("/paipan/enhanced")
@@ -107,6 +106,7 @@ async def paipan_enhanced(req: ZiweiPaipanRequest):
 
 
 @router.post("/config")
+@safe_api_call("设置紫微配置")
 async def set_config(req: ZiweiConfigRequest):
     """设置紫微斗数全局配置（四化、亮度、派别等）
     
@@ -118,71 +118,62 @@ async def set_config(req: ZiweiConfigRequest):
     Returns:
         当前配置信息
     """
-    try:
-        config = ZiweiConfig(
-            mutagens=req.mutagens,
-            brightness=req.brightness,
-            year_divide=YearDivideType(req.year_divide) if req.year_divide else YearDivideType.NORMAL,
-            age_divide=AgeDivideType(req.age_divide) if req.age_divide else AgeDivideType.NORMAL,
-            algorithm=AlgorithmType(req.algorithm) if req.algorithm else AlgorithmType.DEFAULT,
-        )
-        hybrid_iztro_service.config(config)
-        
-        return {
-            "success": True,
-            "message": "配置已更新",
-            "config": {
-                "algorithm": config.algorithm.value,
-                "yearDivide": config.year_divide.value,
-                "ageDivide": config.age_divide.value,
-                "hasMutagens": bool(config.mutagens),
-                "hasBrightness": bool(config.brightness),
-            }
+    config = ZiweiConfig(
+        mutagens=req.mutagens,
+        brightness=req.brightness,
+        year_divide=YearDivideType(req.year_divide) if req.year_divide else YearDivideType.NORMAL,
+        age_divide=AgeDivideType(req.age_divide) if req.age_divide else AgeDivideType.NORMAL,
+        algorithm=AlgorithmType(req.algorithm) if req.algorithm else AlgorithmType.DEFAULT,
+    )
+    hybrid_iztro_service.config(config)
+    
+    return {
+        "success": True,
+        "message": "配置已更新",
+        "config": {
+            "algorithm": config.algorithm.value,
+            "yearDivide": config.year_divide.value,
+            "ageDivide": config.age_divide.value,
+            "hasMutagens": bool(config.mutagens),
+            "hasBrightness": bool(config.brightness),
         }
-    except Exception as e:
-        logger.error(f"设置配置失败: {e}")
-        raise HTTPException(status_code=500, detail=f"设置配置失败: {str(e)}")
+    }
 
 
 @router.get("/config")
+@safe_api_call("获取紫微配置")
 async def get_config():
     """获取当前紫微斗数配置
     
     Returns:
         当前配置信息
     """
-    try:
-        config = hybrid_iztro_service.get_config()
-        mutagen_table = config.get_mutagen_table()
-        
-        return {
-            "algorithm": config.algorithm.value,
-            "yearDivide": config.year_divide.value,
-            "ageDivide": config.age_divide.value,
-            "horoscopeDivide": config.horoscope_divide.value,
-            "mutagens": mutagen_table,
-        }
-    except Exception as e:
-        logger.error(f"获取配置失败: {e}")
-        raise HTTPException(status_code=500, detail=f"获取配置失败: {str(e)}")
+    config = hybrid_iztro_service.get_config()
+    mutagen_table = config.get_mutagen_table()
+    
+    return {
+        "algorithm": config.algorithm.value,
+        "yearDivide": config.year_divide.value,
+        "ageDivide": config.age_divide.value,
+        "horoscopeDivide": config.horoscope_divide.value,
+        "mutagens": mutagen_table,
+    }
 
 
 @router.post("/config/reset")
+@safe_api_call("重置紫微配置")
 async def reset_config():
     """重置紫微斗数配置为默认值
     
     Returns:
         重置结果
     """
-    try:
-        hybrid_iztro_service.reset_config()
-        return {"success": True, "message": "配置已重置为默认值"}
-    except Exception as e:
-        logger.error(f"重置配置失败: {e}")
-        raise HTTPException(status_code=500, detail=f"重置配置失败: {str(e)}")
+    hybrid_iztro_service.reset_config()
+    return {"success": True, "message": "配置已重置为默认值"}
 
 
 @router.post("/horoscope")
+@safe_api_call("运限计算")
 async def get_horoscope(req: ZiweiHoroscopeRequest):
     """计算运限信息（大限/小限/流年/流月/流日/流时）
     
@@ -194,15 +185,10 @@ async def get_horoscope(req: ZiweiHoroscopeRequest):
     Returns:
         完整运限数据
     """
-    try:
-        result = hybrid_iztro_service.horoscope(
-            birth_date=req.birth_date,
-            birth_time_index=req.birth_time_index,
-            gender=req.gender,
-            target_date=req.target_date,
-            target_time_index=req.target_time_index
-        )
-        return result
-    except Exception as e:
-        logger.error(f"运限计算失败: {e}")
-        raise HTTPException(status_code=500, detail=f"运限计算失败: {str(e)}")
+    return hybrid_iztro_service.horoscope(
+        birth_date=req.birth_date,
+        birth_time_index=req.birth_time_index,
+        gender=req.gender,
+        target_date=req.target_date,
+        target_time_index=req.target_time_index
+    )

@@ -11,13 +11,13 @@ export interface ExportableData {
     title: string;
     date: string;
     type: string;
-    data: Record<string, any>;
+    data: Record<string, unknown>;
 }
 
 /**
  * 导出为JSON文件
  */
-export function exportToJson(data: any, filename: string): void {
+export function exportToJson<T = unknown>(data: T, filename: string): void {
     const jsonStr = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
     downloadBlob(blob, `${filename}.json`);
@@ -158,7 +158,7 @@ function generateHtmlReport(content: ExportableData): string {
 /**
  * 渲染数据段落
  */
-function renderDataSections(data: Record<string, any>): string {
+function renderDataSections(data: Record<string, unknown>): string {
     let html = '';
 
     for (const [key, value] of Object.entries(data)) {
@@ -323,7 +323,7 @@ export interface KLinePoint {
 export interface LifeKLineExportData {
     userName?: string;
     chartData: KLinePoint[];
-    analysis?: Record<string, any>;
+    analysis?: Record<string, unknown>;
 }
 
 export function exportLifeKLineHtmlReport(data: LifeKLineExportData): void {

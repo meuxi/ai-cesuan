@@ -3,7 +3,7 @@
  * 参考MingAI-master实现三方四正连线、颜色区分、运限高亮等功能
  */
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, Copy, Check, Sparkles } from 'lucide-react'
 import type { ZiweiResult, EnhancedPalace, StarWithMutagen } from '@/types/ziwei'
@@ -224,8 +224,8 @@ const HOROSCOPE_COLORS = {
     daily: { border: 'border-orange-500', bg: 'bg-orange-500/10', ring: 'ring-orange-500/30', text: 'text-orange-500' },
 }
 
-// 宫位卡片组件 - 优化布局和显示效果
-function PalaceCard({
+// 宫位卡片组件 - 优化布局和显示效果（使用memo避免不必要的重渲染）
+const PalaceCard = memo(function PalaceCard({
     palace,
     palaceIndex,
     isSelected,
@@ -467,7 +467,7 @@ function PalaceCard({
             )}
         </div>
     )
-}
+})
 
 export function ZiweiChartGrid({ data, onPalaceSelect, horoscopeHighlight = {}, horoscopeInfo, onHoroscopeDateChange }: ZiweiChartGridProps) {
     const { t } = useTranslation()

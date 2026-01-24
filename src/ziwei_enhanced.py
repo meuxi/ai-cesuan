@@ -1,6 +1,12 @@
 """
 增强版紫微斗数计算模块
 集成mingpan专业计算引擎
+
+⚠️ 注意：此模块当前未被项目使用
+主要的紫微斗数功能已由 src/divination/ziwei/iztro_service.py 实现
+此模块保留供未来扩展使用，如需集成 mingpan 引擎可启用
+
+TODO: 如确认不再需要，可考虑删除此文件
 """
 
 from typing import Dict, Any, List, Optional

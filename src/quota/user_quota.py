@@ -3,6 +3,7 @@
 支持多层级用户配额控制和使用量追踪
 """
 import os
+import atexit
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
@@ -11,8 +12,12 @@ import threading
 import logging
 import json
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
+
+# 后台文件 IO 线程池（避免阻塞主线程）
+_io_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="quota_io")
 
 # 检测是否在Vercel环境（只读文件系统）
 IS_VERCEL = os.getenv("VERCEL") == "1"
@@ -160,28 +165,51 @@ class UserQuotaManager:
             except Exception as e:
                 logger.error(f"Failed to load usage data: {e}")
     
-    def _save_usage_data(self):
-        """保存使用数据"""
+    def _save_usage_data(self, async_save: bool = True):
+        """
+        保存使用数据
+        
+        Args:
+            async_save: 是否异步保存（默认 True，使用后台线程避免阻塞）
+        """
         if self._data_dir is None:
             return
-        today_file = self._data_dir / f"usage_{date.today().isoformat()}.json"
-        try:
-            data = {}
-            with self._usage_lock:
-                for key, usage in self._usage_data.items():
-                    if usage.date == date.today().isoformat():
-                        data[key] = {
-                            "user_id": usage.user_id,
-                            "date": usage.date,
-                            "call_count": usage.call_count,
-                            "token_count": usage.token_count,
-                            "cost": usage.cost,
-                            "last_call_time": usage.last_call_time
-                        }
-            with open(today_file, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            logger.error(f"Failed to save usage data: {e}")
+        
+        # 准备要保存的数据（在锁内完成）
+        today_str = date.today().isoformat()
+        today_file = self._data_dir / f"usage_{today_str}.json"
+        
+        data = {}
+        with self._usage_lock:
+            for key, usage in self._usage_data.items():
+                if usage.date == today_str:
+                    data[key] = {
+                        "user_id": usage.user_id,
+                        "date": usage.date,
+                        "call_count": usage.call_count,
+                        "token_count": usage.token_count,
+                        "cost": usage.cost,
+                        "last_call_time": usage.last_call_time
+                    }
+        
+        def _do_save():
+            """实际的文件写入操作"""
+            try:
+                with open(today_file, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                logger.error(f"Failed to save usage data: {e}")
+        
+        if async_save:
+            # 异步保存：提交到后台线程池，不阻塞主线程
+            _io_executor.submit(_do_save)
+        else:
+            # 同步保存：直接执行（用于程序退出时的强制保存）
+            _do_save()
+    
+    def force_save(self):
+        """强制同步保存（用于程序退出时）"""
+        self._save_usage_data(async_save=False)
     
     def get_user_tier(self, user_id: str) -> QuotaTier:
         """获取用户等级"""

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, memo, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Trash2, Calendar } from 'lucide-react'
 import { getHistoryByType, deleteHistoryItem, DivinationHistoryItem } from '@/utils/divinationHistory'
@@ -6,8 +6,91 @@ import { ResultDrawer } from '@/components/ResultDrawer'
 import { toast } from 'sonner'
 import { getDivinationOption } from '@/config/constants'
 import MarkdownIt from 'markdown-it'
+import DOMPurify from 'dompurify'
+import { formatRelativeTime } from '@/utils/dateUtils'
 
 const md = new MarkdownIt()
+
+// 安全渲染 Markdown：先渲染再 sanitize，防止 XSS
+const safeRenderMarkdown = (content: string): string => {
+  return DOMPurify.sanitize(md.render(content))
+}
+
+// 使用统一的日期格式化工具
+const formatDate = formatRelativeTime
+
+// ========== 列表项组件（使用 React.memo 优化重渲染） ==========
+interface HistoryItemProps {
+  item: DivinationHistoryItem
+  onView: (item: DivinationHistoryItem) => void
+  onDelete: (id: string) => void
+}
+
+const HistoryItem = memo(function HistoryItem({ item, onView, onDelete }: HistoryItemProps) {
+  const handleClick = useCallback(() => {
+    onView(item)
+  }, [item, onView])
+
+  const handleDelete = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onDelete(item.id)
+  }, [item.id, onDelete])
+
+  return (
+    <div
+      className="p-4 rounded-lg border border-border hover:border-muted-foreground cursor-pointer transition-colors group"
+      onClick={handleClick}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground font-medium">
+              {item.title}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {formatDate(item.timestamp)}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground truncate">
+            {item.prompt}
+          </p>
+          {/* 显示metadata中的额外信息 */}
+          {item.metadata && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {item.metadata.userName && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+                  {item.metadata.userName}
+                </span>
+              )}
+              {item.metadata.qianNumber && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+                  第{item.metadata.qianNumber}签
+                </span>
+              )}
+              {item.metadata.birthday && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+                  {item.metadata.birthday}
+                </span>
+              )}
+              {item.metadata.cards && item.metadata.cards.length > 0 && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
+                  {item.metadata.cards.length}张牌
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <button
+          className="shrink-0 h-8 w-8 p-0 text-muted-foreground hover:text-destructive rounded-md transition-colors flex items-center justify-center"
+          onClick={handleDelete}
+          aria-label="删除记录"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  )
+})
 
 export default function HistoryPage() {
   const navigate = useNavigate()
@@ -29,14 +112,6 @@ export default function HistoryPage() {
     }
   }
 
-  const handleDelete = (id: string) => {
-    if (type) {
-      deleteHistoryItem(id, type)
-      loadHistory()
-      toast.success('已删除')
-    }
-  }
-
   const handleClearAll = () => {
     if (confirm('确定要清空所有历史记录吗？') && type) {
       // 清空该类型的所有记录
@@ -47,32 +122,25 @@ export default function HistoryPage() {
     }
   }
 
-  const handleViewResult = (item: DivinationHistoryItem) => {
+  // 使用 useCallback 稳定回调引用，避免子组件不必要的重渲染
+  const handleViewResult = useCallback((item: DivinationHistoryItem) => {
     setSelectedItem(item)
     setShowDrawer(true)
-  }
+  }, [])
 
-  // 将 markdown 渲染成 HTML
+  const handleDeleteItem = useCallback((id: string) => {
+    if (type) {
+      deleteHistoryItem(id, type)
+      loadHistory()
+      toast.success('已删除')
+    }
+  }, [type])
+
+  // 将 markdown 安全渲染成 HTML（使用 DOMPurify 防止 XSS）
   const renderedResult = useMemo(() => {
     if (!selectedItem) return ''
-    return md.render(selectedItem.result)
+    return safeRenderMarkdown(selectedItem.result)
   }, [selectedItem])
-
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const minutes = Math.floor(diff / 60000)
-    const hours = Math.floor(diff / 3600000)
-    const days = Math.floor(diff / 86400000)
-
-    if (minutes < 1) return '刚刚'
-    if (minutes < 60) return `${minutes}分钟前`
-    if (hours < 24) return `${hours}小时前`
-    if (days < 7) return `${days}天前`
-
-    return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-  }
 
   return (
     <div className="space-y-6">
@@ -118,61 +186,12 @@ export default function HistoryPage() {
         ) : (
           <div className="space-y-3">
             {history.map((item) => (
-              <div
+              <HistoryItem
                 key={item.id}
-                className="p-4 rounded-lg border border-border hover:border-muted-foreground cursor-pointer transition-colors group"
-                onClick={() => handleViewResult(item)}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground font-medium">
-                        {item.title}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(item.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {item.prompt}
-                    </p>
-                    {/* 显示metadata中的额外信息 */}
-                    {item.metadata && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {item.metadata.userName && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                            {item.metadata.userName}
-                          </span>
-                        )}
-                        {item.metadata.qianNumber && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                            第{item.metadata.qianNumber}签
-                          </span>
-                        )}
-                        {item.metadata.birthday && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                            {item.metadata.birthday}
-                          </span>
-                        )}
-                        {item.metadata.cards && item.metadata.cards.length > 0 && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">
-                            {item.metadata.cards.length}张牌
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    className="shrink-0 h-8 w-8 p-0 text-muted-foreground hover:text-destructive rounded-md transition-colors flex items-center justify-center"
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation()
-                      handleDelete(item.id)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+                item={item}
+                onView={handleViewResult}
+                onDelete={handleDeleteItem}
+              />
             ))}
           </div>
         )}

@@ -22,5 +22,10 @@ class CacheClientBase(metaclass=MetaCacheClient):
         return None
 
     @classmethod
+    def delete_token(cls, key: str) -> bool:
+        """删除指定 key，返回是否删除成功"""
+        return False
+
+    @classmethod
     def check_rate_limit(cls, key: str, time_window_seconds: int, max_requests: int) -> None:
         return

@@ -10,6 +10,12 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import './xiaoliu-ren.css'
 
+// lunar-javascript 库的类型补充（库本身类型定义不完整）
+interface LunarDate {
+  getMonth(): number
+  getDay(): number
+}
+
 const CONFIG = getDivinationOption('xiaoliu')!
 
 // 小六壬基础数据
@@ -212,8 +218,8 @@ export default function XiaoLiuRenPage() {
     )
     const lunar = solar.getLunar()
     const year = solarDate.getFullYear()
-    const month = (lunar as any).getMonth() // 农历月份 (1-12)
-    const day = (lunar as any).getDay() // 农历日期 (1-30)
+    const month = (lunar as LunarDate).getMonth() // 农历月份 (1-12)
+    const day = (lunar as LunarDate).getDay() // 农历日期 (1-30)
 
     return { year, month, day }
   }

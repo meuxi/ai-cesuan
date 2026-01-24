@@ -14,6 +14,88 @@ const DI_ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '
 // 天干列表
 const TIAN_GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 
+// 后端响应类型定义（snake_case）
+interface BackendKongWang {
+    xun: string;
+    kong_dizhi: [string, string];
+}
+
+interface BackendInfluence {
+    month_action?: string;
+    day_action?: string;
+    description?: string;
+}
+
+interface BackendStrength {
+    wang_shuai?: string;
+    score?: number;
+    factors?: string[];
+    is_strong?: boolean;
+    special_status?: string;
+}
+
+interface BackendChangeAnalysis {
+    hua_type: string;
+    original_zhi: string;
+    changed_zhi: string;
+    description: string;
+}
+
+interface BackendChangSheng {
+    stage: string;
+    strength: string;
+    description: string;
+}
+
+interface BackendExtendedYao {
+    index: number;
+    branch: string;
+    element: string;
+    liu_qin: string;
+    is_moving: boolean;
+    kong_wang_state: string;
+    influence?: BackendInfluence;
+    strength?: BackendStrength;
+    change_analysis?: BackendChangeAnalysis;
+    chang_sheng?: BackendChangSheng;
+}
+
+interface BackendShenInfo {
+    liu_qin: string;
+    wu_xing: string;
+    positions: number[];
+}
+
+interface BackendShenSystem {
+    yuan_shen?: BackendShenInfo;
+    ji_shen?: BackendShenInfo;
+    chou_shen?: BackendShenInfo;
+}
+
+interface BackendTimeRecommendation {
+    type: string;
+    timeframe: string;
+    earthly_branch: string;
+    description: string;
+}
+
+interface BackendAnalysisResult {
+    kong_wang?: BackendKongWang;
+    extended_yaos?: BackendExtendedYao[];
+    san_he_analysis?: {
+        has_full_san_he: boolean;
+        full_san_he?: unknown;
+        has_ban_he: boolean;
+        ban_he?: unknown[];
+    };
+    liu_chong_gua?: {
+        is_liu_chong_gua: boolean;
+        description?: string;
+    };
+    shen_system?: BackendShenSystem;
+    time_recommendations?: BackendTimeRecommendation[];
+}
+
 /**
  * 根据公历日期计算干支
  * 简化算法，实际应用中建议使用更精确的农历库
@@ -41,13 +123,13 @@ function calculateGanZhi(date: Date): { monthZhi: string; dayGan: string; dayZhi
 }
 
 // 转换后端snake_case为前端camelCase
-const transformAnalysisResult = (data: any): AdvancedAnalysisResult => {
+const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisResult => {
     return {
         kongWang: {
             xun: data.kong_wang?.xun || '',
             kongDizhi: data.kong_wang?.kong_dizhi || ['', '']
         },
-        extendedYaos: (data.extended_yaos || []).map((yao: any) => ({
+        extendedYaos: (data.extended_yaos || []).map((yao) => ({
             index: yao.index,
             branch: yao.branch,
             element: yao.element,
@@ -105,7 +187,7 @@ const transformAnalysisResult = (data: any): AdvancedAnalysisResult => {
                 positions: data.shen_system.chou_shen.positions
             } : undefined
         } : undefined,
-        timeRecommendations: (data.time_recommendations || []).map((rec: any) => ({
+        timeRecommendations: (data.time_recommendations || []).map((rec) => ({
             type: rec.type,
             timeframe: rec.timeframe,
             earthlyBranch: rec.earthly_branch,

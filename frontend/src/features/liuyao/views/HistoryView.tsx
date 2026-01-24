@@ -11,6 +11,8 @@ import { getHistory, clearHistory } from '../utils/storage';
 import HexagramLines from '../components/HexagramLines';
 import { calculateHexagram } from '../utils/liuyao';
 import { useTheme } from '../hooks/useTheme';
+import { logger } from '@/utils/logger';
+import { formatShortDateTime } from '@/utils/dateUtils';
 
 const HistoryView: React.FC = () => {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
@@ -20,19 +22,10 @@ const HistoryView: React.FC = () => {
     setRecords(getHistory());
   }, []);
 
+  // 使用统一的日期格式化工具
   const formatDate = (ts: number) => {
-    const d = new Date(ts);
-    const now = new Date();
-    const isToday = d.toDateString() === now.toDateString();
-    const hours = d.getHours().toString().padStart(2, '0');
-    const minutes = d.getMinutes().toString().padStart(2, '0');
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-
-    if (isToday) {
-      return `今日 ${hours}:${minutes}`;
-    }
-    return `${month}月${day}日 ${hours}:${minutes}`;
+    // 使用导入的工具函数
+    return formatShortDateTime(ts);
   };
 
   // 获取起卦方法的中文名
@@ -62,7 +55,7 @@ const HistoryView: React.FC = () => {
         hexagramData = calculateHexagram(selectedRecord.lines);
       }
     } catch (err) {
-      console.error('Failed to calculate hexagram:', err);
+      logger.error('Failed to calculate hexagram:', err);
     }
 
     return (

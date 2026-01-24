@@ -1,10 +1,16 @@
 import logging
+import os
+import secrets
 from typing import Tuple
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 _logger = logging.getLogger(__name__)
+
+# 安全配置常量
+MIN_JWT_SECRET_LENGTH = 32  # JWT 密钥最小长度
+WEAK_JWT_SECRETS = {"secret", "password", "123456", "jwt_secret", ""}  # 弱密钥黑名单
 
 
 class Settings(BaseSettings):
@@ -44,7 +50,63 @@ class Settings(BaseSettings):
     # github oauth login settings
     github_client_id: str = ""
     github_client_secret: str = Field(default="", exclude=True)
-    jwt_secret: str = Field(default="secret", exclude=True)
+    jwt_secret: str = Field(default="", exclude=True)
+    
+    @field_validator('jwt_secret', mode='before')
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        """验证 JWT 密钥强度，生产环境强制使用强密钥"""
+        is_production = os.getenv("VERCEL") == "1" or os.getenv("ENVIRONMENT") == "production"
+        
+        # 如果未设置或为弱密钥
+        if not v or v.lower() in WEAK_JWT_SECRETS:
+            if is_production:
+                # 生产环境：必须配置强密钥
+                raise ValueError(
+                    f"安全错误：生产环境必须配置 JWT_SECRET 环境变量，"
+                    f"且长度不少于 {MIN_JWT_SECRET_LENGTH} 个字符。"
+                    f"可使用以下命令生成：python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+                )
+            else:
+                # 开发环境：自动生成随机密钥并警告
+                generated_secret = secrets.token_urlsafe(32)
+                _logger.warning(
+                    f"[安全警告] JWT_SECRET 未配置或过于简单，已自动生成临时密钥。"
+                    f"生产环境请务必配置强密钥！"
+                )
+                return generated_secret
+        
+        # 检查密钥长度
+        if len(v) < MIN_JWT_SECRET_LENGTH:
+            if is_production:
+                raise ValueError(
+                    f"安全错误：JWT_SECRET 长度不足，至少需要 {MIN_JWT_SECRET_LENGTH} 个字符。"
+                )
+            else:
+                _logger.warning(
+                    f"[安全警告] JWT_SECRET 长度不足 {MIN_JWT_SECRET_LENGTH} 字符，"
+                    f"建议使用更强的密钥。"
+                )
+        
+        return v
+    
+    @field_validator('cache_client_type', mode='after')
+    @classmethod
+    def validate_cache_client_type(cls, v: str) -> str:
+        """验证缓存类型，生产环境警告使用内存缓存"""
+        is_production = os.getenv("VERCEL") == "1" or os.getenv("ENVIRONMENT") == "production"
+        valid_types = {"memory", "redis", "upstash_kv"}
+        
+        if v not in valid_types:
+            raise ValueError(f"cache_client_type 必须是 {valid_types} 之一，实际值: {v}")
+        
+        if is_production and v == "memory":
+            _logger.warning(
+                "[水平扩展警告] 生产环境使用内存缓存 (cache_client_type=memory)，"
+                "无法支持多实例部署。建议配置 Redis 或 Upstash KV。"
+            )
+        
+        return v
 
     # google ads settings
     ad_client: str = ""

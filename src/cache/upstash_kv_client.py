@@ -57,6 +57,25 @@ class UpstashCacheClient(CacheClientBase):
         return None
 
     @classmethod
+    def delete_token(cls, key: str) -> bool:
+        """删除指定 key"""
+        try:
+            res = requests.post(
+                f"{settings.upstash_api_url}",
+                data=f'["DEL", "{key}"]',
+                headers={
+                    "Authorization": f"Bearer {settings.upstash_api_token}",
+                    "Content-Type": "application/json",
+                }
+            )
+            if res.status_code == 200:
+                return res.json().get("result", 0) > 0
+            return False
+        except Exception as e:
+            _logger.error(f"Delete token failed: {e}")
+            return False
+
+    @classmethod
     def check_rate_limit(cls, key: str, time_window_seconds: int, max_requests: int) -> None:
         # user zest to check rate limit
         cur_timestamp = int(time.time())

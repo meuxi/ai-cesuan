@@ -1,4 +1,5 @@
 import time
+import threading
 from fastapi import HTTPException
 import redis
 import logging
@@ -16,12 +17,27 @@ _logger = logging.getLogger(__name__)
 class RedisCacheClient(CacheClientBase):
 
     _type = "redis"
-    redis_client = None
+    redis_client: Optional[redis.Redis] = None
+    _init_lock = threading.Lock()  # 初始化锁，防止竞态条件
 
     @classmethod
     def init_redis(cls):
+        """
+        线程安全的 Redis 客户端初始化
+        使用双重检查锁定模式（Double-Checked Locking）
+        """
         if cls.redis_client is None:
-            cls.redis_client = redis.Redis.from_url(settings.redis_url, decode_responses=True)
+            with cls._init_lock:
+                # 双重检查：在锁内再次检查，防止重复初始化
+                if cls.redis_client is None:
+                    cls.redis_client = redis.Redis.from_url(
+                        settings.redis_url,
+                        decode_responses=True,
+                        socket_connect_timeout=5,  # 连接超时
+                        socket_timeout=10,         # 操作超时
+                        retry_on_timeout=True,     # 超时重试
+                    )
+                    _logger.info("[Redis] 客户端初始化成功")
 
     @classmethod
     def store_token(cls, key: str, token: str, expire_seconds: int) -> None:
@@ -43,6 +59,16 @@ class RedisCacheClient(CacheClientBase):
         except Exception as e:
             _logger.error(f"Get token failed: {e}")
             return None
+
+    @classmethod
+    def delete_token(cls, key: str) -> bool:
+        """删除指定 key"""
+        try:
+            cls.init_redis()
+            return cls.redis_client.delete(key) > 0
+        except Exception as e:
+            _logger.error(f"Delete token failed: {e}")
+            return False
 
     @classmethod
     def check_rate_limit(cls, key: str, time_window_seconds: int, max_requests: int) -> None:

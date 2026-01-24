@@ -7,14 +7,49 @@ import { HexagramInfo, LineDetails, FuShenInfo, CoinCastResult } from '../types'
 
 const API_BASE = '/api/liuyao';
 
+// 后端响应类型定义（snake_case）
+interface BackendFuShen {
+    stem: string;
+    branch: string;
+    relation: string;
+    element: string;
+}
+
+interface BackendLine {
+    index: number;
+    type: string;
+    type_name: string;
+    is_moving: boolean;
+    stem: string;
+    branch: string;
+    element: string;
+    six_relation: string;
+    six_beast: string;
+    is_shi: boolean;
+    is_ying: boolean;
+    fu_shen?: BackendFuShen;
+    changed_type?: string;
+    changed_branch?: string;
+    changed_stem?: string;
+    changed_relation?: string;
+}
+
+interface BackendHexagram {
+    name: string;
+    palace_name: string;
+    palace_element: string;
+    transformed_name?: string;
+    lines: BackendLine[];
+}
+
 // 将后端snake_case转换为前端camelCase
-const transformHexagram = (data: any): HexagramInfo => {
+const transformHexagram = (data: BackendHexagram): HexagramInfo => {
     return {
         name: data.name,
         palaceName: data.palace_name,
         palaceElement: data.palace_element,
         transformedName: data.transformed_name,
-        lines: data.lines.map((line: any): LineDetails => ({
+        lines: data.lines.map((line): LineDetails => ({
             index: line.index,
             type: line.type,
             typeName: line.type_name,

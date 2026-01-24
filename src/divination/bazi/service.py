@@ -130,7 +130,8 @@ class BaziService:
                 'prev_qi': qi.getName() if qi else None,
                 'month_jie': bazi.getMonthJie() if hasattr(bazi, 'getMonthJie') else None,
             }
-        except Exception:
+        except Exception as e:
+            _logger.debug(f"获取节气信息失败: {e}")
             return {}
     
     def _calculate_fallback(self, year: int, month: int, day: int, hour: int,

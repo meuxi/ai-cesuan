@@ -20,8 +20,25 @@ const DIZHI_WUXING: Record<string, string> = {
 
 type FiveElement = '木' | '火' | '土' | '金' | '水'
 
+interface BaziData {
+    sizhu?: {
+        year?: string
+        month?: string
+        day?: string
+        hour?: string
+    }
+    dizhi_cang?: Record<string, string[]>
+    lunar_info?: {
+        lunar_year?: number
+        lunar_month?: number
+        lunar_day?: number
+        [key: string]: unknown
+    }
+    [key: string]: unknown
+}
+
 interface BaziDisplayProps {
-    data: any
+    data: BaziData | null
     loading?: boolean
 }
 

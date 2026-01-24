@@ -83,7 +83,7 @@ Support both click lock and hover preview modes
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/ai-divination.git
+git clone https://github.com/meuxi/ai-cesuan.git
 cd ai-divination
 
 # 后端
