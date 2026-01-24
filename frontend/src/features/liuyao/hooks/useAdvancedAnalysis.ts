@@ -4,7 +4,18 @@
  */
 
 import { useState, useCallback } from 'react';
-import { HexagramInfo, AdvancedAnalysisResult, KongWangState, TimeRecommendation, ExtendedYaoInfo } from '../types';
+import { 
+    HexagramInfo, 
+    AdvancedAnalysisResult, 
+    KongWangState, 
+    TimeRecommendation, 
+    ExtendedYaoInfo,
+    YaoAction,
+    WangShuai,
+    SpecialStatus,
+    HuaType,
+    ChangShengStage
+} from '../types';
 
 const API_BASE = '/api/liuyao';
 
@@ -137,25 +148,25 @@ const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisR
             isMoving: yao.is_moving,
             kongWangState: yao.kong_wang_state as KongWangState,
             influence: {
-                monthAction: yao.influence?.month_action,
-                dayAction: yao.influence?.day_action,
-                description: yao.influence?.description
+                monthAction: (yao.influence?.month_action || '无') as YaoAction,
+                dayAction: (yao.influence?.day_action || '无') as YaoAction,
+                description: yao.influence?.description || ''
             },
             strength: {
-                wangShuai: yao.strength?.wang_shuai,
-                score: yao.strength?.score,
+                wangShuai: (yao.strength?.wang_shuai || '休') as WangShuai,
+                score: yao.strength?.score ?? 0,
                 factors: yao.strength?.factors || [],
-                isStrong: yao.strength?.is_strong,
-                specialStatus: yao.strength?.special_status
+                isStrong: yao.strength?.is_strong ?? false,
+                specialStatus: (yao.strength?.special_status || '无') as SpecialStatus
             },
             changeAnalysis: yao.change_analysis ? {
-                huaType: yao.change_analysis.hua_type,
+                huaType: yao.change_analysis.hua_type as HuaType,
                 originalZhi: yao.change_analysis.original_zhi,
                 changedZhi: yao.change_analysis.changed_zhi,
                 description: yao.change_analysis.description
             } : undefined,
             changSheng: yao.chang_sheng ? {
-                stage: yao.chang_sheng.stage,
+                stage: yao.chang_sheng.stage as ChangShengStage,
                 strength: yao.chang_sheng.strength,
                 description: yao.chang_sheng.description
             } : undefined

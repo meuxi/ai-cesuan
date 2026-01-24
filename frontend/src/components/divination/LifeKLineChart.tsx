@@ -82,16 +82,18 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
 };
 
 interface CandleShapeProps {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    payload: KLinePoint;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    payload?: KLinePoint;
     yAxis?: { scale: (value: number) => number };
 }
 
 const CandleShape = (props: CandleShapeProps) => {
-    const { x, y, width, height, payload, yAxis } = props;
+    const { x = 0, y = 0, width = 0, height = 0, payload, yAxis } = props;
+    
+    if (!payload) return null;
 
     const isUp = payload.close >= payload.open;
     const color = isUp ? '#ef4444' : '#22c55e';

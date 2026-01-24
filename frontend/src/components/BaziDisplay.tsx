@@ -21,17 +21,18 @@ const DIZHI_WUXING: Record<string, string> = {
 type FiveElement = '木' | '火' | '土' | '金' | '水'
 
 interface BaziData {
-    sizhu?: {
-        year?: string
-        month?: string
-        day?: string
-        hour?: string
-    }
+    sizhu?: Record<string, string | undefined>
+    nayin?: Record<string, string | undefined>
     dizhi_cang?: Record<string, string[]>
+    xunkong?: string
     lunar_info?: {
         lunar_year?: number
         lunar_month?: number
         lunar_day?: number
+        year_cn?: string
+        month_cn?: string
+        day_cn?: string
+        zodiac?: string
         [key: string]: unknown
     }
     [key: string]: unknown
