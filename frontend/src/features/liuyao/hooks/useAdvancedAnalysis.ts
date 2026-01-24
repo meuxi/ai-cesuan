@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { HexagramInfo, AdvancedAnalysisResult } from '../types';
+import { HexagramInfo, AdvancedAnalysisResult, KongWangState, TimeRecommendation, ExtendedYaoInfo } from '../types';
 
 const API_BASE = '/api/liuyao';
 
@@ -129,13 +129,13 @@ const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisR
             xun: data.kong_wang?.xun || '',
             kongDizhi: data.kong_wang?.kong_dizhi || ['', '']
         },
-        extendedYaos: (data.extended_yaos || []).map((yao) => ({
+        extendedYaos: (data.extended_yaos || []).map((yao): ExtendedYaoInfo => ({
             index: yao.index,
             branch: yao.branch,
             element: yao.element,
             liuQin: yao.liu_qin,
             isMoving: yao.is_moving,
-            kongWangState: yao.kong_wang_state,
+            kongWangState: yao.kong_wang_state as KongWangState,
             influence: {
                 monthAction: yao.influence?.month_action,
                 dayAction: yao.influence?.day_action,
@@ -162,9 +162,9 @@ const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisR
         })),
         sanHeAnalysis: {
             hasFullSanHe: data.san_he_analysis?.has_full_san_he || false,
-            fullSanHe: data.san_he_analysis?.full_san_he,
+            fullSanHe: data.san_he_analysis?.full_san_he as { name: string; result: string; positions: number[] } | undefined,
             hasBanHe: data.san_he_analysis?.has_ban_he || false,
-            banHe: data.san_he_analysis?.ban_he || []
+            banHe: (data.san_he_analysis?.ban_he || []) as Array<{ branches: [string, string]; result: string; type: 'sheng' | 'mu'; positions: number[] }>
         },
         liuChongGua: {
             isLiuChongGua: data.liu_chong_gua?.is_liu_chong_gua || false,
@@ -187,8 +187,8 @@ const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisR
                 positions: data.shen_system.chou_shen.positions
             } : undefined
         } : undefined,
-        timeRecommendations: (data.time_recommendations || []).map((rec) => ({
-            type: rec.type,
+        timeRecommendations: (data.time_recommendations || []).map((rec): TimeRecommendation => ({
+            type: rec.type as 'favorable' | 'unfavorable' | 'critical',
             timeframe: rec.timeframe,
             earthlyBranch: rec.earthly_branch,
             description: rec.description

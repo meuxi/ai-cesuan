@@ -172,12 +172,13 @@ function renderDataSections(data: Record<string, unknown>): string {
                     </ul>
                 </div>`;
             } else if ('content' in value && 'score' in value) {
-                const scoreClass = value.score >= 7 ? 'score-high' : value.score >= 4 ? 'score-mid' : 'score-low';
+                const typedValue = value as { content: unknown; score: number };
+                const scoreClass = typedValue.score >= 7 ? 'score-high' : typedValue.score >= 4 ? 'score-mid' : 'score-low';
                 html += `
                 <div class="section">
-                    <h2>${formatKey(key)} <span style="float:right">${value.score}/10</span></h2>
-                    <div class="score-bar"><div class="score-bar-fill ${scoreClass}" style="width: ${value.score * 10}%"></div></div>
-                    <p>${value.content}</p>
+                    <h2>${formatKey(key)} <span style="float:right">${typedValue.score}/10</span></h2>
+                    <div class="score-bar"><div class="score-bar-fill ${scoreClass}" style="width: ${typedValue.score * 10}%"></div></div>
+                    <p>${typedValue.content}</p>
                 </div>`;
             } else {
                 html += `
@@ -290,8 +291,10 @@ export function generateShareText(data: ExportableData): string {
     for (const [key, value] of Object.entries(data.data)) {
         if (typeof value === 'string') {
             text += `【${formatKey(key)}】\n${value}\n\n`;
-        } else if (typeof value === 'object' && 'content' in value) {
-            text += `【${formatKey(key)}】${value.score}/10分\n${value.content}\n\n`;
+        } else if (typeof value === 'object' && value !== null && 'content' in value) {
+            const typedValue = value as { content: string; score?: number };
+            const scoreText = typedValue.score !== undefined ? `${typedValue.score}/10分` : '';
+            text += `【${formatKey(key)}】${scoreText}\n${typedValue.content}\n\n`;
         }
     }
 

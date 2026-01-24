@@ -157,7 +157,7 @@ export class ZiweiHoroscopeService {
             const decadeEndAge = decadeStartAge + 9
 
             // 获取大限四化（通过大限天干）
-            const mutagen = this.getMutagenByStem(palace.heavenlyStem)
+            const mutagen = palace.heavenlyStem ? this.getMutagenByStem(palace.heavenlyStem) : undefined
 
             // 获取大限重排宫名：通过该大限年龄计算 horoscope
             let palaceNames: string[] | undefined

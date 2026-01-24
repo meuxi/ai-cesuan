@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { HexagramInfo, LineDetails, FuShenInfo, CoinCastResult } from '../types';
+import { HexagramInfo, LineDetails, FuShenInfo, CoinCastResult, LineType } from '../types';
 
 const API_BASE = '/api/liuyao';
 
@@ -51,7 +51,7 @@ const transformHexagram = (data: BackendHexagram): HexagramInfo => {
         transformedName: data.transformed_name,
         lines: data.lines.map((line): LineDetails => ({
             index: line.index,
-            type: line.type,
+            type: Number(line.type) as LineType,
             typeName: line.type_name,
             isMoving: line.is_moving,
             stem: line.stem,
@@ -67,7 +67,7 @@ const transformHexagram = (data: BackendHexagram): HexagramInfo => {
                 relation: line.fu_shen.relation,
                 element: line.fu_shen.element
             } as FuShenInfo : undefined,
-            changedType: line.changed_type,
+            changedType: line.changed_type !== undefined ? Number(line.changed_type) as LineType : undefined,
             changedBranch: line.changed_branch,
             changedStem: line.changed_stem,
             changedRelation: line.changed_relation
