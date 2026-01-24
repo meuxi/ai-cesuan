@@ -124,7 +124,7 @@ const LifeKLinePage: React.FC = () => {
         if (!result) return;
         exportLifeKLineHtmlReport({
             chartData: result.chartData,
-            analysis: result.analysis as Record<string, unknown> | undefined,
+            analysis: result.analysis as unknown as Record<string, unknown> | undefined,
         });
     };
 

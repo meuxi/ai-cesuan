@@ -167,7 +167,7 @@ const transformAnalysisResult = (data: BackendAnalysisResult): AdvancedAnalysisR
             } : undefined,
             changSheng: yao.chang_sheng ? {
                 stage: yao.chang_sheng.stage as ChangShengStage,
-                strength: yao.chang_sheng.strength,
+                strength: yao.chang_sheng.strength as 'strong' | 'medium' | 'weak',
                 description: yao.chang_sheng.description
             } : undefined
         })),
