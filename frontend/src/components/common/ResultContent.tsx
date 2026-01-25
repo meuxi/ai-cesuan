@@ -128,13 +128,10 @@ export const MarkdownContent = memo(function MarkdownContent({
 }: MarkdownContentProps) {
   return (
     <div className={cn(
-      'prose prose-sm dark:prose-invert max-w-none',
-      'prose-headings:text-foreground prose-p:text-foreground/90',
-      'prose-strong:text-foreground prose-a:text-primary',
+      'prose dark:prose-invert max-w-none',
+      'prose-headings:text-foreground',
+      'prose-strong:text-foreground prose-a:text-primary hover:prose-a:underline',
       'prose-ul:list-disc prose-ol:list-decimal',
-      'prose-li:my-1 prose-p:my-2',
-      'prose-h1:text-xl prose-h2:text-lg prose-h3:text-base',
-      'prose-blockquote:border-l-primary prose-blockquote:bg-muted/50',
       className
     )}>
       <ReactMarkdown
@@ -142,23 +139,7 @@ export const MarkdownContent = memo(function MarkdownContent({
         components={{
           // 确保换行符正确渲染
           p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
-          // 优化列表渲染（li 样式由 prose-li:my-1 控制）
-          ul: ({ children }) => <ul className="list-disc pl-4 my-2">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal pl-4 my-2">{children}</ol>,
-          // 优化标题渲染
-          h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2 text-foreground">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-lg font-semibold mt-3 mb-2 text-foreground">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-base font-medium mt-2 mb-1 text-foreground">{children}</h3>,
-          // 优化强调文本
-          strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
-          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
-          // 优化引用块
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary pl-4 py-2 my-2 bg-muted/30 rounded-r">
-              {children}
-            </blockquote>
-          ),
-          // 优化代码块
+          // 代码块（需要特殊处理）
           code: ({ className, children, ...props }) => {
             const isInline = !className
             return isInline ? (
@@ -171,8 +152,6 @@ export const MarkdownContent = memo(function MarkdownContent({
               </code>
             )
           },
-          // 分隔线
-          hr: () => <hr className="my-4 border-border" />,
         }}
       >
         {content}

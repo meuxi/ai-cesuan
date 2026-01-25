@@ -1,8 +1,16 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
-import { Menu, X, Sun, Moon, Settings, LogIn, LogOut, ArrowRight } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Menu, X, Sun, Moon, Settings, LogIn, LogOut, ArrowRight, Globe } from 'lucide-react'
 import { useGlobalState } from '@/store'
 import { useSmoothScroll } from '@/hooks'
+import { useTranslation } from 'react-i18next'
+
+const languages = [
+    { code: 'zh', label: '简' },
+    { code: 'zh-TW', label: '繁' },
+    { code: 'en', label: 'EN' },
+    { code: 'ja', label: '日' },
+]
 
 export default function Navigation() {
     const navigate = useNavigate()
@@ -10,6 +18,30 @@ export default function Navigation() {
     const { isDark, toggleDark, settings, setJwt } = useGlobalState()
     const { scrollToAnchor } = useSmoothScroll()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [langMenuOpen, setLangMenuOpen] = useState(false)
+    const { i18n } = useTranslation()
+    const langMenuRef = useRef<HTMLDivElement>(null)
+
+    // 点击外部关闭语言菜单
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
+                setLangMenuOpen(false)
+            }
+        }
+        if (langMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [langMenuOpen])
+
+    const currentLangCode = i18n.language.startsWith('zh-TW') || i18n.language.startsWith('zh-HK') 
+        ? 'zh-TW' 
+        : i18n.language.startsWith('zh') 
+            ? 'zh' 
+            : i18n.language.startsWith('ja') 
+                ? 'ja' 
+                : 'en'
 
     const logOut = () => {
         setJwt('')
@@ -82,6 +114,38 @@ export default function Navigation() {
                                 </button>
                             )
                         )}
+
+                        {/* Language Switcher */}
+                        <div className="relative" ref={langMenuRef}>
+                            <button
+                                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                                title="切换语言"
+                                className="p-2 hover:bg-accent rounded-md transition-colors flex items-center gap-1"
+                            >
+                                <Globe className="h-5 w-5 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground hidden sm:inline">
+                                    {languages.find(l => l.code === currentLangCode)?.label}
+                                </span>
+                            </button>
+                            {langMenuOpen && (
+                                <div className="absolute top-full right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden z-50 min-w-[100px]">
+                                    {languages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                i18n.changeLanguage(lang.code)
+                                                setLangMenuOpen(false)
+                                            }}
+                                            className={`w-full px-3 py-2 text-sm text-left hover:bg-accent transition-colors ${
+                                                currentLangCode === lang.code ? 'bg-accent text-accent-foreground' : 'text-popover-foreground'
+                                            }`}
+                                        >
+                                            {lang.label === '简' ? '简体中文' : lang.label === '繁' ? '繁體中文' : lang.label === 'EN' ? 'English' : '日本語'}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         <button
                             onClick={() => navigate('/settings')}

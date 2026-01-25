@@ -1,44 +1,62 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { useGlobalState } from '@/store'
-import MarketPage from '@/pages/Market'
-import DivinationHub from '@/pages/DivinationHub'
-import ChouqianPage from '@/pages/Chouqian'
-import AboutPage from '@/pages/About'
-import SettingsPage from '@/pages/Settings'
-import LoginPage from '@/pages/Login'
-import HistoryPage from '@/pages/History'
-import TarotPage from '@/pages/divination/TarotPage'
-import BirthdayPage from '@/pages/divination/BirthdayPage'
-import NewNamePage from '@/pages/divination/NewNamePage'
-import NamePage from '@/pages/divination/NamePage'
-import DreamPage from '@/pages/divination/DreamPage'
-import PlumFlowerPage from '@/pages/divination/PlumFlowerPage'
-import FatePage from '@/pages/divination/FatePage'
-import XiaoLiuRenPage from '@/pages/divination/XiaoLiuRenPage'
-import LiuYaoPage from '@/features/liuyao'
-import LaohuangliPage from '@/pages/divination/LaohuangliPage'
-import QimenPage from '@/pages/divination/QimenPage'
-import DaliurenPage from '@/pages/divination/DaliurenPage'
-import JiriSelectPage from '@/pages/divination/JiriSelectPage'
-import JiriDetailPage from '@/pages/divination/JiriDetailPage'
-import DailyFortunePage from '@/pages/divination/DailyFortunePage'
-import MonthlyFortunePage from '@/pages/divination/MonthlyFortunePage'
-import ZodiacPage from '@/pages/divination/ZodiacPage'
-import LifeKLinePage from '@/features/life-kline/LifeKLinePage'
-import ZiweiPage from '@/pages/divination/ZiweiPage'
-import HehunPage from '@/pages/divination/HehunPage'
-import ZhugePage from '@/pages/divination/ZhugePage'
-import TermsPage from '@/pages/Terms'
-import PrivacyPage from '@/pages/Privacy'
-import DisclaimerPage from '@/pages/Disclaimer'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Sparkles } from 'lucide-react'
 import MainLayout from '@/layouts/MainLayout'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import OfflineIndicator from '@/components/OfflineIndicator'
 import { logger } from '@/utils/logger'
+
+// 懒加载页面组件 - 优化首屏加载速度
+const MarketPage = lazy(() => import('@/pages/Market'))
+const DivinationHub = lazy(() => import('@/pages/DivinationHub'))
+const ChouqianPage = lazy(() => import('@/pages/Chouqian'))
+const AboutPage = lazy(() => import('@/pages/About'))
+const SettingsPage = lazy(() => import('@/pages/Settings'))
+const LoginPage = lazy(() => import('@/pages/Login'))
+const HistoryPage = lazy(() => import('@/pages/History'))
+
+// 占卜页面
+const TarotPage = lazy(() => import('@/pages/divination/TarotPage'))
+const BirthdayPage = lazy(() => import('@/pages/divination/BirthdayPage'))
+const NewNamePage = lazy(() => import('@/pages/divination/NewNamePage'))
+const NamePage = lazy(() => import('@/pages/divination/NamePage'))
+const DreamPage = lazy(() => import('@/pages/divination/DreamPage'))
+const PlumFlowerPage = lazy(() => import('@/pages/divination/PlumFlowerPage'))
+const FatePage = lazy(() => import('@/pages/divination/FatePage'))
+const XiaoLiuRenPage = lazy(() => import('@/pages/divination/XiaoLiuRenPage'))
+const LiuYaoPage = lazy(() => import('@/features/liuyao'))
+const LaohuangliPage = lazy(() => import('@/pages/divination/LaohuangliPage'))
+const QimenPage = lazy(() => import('@/pages/divination/QimenPage'))
+const DaliurenPage = lazy(() => import('@/pages/divination/DaliurenPage'))
+const JiriSelectPage = lazy(() => import('@/pages/divination/JiriSelectPage'))
+const JiriDetailPage = lazy(() => import('@/pages/divination/JiriDetailPage'))
+const DailyFortunePage = lazy(() => import('@/pages/divination/DailyFortunePage'))
+const MonthlyFortunePage = lazy(() => import('@/pages/divination/MonthlyFortunePage'))
+const ZodiacPage = lazy(() => import('@/pages/divination/ZodiacPage'))
+const LifeKLinePage = lazy(() => import('@/features/life-kline/LifeKLinePage'))
+const ZiweiPage = lazy(() => import('@/pages/divination/ZiweiPage'))
+const HehunPage = lazy(() => import('@/pages/divination/HehunPage'))
+const ZhugePage = lazy(() => import('@/pages/divination/ZhugePage'))
+
+// 静态页面
+const TermsPage = lazy(() => import('@/pages/Terms'))
+const PrivacyPage = lazy(() => import('@/pages/Privacy'))
+const DisclaimerPage = lazy(() => import('@/pages/Disclaimer'))
+
+// 页面加载骨架
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="text-center space-y-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary/20 border-t-primary mx-auto"></div>
+        <p className="text-sm text-muted-foreground">加载中...</p>
+      </div>
+    </div>
+  )
+}
 
 const API_BASE = import.meta.env.VITE_API_BASE || ''
 
@@ -107,40 +125,42 @@ function App() {
 
       <MainLayout>
         {settings.fetched && !settings.error ? (
-          <Routes>
-            <Route path="/" element={<MarketPage />} />
-            <Route path="/divination" element={<DivinationHub />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/divination/tarot" element={<TarotPage />} />
-            <Route path="/divination/xiaoliu" element={<XiaoLiuRenPage />} />
-            <Route path="/divination/birthday" element={<BirthdayPage />} />
-            <Route path="/divination/new_name" element={<NewNamePage />} />
-            <Route path="/divination/name" element={<NamePage />} />
-            <Route path="/divination/dream" element={<DreamPage />} />
-            <Route path="/divination/plum_flower" element={<PlumFlowerPage />} />
-            <Route path="/divination/fate" element={<FatePage />} />
-            <Route path="/divination/liuyao" element={<LiuYaoPage />} />
-            <Route path="/divination/chouqian" element={<ChouqianPage />} />
-            <Route path="/divination/laohuangli" element={<LaohuangliPage />} />
-            <Route path="/divination/laohuangli/select" element={<JiriSelectPage />} />
-            <Route path="/divination/laohuangli/detail" element={<JiriDetailPage />} />
-            <Route path="/divination/qimen" element={<QimenPage />} />
-            <Route path="/divination/daliuren" element={<DaliurenPage />} />
-            <Route path="/divination/daily" element={<DailyFortunePage />} />
-            <Route path="/divination/monthly" element={<MonthlyFortunePage />} />
-            <Route path="/divination/zodiac" element={<ZodiacPage />} />
-            <Route path="/divination/life-kline" element={<LifeKLinePage />} />
-            <Route path="/divination/ziwei" element={<ZiweiPage />} />
-            <Route path="/divination/hehun" element={<HehunPage />} />
-            <Route path="/divination/zhuge" element={<ZhugePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/login/:login_type" element={<LoginPage />} />
-            <Route path="/history/:type" element={<HistoryPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/disclaimer" element={<DisclaimerPage />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<MarketPage />} />
+              <Route path="/divination" element={<DivinationHub />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/divination/tarot" element={<TarotPage />} />
+              <Route path="/divination/xiaoliu" element={<XiaoLiuRenPage />} />
+              <Route path="/divination/birthday" element={<BirthdayPage />} />
+              <Route path="/divination/new_name" element={<NewNamePage />} />
+              <Route path="/divination/name" element={<NamePage />} />
+              <Route path="/divination/dream" element={<DreamPage />} />
+              <Route path="/divination/plum_flower" element={<PlumFlowerPage />} />
+              <Route path="/divination/fate" element={<FatePage />} />
+              <Route path="/divination/liuyao" element={<LiuYaoPage />} />
+              <Route path="/divination/chouqian" element={<ChouqianPage />} />
+              <Route path="/divination/laohuangli" element={<LaohuangliPage />} />
+              <Route path="/divination/laohuangli/select" element={<JiriSelectPage />} />
+              <Route path="/divination/laohuangli/detail" element={<JiriDetailPage />} />
+              <Route path="/divination/qimen" element={<QimenPage />} />
+              <Route path="/divination/daliuren" element={<DaliurenPage />} />
+              <Route path="/divination/daily" element={<DailyFortunePage />} />
+              <Route path="/divination/monthly" element={<MonthlyFortunePage />} />
+              <Route path="/divination/zodiac" element={<ZodiacPage />} />
+              <Route path="/divination/life-kline" element={<LifeKLinePage />} />
+              <Route path="/divination/ziwei" element={<ZiweiPage />} />
+              <Route path="/divination/hehun" element={<HehunPage />} />
+              <Route path="/divination/zhuge" element={<ZhugePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/login/:login_type" element={<LoginPage />} />
+              <Route path="/history/:type" element={<HistoryPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/disclaimer" element={<DisclaimerPage />} />
+            </Routes>
+          </Suspense>
         ) : settings.error ? (
           <Alert variant="destructive" className="glass">
             <AlertDescription>{settings.error}</AlertDescription>
