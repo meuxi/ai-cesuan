@@ -312,7 +312,17 @@ async def interpret_hexagram(request: Request, body: InterpretRequest):
         
         # 使用AI故障转移系统（流式输出）
         prompt = build_interpretation_prompt(body.hexagram_data, body.question or "", body.style or "detailed", advanced_analysis)
-        system_prompt = "你是一位精通《周易》的资深易学大师，深谙《增删卜易》《卜筮正宗》之精髓。请根据用户提供的卦象进行专业解读。"
+        
+        # 从模板系统获取专业提示词
+        from src.prompts import get_prompt_manager
+        from src.prompts.output_control import enhance_prompt_with_length_control
+        manager = get_prompt_manager()
+        template = manager.get_template("liuyao_analysis")
+        if template:
+            system_prompt = template.system_prompt
+            prompt = enhance_prompt_with_length_control(prompt, tool_name="liuyao_analysis")
+        else:
+            system_prompt = "你是一位精通《周易》的资深易学大师，深谙《增删卜易》《卜筮正宗》之精髓。请根据用户提供的卦象进行专业解读。"
         
         ai_manager = get_ai_manager()
         messages = [
@@ -362,7 +372,17 @@ async def interpret_hexagram_stream(request: Request, body: InterpretRequest):
     
     # 构建prompt
     prompt = build_interpretation_prompt(body.hexagram_data, body.question or "", body.style or "detailed", advanced_analysis)
-    system_prompt = "你是一位精通《周易》的资深易学大师，深谙《增删卜易》《卜筮正宗》之精髓。请根据用户提供的卦象进行专业解读。"
+    
+    # 从模板系统获取专业提示词
+    from src.prompts import get_prompt_manager
+    from src.prompts.output_control import enhance_prompt_with_length_control
+    manager = get_prompt_manager()
+    template = manager.get_template("liuyao_analysis")
+    if template:
+        system_prompt = template.system_prompt
+        prompt = enhance_prompt_with_length_control(prompt, tool_name="liuyao_analysis")
+    else:
+        system_prompt = "你是一位精通《周易》的资深易学大师，深谙《增删卜易》《卜筮正宗》之精髓。请根据用户提供的卦象进行专业解读。"
     
     # 使用DashScope进行真正的流式调用
     api_key = settings.dashscope_api_key
