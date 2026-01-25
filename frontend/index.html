@@ -70,12 +70,18 @@
 
   <!-- Google AdSense - 延迟加载优化 -->
   <script>
+    // AdSense 发布商 ID（支持环境变量配置，默认使用内置ID）
+    var adClientId = '%VITE_AD_CLIENT%';
+    // 如果环境变量未设置（Vite 会保留原字符串），使用默认值
+    if (!adClientId || adClientId === '' || adClientId.indexOf('VITE_') !== -1) {
+      adClientId = 'ca-pub-1821747886980667';
+    }
     // 延迟加载 AdSense 脚本，防止影响页面速度得分
     function loadAdSense() {
       if (window.adsbygoogleLoaded) return;
       window.adsbygoogleLoaded = true;
       var script = document.createElement('script');
-      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1821747886980667';
+      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adClientId;
       script.async = true;
       script.crossOrigin = 'anonymous';
       document.head.appendChild(script);

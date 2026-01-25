@@ -95,15 +95,15 @@ export const LoadingSkeleton = memo(function LoadingSkeleton({
   lines = 5,
   className
 }: LoadingSkeletonProps) {
-  const widths = [100, 85, 95, 75, 90, 80, 70, 88, 92, 78]
+  // 使用 Tailwind 预定义宽度类代替 inline style
+  const widthClasses = ['w-full', 'w-[85%]', 'w-[95%]', 'w-3/4', 'w-[90%]', 'w-4/5', 'w-[70%]', 'w-[88%]', 'w-[92%]', 'w-[78%]']
   
   return (
     <div className={cn('space-y-3 animate-pulse', className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <div 
           key={i}
-          className="h-4 bg-muted rounded"
-          style={{ width: `${widths[i % widths.length]}%` }}
+          className={cn('h-4 bg-muted rounded', widthClasses[i % widthClasses.length])}
         />
       ))}
     </div>
@@ -142,10 +142,9 @@ export const MarkdownContent = memo(function MarkdownContent({
         components={{
           // 确保换行符正确渲染
           p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
-          // 优化列表渲染
+          // 优化列表渲染（li 样式由 prose-li:my-1 控制）
           ul: ({ children }) => <ul className="list-disc pl-4 my-2">{children}</ul>,
           ol: ({ children }) => <ol className="list-decimal pl-4 my-2">{children}</ol>,
-          li: ({ children }) => <li className="my-1">{children}</li>,
           // 优化标题渲染
           h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2 text-foreground">{children}</h1>,
           h2: ({ children }) => <h2 className="text-lg font-semibold mt-3 mb-2 text-foreground">{children}</h2>,

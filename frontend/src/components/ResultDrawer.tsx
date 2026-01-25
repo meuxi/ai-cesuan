@@ -51,10 +51,7 @@ export function ResultDrawer({ show, onClose, result, loading, streaming, title 
       ></div>
       {/* 抽屉容器 */}
       <div
-        className="fixed inset-x-0 bottom-0 z-50 h-[80vh] rounded-t-2xl border-t border-border bg-card shadow-2xl transition-transform duration-300 ease-out"
-        style={{
-          transform: isAnimating ? 'translateY(0)' : 'translateY(100%)',
-        }}
+        className={`fixed inset-x-0 bottom-0 z-50 h-[80vh] rounded-t-2xl border-t border-border bg-card shadow-2xl transition-transform duration-300 ease-out ${isAnimating ? 'translate-y-0' : 'translate-y-full'}`}
       >
         {/* 头部 */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">

@@ -15,14 +15,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { logger } from '@/utils/logger'
-import { useGlobalState } from '@/store'
 
 interface AdUnitProps {
     slot: string
     format?: 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical'
     responsive?: boolean
     className?: string
-    style?: React.CSSProperties
     lazyLoad?: boolean
     lazyOffset?: number
 }
@@ -33,25 +31,32 @@ declare global {
     }
 }
 
-// 默认的AdSense发布商ID（可通过后端配置覆盖）
+// 默认的AdSense发布商ID（可通过环境变量 VITE_AD_CLIENT 覆盖）
 const DEFAULT_AD_CLIENT = 'ca-pub-1821747886980667'
+
+// 获取 AdSense 发布商 ID：优先使用环境变量，否则使用默认值
+function getAdClient(): string {
+    const envAdClient = import.meta.env.VITE_AD_CLIENT
+    if (envAdClient && envAdClient !== '' && !envAdClient.includes('VITE_')) {
+        return envAdClient
+    }
+    return DEFAULT_AD_CLIENT
+}
 
 export function AdUnit({
     slot,
     format = 'auto',
     responsive = true,
     className = '',
-    style,
     lazyLoad = true,
     lazyOffset = 200
 }: AdUnitProps) {
     const adRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(!lazyLoad)
     const [adLoaded, setAdLoaded] = useState(false)
-    const { settings } = useGlobalState()
 
-    // 优先使用后端配置的ad_client，否则使用默认值
-    const adClient = settings.ad_client || DEFAULT_AD_CLIENT
+    // 使用环境变量配置的 ad_client，否则使用默认值
+    const adClient = getAdClient()
 
     useEffect(() => {
         if (!lazyLoad) {
@@ -99,36 +104,39 @@ export function AdUnit({
         return () => clearTimeout(timer)
     }, [isVisible, adLoaded])
 
-    const getFormatStyle = (): React.CSSProperties => {
+    // 根据格式返回对应的 Tailwind 类（移动端友好）
+    const getFormatClass = (): string => {
         switch (format) {
             case 'rectangle':
-                return { minWidth: '300px', minHeight: '250px' }
+                // 移动端自适应，桌面端保持最小尺寸
+                return 'w-full md:min-w-[300px] min-h-[250px]'
             case 'horizontal':
-                return { minWidth: '728px', minHeight: '90px' }
+                // 移动端全宽，桌面端保持横幅尺寸
+                return 'w-full md:min-w-[728px] min-h-[90px]'
             case 'vertical':
-                return { minWidth: '160px', minHeight: '600px' }
+                // 侧边栏广告仅桌面端显示，所以可以保持固定尺寸
+                return 'min-w-[160px] min-h-[600px]'
             case 'fluid':
-                return { width: '100%' }
+                return 'w-full'
             default:
-                return {}
+                return 'w-full'
         }
     }
+
+    // 判断是否使用自动广告（slot 为 auto 或空时）
+    const isAutoAd = !slot || slot === 'auto'
 
     return (
         <div
             ref={adRef}
-            className={`ad-container overflow-hidden ${className}`}
-            style={{
-                ...getFormatStyle(),
-                ...style
-            }}
+            className={`ad-container overflow-hidden ${getFormatClass()} ${className}`}
         >
             {isVisible && (
                 <ins
-                    className="adsbygoogle"
-                    style={{ display: 'block', ...style }}
+                    className="adsbygoogle block"
                     data-ad-client={adClient}
-                    data-ad-slot={slot}
+                    // 自动广告不需要 slot，手动广告需要具体 slot ID
+                    {...(!isAutoAd && { 'data-ad-slot': slot })}
                     data-ad-format={format}
                     data-full-width-responsive={responsive ? 'true' : 'false'}
                 />
@@ -137,12 +145,77 @@ export function AdUnit({
     )
 }
 
+/**
+ * 内容区广告 - 适合放在文章/结果内容之间
+ * 移动端友好，自动响应式调整
+ */
+export function ContentAd({ className = '' }: { className?: string }) {
+    return (
+        <div className={`w-full my-6 ${className}`}>
+            <div className="relative">
+                {/* 广告标识 - 小巧不突兀 */}
+                <div className="text-center text-[10px] text-muted-foreground/60 mb-1">广告</div>
+                <AdUnit
+                    slot="auto"
+                    format="auto"
+                    responsive={true}
+                    lazyLoad={true}
+                    className="rounded-lg overflow-hidden max-w-full"
+                />
+            </div>
+        </div>
+    )
+}
+
+/**
+ * 结果页广告 - 放在占卜结果下方
+ * 有适当间距，不影响阅读
+ */
+export function ResultAd({ className = '' }: { className?: string }) {
+    return (
+        <div className={`w-full mt-8 pt-6 border-t border-border/50 ${className}`}>
+            <div className="text-center text-[10px] text-muted-foreground/50 mb-2">— 广告 —</div>
+            <AdUnit
+                slot="auto"
+                format="fluid"
+                responsive={true}
+                lazyLoad={true}
+                className="rounded-lg overflow-hidden"
+            />
+        </div>
+    )
+}
+
+/**
+ * 页面分隔广告 - 放在页面模块之间
+ * 有明显分隔，视觉上独立
+ */
+export function SectionAd({ className = '' }: { className?: string }) {
+    return (
+        <div className={`w-full py-4 ${className}`}>
+            <div className="max-w-2xl mx-auto">
+                <div className="text-center text-[10px] text-muted-foreground/50 mb-1">广告</div>
+                <AdUnit
+                    slot="auto"
+                    format="auto"
+                    responsive={true}
+                    lazyLoad={true}
+                    className="rounded-lg overflow-hidden"
+                />
+            </div>
+        </div>
+    )
+}
+
+/**
+ * 文章内嵌广告 - 适合长文内容
+ */
 export function InArticleAd({ className = '' }: { className?: string }) {
     return (
         <div className={`my-6 ${className}`}>
-            <div className="text-center text-xs text-muted-foreground mb-1">广告</div>
+            <div className="text-center text-[10px] text-muted-foreground/50 mb-1">广告</div>
             <AdUnit
-                slot="YOUR_IN_ARTICLE_SLOT"
+                slot="auto"
                 format="fluid"
                 lazyLoad={true}
                 className="rounded-lg overflow-hidden"
@@ -151,26 +224,31 @@ export function InArticleAd({ className = '' }: { className?: string }) {
     )
 }
 
+/**
+ * 侧边栏广告 - 仅桌面端显示
+ */
 export function SidebarAd({ className = '' }: { className?: string }) {
     return (
-        <div className={`sticky top-20 ${className}`}>
-            <div className="text-center text-xs text-muted-foreground mb-1">广告</div>
+        <div className={`hidden lg:block sticky top-24 ${className}`}>
+            <div className="text-center text-[10px] text-muted-foreground/50 mb-1">广告</div>
             <AdUnit
-                slot="YOUR_SIDEBAR_SLOT"
+                slot="auto"
                 format="vertical"
                 responsive={false}
                 lazyLoad={true}
-                style={{ minWidth: '160px', minHeight: '600px' }}
             />
         </div>
     )
 }
 
+/**
+ * 横幅广告 - 页面顶部/底部
+ */
 export function BannerAd({ className = '' }: { className?: string }) {
     return (
         <div className={`w-full ${className}`}>
             <AdUnit
-                slot="YOUR_BANNER_SLOT"
+                slot="auto"
                 format="horizontal"
                 responsive={true}
                 lazyLoad={true}
@@ -179,11 +257,14 @@ export function BannerAd({ className = '' }: { className?: string }) {
     )
 }
 
+/**
+ * 响应式广告 - 通用场景
+ */
 export function ResponsiveAd({ className = '' }: { className?: string }) {
     return (
         <div className={`w-full my-4 ${className}`}>
             <AdUnit
-                slot="YOUR_RESPONSIVE_SLOT"
+                slot="auto"
                 format="auto"
                 responsive={true}
                 lazyLoad={true}

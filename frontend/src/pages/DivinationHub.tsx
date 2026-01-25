@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { useSmoothScroll, useScrollSpy } from '@/hooks'
 import { DIVINATION_OPTIONS } from '@/config/constants'
+import { SectionAd } from '@/components/AdUnit'
 
 const TarotModule = lazy(() => import('@/pages/divination/TarotPage'))
 const XiaoLiuRenModule = lazy(() => import('@/pages/divination/XiaoLiuRenPage'))
@@ -119,6 +120,9 @@ export default function DivinationHub() {
                     )
                 })}
             </div>
+
+            {/* 广告位 - 在运势科普前 */}
+            <SectionAd className="my-8" />
 
             {/* Knowledge Section */}
             <section id="knowledge" className="scroll-mt-32 py-12">
