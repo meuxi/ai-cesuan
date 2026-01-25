@@ -29,6 +29,8 @@ class PromptCategory(Enum):
     FATE = "fate"               # 缘分测算
     ZHUGE = "zhuge"             # 诸葛神算
     HEHUN = "hehun"             # 八字合婚
+    FORTUNE = "fortune"         # 运势类（每日/每周/每月）
+    ZODIAC = "zodiac"           # 星座运势
 
 
 class PromptStatus(Enum):

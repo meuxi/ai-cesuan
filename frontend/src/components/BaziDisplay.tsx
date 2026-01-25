@@ -24,7 +24,7 @@ interface BaziData {
     sizhu?: Record<string, string | undefined>
     nayin?: Record<string, string | undefined>
     dizhi_cang?: Record<string, string[]>
-    xunkong?: string | Record<string, string>
+    xunkong?: Record<string, string>
     lunar_info?: {
         lunar_year?: number
         lunar_month?: number
@@ -194,7 +194,7 @@ export function BaziDisplay({ data, loading }: BaziDisplayProps) {
                                             : ['年', '月', '日', '时'][idx]
                                         }
                                     </div>
-                                    <div>{typeof xunkong === 'object' ? xunkong?.[pillar] : (idx === 0 ? xunkong : '--')}</div>
+                                    <div>{xunkong?.[pillar] || '--'}</div>
                                 </div>
                             ))}
                         </div>

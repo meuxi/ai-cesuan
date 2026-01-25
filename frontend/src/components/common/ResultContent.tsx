@@ -10,6 +10,7 @@ import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import DOMPurify from 'dompurify'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 
 // ========== 加载状态组件 ==========
@@ -130,9 +131,53 @@ export const MarkdownContent = memo(function MarkdownContent({
       'prose prose-sm dark:prose-invert max-w-none',
       'prose-headings:text-foreground prose-p:text-foreground/90',
       'prose-strong:text-foreground prose-a:text-primary',
+      'prose-ul:list-disc prose-ol:list-decimal',
+      'prose-li:my-1 prose-p:my-2',
+      'prose-h1:text-xl prose-h2:text-lg prose-h3:text-base',
+      'prose-blockquote:border-l-primary prose-blockquote:bg-muted/50',
       className
     )}>
-      <ReactMarkdown>{content}</ReactMarkdown>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // 确保换行符正确渲染
+          p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
+          // 优化列表渲染
+          ul: ({ children }) => <ul className="list-disc pl-4 my-2">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal pl-4 my-2">{children}</ol>,
+          li: ({ children }) => <li className="my-1">{children}</li>,
+          // 优化标题渲染
+          h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2 text-foreground">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-lg font-semibold mt-3 mb-2 text-foreground">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-base font-medium mt-2 mb-1 text-foreground">{children}</h3>,
+          // 优化强调文本
+          strong: ({ children }) => <strong className="font-bold text-foreground">{children}</strong>,
+          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
+          // 优化引用块
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-primary pl-4 py-2 my-2 bg-muted/30 rounded-r">
+              {children}
+            </blockquote>
+          ),
+          // 优化代码块
+          code: ({ className, children, ...props }) => {
+            const isInline = !className
+            return isInline ? (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                {children}
+              </code>
+            ) : (
+              <code className={cn("block bg-muted p-3 rounded-lg overflow-x-auto text-sm font-mono", className)} {...props}>
+                {children}
+              </code>
+            )
+          },
+          // 分隔线
+          hr: () => <hr className="my-4 border-border" />,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
       {streaming && <StreamingCursor variant="block" />}
     </div>
   )
