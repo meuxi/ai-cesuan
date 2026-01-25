@@ -24,7 +24,7 @@ export function InlineResult({ result, loading, streaming, title }: InlineResult
                 result={result}
                 loading={loading}
                 streaming={streaming}
-                contentType="html"
+                contentType="markdown"
                 id="inline-result"
                 loadingConfig={{
                     text: 'AI 正在为您解读...',

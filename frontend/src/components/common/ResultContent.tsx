@@ -250,7 +250,7 @@ export const ResultContent = memo(forwardRef<HTMLDivElement, ResultContentProps>
     result,
     loading = false,
     streaming = false,
-    contentType = 'html',
+    contentType = 'markdown',
     loadingConfig,
     id,
     className,

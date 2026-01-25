@@ -76,7 +76,7 @@ export function ResultDrawer({ show, onClose, result, loading, streaming, title 
             result={result}
             loading={loading}
             streaming={streaming}
-            contentType="html"
+            contentType="markdown"
             id="divination-result"
             loadingConfig={{
               text: '正在占卜中...',
