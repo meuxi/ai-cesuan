@@ -196,7 +196,7 @@ export function SectionAd({ className = '' }: { className?: string }) {
             <div className="max-w-2xl mx-auto">
                 <div className="text-center text-[10px] text-muted-foreground/50 mb-1">广告</div>
                 <AdUnit
-                    slot="auto"
+                    slot="3035196482"
                     format="auto"
                     responsive={true}
                     lazyLoad={true}
