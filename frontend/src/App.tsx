@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@vercel/analytics/react'
 import { useGlobalState } from '@/store'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Sparkles } from 'lucide-react'
@@ -168,6 +169,7 @@ function App() {
         ) : null}
       </MainLayout>
       <Toaster />
+      <Analytics />
     </ErrorBoundary>
   )
 }
